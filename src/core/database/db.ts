@@ -1,8 +1,13 @@
 import "dotenv/config";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-const Entities : any = [
-
+import { GroupMaster } from "../../class_master/group.model";
+import { classMaster } from "../../class_master/class.model";
+import { SchoolMaster } from "../../school_master/school.model";
+import { MarkMaster } from "../../mark_master/mark.model";
+import { MediumMaster } from "../../medium_master/medium.model";
+const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster
+    
 ]
 
 export const appSource = new DataSource({
