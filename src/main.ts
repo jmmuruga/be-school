@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import "./core/database/db"
+import classRouter from "./Master/class_master/class.controller";
 const app = express();
 
 dotenv.config();
@@ -20,6 +21,7 @@ let corsOptions = {
 };
 
 // place cors here
+app.use('/classRouter' , cors(corsOptions) , classRouter);
 
 
 

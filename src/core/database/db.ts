@@ -1,12 +1,13 @@
 import "dotenv/config";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { GroupMaster } from "../../class_master/group.model";
-import { classMaster } from "../../class_master/class.model";
-import { SchoolMaster } from "../../school_master/school.model";
-import { MarkMaster } from "../../mark_master/mark.model";
-import { MediumMaster } from "../../medium_master/medium.model";
-const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster
+import { GroupMaster } from "../../Master/group_master/group.model";
+import { classMaster } from "../../Master/class_master/class.model";
+import { SchoolMaster } from "../../Master/school_master/school.model";
+import { MarkMaster } from "../../Master/mark_master/mark.model";
+import { MediumMaster } from "../../Master/medium_master/medium.model";
+import { SubjectMaster } from "../../Master/subject_master/subject.model";
+const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster
     
 ]
 
@@ -41,6 +42,7 @@ export const appSource = new DataSource({
     requestTimeout: 60000
   },
 });
+ 
  appSource
   .initialize()
   .then((res) => console.log("SQL Server Connected"))

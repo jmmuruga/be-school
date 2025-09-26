@@ -13,7 +13,9 @@ export class SubjectMaster {
     @Column()
     subjectName: string
     @Column()
-    Practical: string
+    subjectType: string
+    @Column()
+    selectedClasses: string
     @Column()
     isActive: boolean
    @Column()

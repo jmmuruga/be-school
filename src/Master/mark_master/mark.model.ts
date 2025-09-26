@@ -2,13 +2,13 @@ import { CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
 import { PrimaryGeneratedColumn } from "typeorm";
 import { Column } from "typeorm";
 @Entity()
-export class MediumMaster {
+export class MarkMaster {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  SiNo: number;
+  markcode: number;
   @Column()
-  Medium: string;
+  mark: string;
   @Column()
   isActive: boolean;
   @Column()

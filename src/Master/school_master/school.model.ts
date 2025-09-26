@@ -9,9 +9,9 @@ export class SchoolMaster {
     @PrimaryGeneratedColumn()
     id: number;
     @Column()
-    schoolCode: number
+    siNo: number
     @Column()
-    schoolName: string
+    school: string
     @Column()
     isActive: boolean
     @Column()
