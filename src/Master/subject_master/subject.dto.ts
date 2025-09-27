@@ -17,5 +17,4 @@ export interface SubjectDto {
   isActive: boolean;
   created_UserId: string;
   updated_UserId: string;
-
 }

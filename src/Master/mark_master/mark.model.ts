@@ -8,7 +8,7 @@ export class MarkMaster {
   @Column()
   markcode: number;
   @Column()
-  mark: string;
+  mark: number;
   @Column()
   isActive: boolean;
   @Column()

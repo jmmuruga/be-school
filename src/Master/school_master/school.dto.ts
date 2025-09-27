@@ -13,5 +13,4 @@ export interface SchoolDto {
   isActive: boolean;
   created_UserId: string;
   updated_UserId: string;
-
 }

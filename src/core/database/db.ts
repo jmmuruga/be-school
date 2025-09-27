@@ -7,7 +7,9 @@ import { SchoolMaster } from "../../Master/school_master/school.model";
 import { MarkMaster } from "../../Master/mark_master/mark.model";
 import { MediumMaster } from "../../Master/medium_master/medium.model";
 import { SubjectMaster } from "../../Master/subject_master/subject.model";
-const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster
+// import { Signup } from "../../Signup/signup.model";
+import { Signup } from "../../Signup/signup.model";
+const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,Signup
     
 ]
 
