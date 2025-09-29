@@ -18,7 +18,7 @@ export const SignupValidation = Joi.object({
    contact: Joi.string().pattern(/^\d{10}$/).required(),
     created_UserId: Joi.string().required(),
     updated_UserId: Joi.string().required(),
-}).xor("medium", "otherMedium");
+})
 
 export interface SignupDto {
     name: string;

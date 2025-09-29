@@ -25,7 +25,6 @@ export class Signup {
   address: string;
   @Column()
   standard: string;
-  @Column({ nullable: true })
   @Column({ type: "nvarchar", nullable: true })
   medium: string | null;
   @Column({ type: "nvarchar", nullable: true })
