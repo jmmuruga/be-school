@@ -15,6 +15,7 @@ export const SignupValidation = Joi.object({
     board: Joi.string().required(),
     school: Joi.string().required(),
     schoolAddress: Joi.string().required(), 
+      isActive: Joi.boolean().required(),
    contact: Joi.string().pattern(/^\d{10}$/).required(),
     created_UserId: Joi.string().required(),
     updated_UserId: Joi.string().required(),

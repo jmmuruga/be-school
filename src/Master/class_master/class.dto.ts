@@ -14,5 +14,6 @@ export interface ClassDto {
   isActive: boolean;
   created_UserId: string;
   updated_UserId: string;
+        
 }
 

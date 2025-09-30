@@ -11,6 +11,8 @@ import mediumRouter from "./Master/medium_master/medium.controller";
 import schoolRouter from "./Master/school_master/school.controller";
 import subjectRouter from "./Master/subject_master/subject.controller";
 import signupRouter from "./Signup/signup.controller";
+import userRouter from "./User-Profile/user.controller";
+import QuesGenerateRouter from "./Question bank/question-paper-generate/ques-paper-generate.controller";
 const app = express();
 
 dotenv.config();
@@ -34,6 +36,8 @@ app.use('/mediumRouter',cors(corsOptions),mediumRouter);
 app.use('/schoolRouter',cors(corsOptions),schoolRouter);
 app.use('/subjectRouter',cors(corsOptions),subjectRouter);
 app.use('/signupRouter',cors(corsOptions),signupRouter);
+app.use('/userRouter',cors(corsOptions),userRouter);
+app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter)
 app.listen(PORT, () => console.log(`server upon port ${PORT}`));
 
 
