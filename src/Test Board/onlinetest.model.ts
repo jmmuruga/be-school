@@ -3,27 +3,16 @@ import { Entity } from "typeorm";
 import { UpdateDateColumn } from "typeorm";
 import { PrimaryGeneratedColumn } from "typeorm";
 import { Column } from "typeorm";
-
 @Entity()
-export class Quesgenerate {
+export class onlinetest {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  scheme: string;
+  Subject: string;
   @Column()
-  class: string;
+  TestType: string;
   @Column()
-  subject: string;
-  @Column()
-  total: number; 
-  @Column()
-  onemark:number;
-  @Column()
-  twomark:number;
-  @Column()
-  threemark:number;
-  @Column()
-  fivemark:number;
+  Numofquestion: number;
   @Column()
   isActive: Boolean;
   @Column()

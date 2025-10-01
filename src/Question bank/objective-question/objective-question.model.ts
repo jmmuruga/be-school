@@ -4,8 +4,41 @@ import { UpdateDateColumn } from "typeorm";
 import { PrimaryGeneratedColumn } from "typeorm";
 import { Column } from "typeorm";
 @Entity()
-export class objectiveques{
-    @PrimaryGeneratedColumn()
+export class objectiveques {
+  @PrimaryGeneratedColumn()
   id: number;
-   
+  @Column()
+  standard: string;
+  @Column()
+  subject: string;
+  @Column()
+  type: string;
+  @Column()
+  question: string;
+  @Column()
+   answerType:string;
+  @Column()
+  ImagePath: string;
+  @Column()
+  FilePath: string;
+  @Column()
+  option1: string;
+  @Column()
+  option2: string;
+  @Column()
+  option3: string;
+  @Column()
+  option4: string;
+  @Column()
+  correctanswer: string;
+  @Column()
+  isActive: Boolean;
+  @Column()
+  created_UserId: string;
+  @Column()
+  updated_UserId: string;
+  @CreateDateColumn({ name: "created_at" })
+  createdAt: Date;
+  @UpdateDateColumn({ name: "updated_at" })
+  updatedAt: Date;
 }

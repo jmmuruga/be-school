@@ -6,6 +6,8 @@ export const QuestionValidation = Joi.object({
   type: Joi.string().required(),
   mark: Joi.number().required(),
   question: Joi.string().required(),
+  ImageaPath: Joi.string().required(),
+  FilePath: Joi.string().required(),
   isActive: Joi.boolean().required(),
   created_UserId: Joi.string().required(),
   updated_UserId: Joi.string().required(),
@@ -16,6 +18,8 @@ export interface QuestionDto {
   type: string;
   mark: number;
   question: string;
+  ImagePath:string;
+  FilePath:string;
   isActive: Boolean;
   created_UserId: string;
   updated_UserId: string;

@@ -12,7 +12,11 @@ export const addSignup = async(req : Request , res :Response)=>{
             })
         }
         const signupRepository = appSource.getRepository(Signup);
-        await signupRepository.save(payload);
+        await signupRepository.save({
+            ...payload,
+            aadhaar: String(payload.aadhaar),
+            contact: String(payload.contact)
+        });
         return res.status(200).json({message : "Signup added successfully"})
     }
     catch(error){

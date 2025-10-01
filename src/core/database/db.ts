@@ -11,7 +11,7 @@ import { SubjectMaster } from "../../Master/subject_master/subject.model";
 import { Signup } from "../../Signup/signup.model";
 import { User } from "../../User-Profile/user.model";
 import { Quesgenerate } from "../../Question bank/question-paper-generate/ques-paper-generate.model";
-const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,Signup,User,Quesgenerate
+const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,Signup,User
     
 ]
 
