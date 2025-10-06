@@ -6,9 +6,9 @@ export const SignInvalidation = Joi.object({
   password: Joi.string().required(),
   AdmissionNo: Joi.string().required(),
   dateOfBirth: Joi.date().required(),
-  isActive: Joi.boolean().required(),
-  created_UserId: Joi.string().required(),
-  updated_UserId: Joi.string().required(),
+  isActive: Joi.boolean().optional(),
+  created_UserId: Joi.string().optional(),
+  updated_UserId: Joi.string().optional(),
 });
 export interface SignInDto {
   role: string;

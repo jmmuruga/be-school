@@ -13,9 +13,9 @@ export const objectquesValidation = Joi.object({
   option3: Joi.string().required(),
   option4: Joi.string().required(),
   correctanswer: Joi.string().required(),
-  isActive: Joi.boolean().required(),
-  created_UserId: Joi.string().required(),
-  updated_UserId: Joi.string().required(),
+  isActive: Joi.boolean().optional(),
+  created_UserId: Joi.string().optional(),
+  updated_UserId: Joi.string().optional(),
 });
 export interface objectivequesDto {
   standard: string;

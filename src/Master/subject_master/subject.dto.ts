@@ -5,9 +5,9 @@ export const Subjectvalidation = Joi.object({
   subjectName: Joi.string().required(),
   subjectType: Joi.string().required(),
   selectedClasses: Joi.string().required(),
-  isActive: Joi.boolean().required(),
-  created_UserId: Joi.string().required(),
-  updated_UserId: Joi.string().required(),
+  isActive: Joi.boolean().optional(),
+  created_UserId: Joi.string().optional(),
+  updated_UserId: Joi.string().optional(),
 });
 export interface SubjectDto {
   subjectCode: number;

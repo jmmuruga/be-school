@@ -13,11 +13,11 @@ export class onlinetest {
   TestType: string;
   @Column()
   Numofquestion: number;
-  @Column()
+  @Column({default:true})
   isActive: Boolean;
-  @Column()
+  @Column({nullable:true})
   created_UserId: string;
-  @Column()
+  @Column({nullable:true})
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

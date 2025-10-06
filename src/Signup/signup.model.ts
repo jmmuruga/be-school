@@ -37,9 +37,9 @@ export class Signup {
   schoolAddress: string;
   @Column({ type: "nvarchar", length: 15 })
   contact: string;
-  @Column()
+  @Column({nullable:true})
   created_UserId: string;
-  @Column()
+  @Column({nullable:true})
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

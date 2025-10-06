@@ -8,9 +8,9 @@ export const UserValidation = Joi.object({
   roleType: Joi.string().required(),
   staffNo: Joi.string().required(),
   phone: Joi.number().required(),
-  isActive: Joi.boolean().required(),
-  created_UserId: Joi.string().required(),
-  updated_UserId: Joi.string().required(),
+  isActive: Joi.boolean().optional(),
+  created_UserId: Joi.string().optional(),
+  updated_UserId: Joi.string().optional(),
 });
 export interface UserDto {
   UserId: number;

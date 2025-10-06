@@ -9,11 +9,11 @@ export class MediumMaster {
   mediumCode: number;
   @Column()
   medium: string;
-  @Column()
+  @Column({default:true})
   isActive: boolean;
-  @Column()
+  @Column({nullable:true})
   created_UserId: string;
-  @Column()
+  @Column({nullable:true})
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

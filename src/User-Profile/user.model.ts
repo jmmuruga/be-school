@@ -24,7 +24,7 @@ export class User {
   roleType: string;
   @Column()
   staffNo: string;
-  @Column()
+  @Column({default:true})
   isActive: boolean;
    @Column()
   created_UserId: string;

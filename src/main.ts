@@ -30,7 +30,7 @@ let corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// place cors here
+
 app.use('/classRouter' , cors(corsOptions) , classRouter);
 app.use('/groupRouter',cors(corsOptions),groupRouter);
 app.use('/markRouter',cors(corsOptions),markRouter);
