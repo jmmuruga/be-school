@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { addGroup } from "./group.service";
+import { addGroup, getGroupCode } from "./group.service";
 
 const groupRouter = Router();
-groupRouter.post('/addGroup' , (req,res) => addGroup(req,res));
-// groupRouter.get('/getGroup' , (req,res) => getGroup(req,res));
+groupRouter.post("/addGroup", (req, res) => addGroup(req, res));
+groupRouter.get("/getGroupCode", (req, res) => getGroupCode(req, res));
 
 export default groupRouter;

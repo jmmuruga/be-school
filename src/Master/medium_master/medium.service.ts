@@ -12,10 +12,40 @@ export const addMedium = async(req : Request , res :Response)=>{
             })
         }   
         const mediumRepoistry = appSource.getRepository(MediumMaster);
+         const existingMedium = await mediumRepoistry.findOneBy({
+                        medium: payload.medium,
+    });
+
+    if (existingMedium) {
+      return res.status(400).json({
+        message: "Medium already exists",
+      });
+    }
         await mediumRepoistry.save(payload);
         return res.status(200).json({message : "Medium added successfully"})
     }       
     catch(error){
         console.log(error)
     }
-}
+};
+export const getMediumCode = async (req: Request, res: Response) => {
+  try {
+    const mediumRepositry = appSource.getRepository(MediumMaster);
+    let mediumCode = await mediumRepositry.query(
+      `SELECT mediumCode
+            FROM [${process.env.DB_NAME}].[dbo].[medium_master] 
+            Group by mediumCode
+            ORDER BY CAST(mediumCode AS INT) DESC;`
+    );
+    let id = "0";
+    if (mediumCode?.length > 0) {
+      id = mediumCode[0].mediumCode;
+    }
+    const finalRes = Number(id) + 1;
+    res.status(200).send({
+      Result: finalRes,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};

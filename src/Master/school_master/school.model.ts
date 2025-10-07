@@ -9,7 +9,7 @@ export class SchoolMaster {
     @PrimaryGeneratedColumn()
     id: number;
     @Column()
-    siNo: number
+    schoolCode: number
     @Column()
     school: string
     @Column({default:true})

@@ -1,7 +1,7 @@
 import * as Joi from 'joi';
 
 export const MarkValidation = Joi.object({
-  markcode: Joi.number().required(),
+  markCode: Joi.number().required(),
   mark: Joi.number().required(),
   isActive: Joi.boolean().optional(),
   created_UserId: Joi.string().optional(),
@@ -9,7 +9,7 @@ export const MarkValidation = Joi.object({
 
 });
 export interface MarkDto {
-  markcode: number;
+  markCode: number;
   mark: number;
   isActive: boolean;
   created_UserId: string;
