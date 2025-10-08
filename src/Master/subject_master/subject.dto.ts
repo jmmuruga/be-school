@@ -4,7 +4,8 @@ export const Subjectvalidation = Joi.object({
   subjectCode: Joi.number().required(),
   subjectName: Joi.string().required(),
   subjectType: Joi.string().required(),
-  selectedClasses: Joi.string().required(),
+selectedClasses: Joi.string().required(),
+
   isActive: Joi.boolean().optional(),
   created_UserId: Joi.string().optional(),
   updated_UserId: Joi.string().optional(),

@@ -2,18 +2,19 @@ import { appSource } from "../../core/database/db";
 import { SchoolDto, SchoolValidation } from "./school.dto";
 import { Request, Response } from "express";
 import { SchoolMaster } from "./school.model";
-export const addSchool = async(req : Request , res :Response)=>{
-    try{
-        const payload : SchoolDto = req.body;
-        const validation = SchoolValidation.validate(payload);
-        if(validation.error){
-            return res.status(400).json({   
-                message: validation.error.details[0].message
-            })
-        }   
-        const schoolRepoistry = appSource.getRepository(SchoolMaster);
-         const existingSchool = await schoolRepoistry.findOneBy({
-                        school: payload.school,
+
+export const addSchool = async (req: Request, res: Response) => {
+  try {
+    const payload: SchoolDto = req.body;
+    const validation = SchoolValidation.validate(payload);
+    if (validation.error) {
+      return res.status(400).json({
+        message: validation.error.details[0].message,
+      });
+    }
+    const schoolRepoistry = appSource.getRepository(SchoolMaster);
+    const existingSchool = await schoolRepoistry.findOneBy({
+      school: payload.school,
     });
 
     if (existingSchool) {
@@ -21,13 +22,11 @@ export const addSchool = async(req : Request , res :Response)=>{
         message: "School  already exists",
       });
     }
-        await schoolRepoistry.save(payload);
-        return res.status(200).json({message : "School added successfully"})
-    }   
-    catch(error){
-        console.log(error)
-
-    }
+    await schoolRepoistry.save(payload);
+    return res.status(200).json({ message: "School added successfully" });
+  } catch (error) {
+    console.log(error);
+  }
 };
 export const getSchoolCode = async (req: Request, res: Response) => {
   try {
@@ -50,3 +49,15 @@ export const getSchoolCode = async (req: Request, res: Response) => {
     console.log(error);
   }
 };
+export  const getSchoolDetails = async (req:Request, res:Response) =>{
+  try{
+  const schoolRepoistry = appSource.getRepository(SchoolMaster);
+  const schlM = await schoolRepoistry.createQueryBuilder("").getMany();
+  res.status(200).send({
+    Result:schlM,
+  });
+}
+  catch(error){
+   console.log(error);
+  }
+  };

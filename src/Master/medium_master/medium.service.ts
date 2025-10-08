@@ -49,3 +49,15 @@ export const getMediumCode = async (req: Request, res: Response) => {
     console.log(error);
   }
 };
+export const getMediumDetails = async (req:Request,res:Response) =>{
+  try{
+    const mediumRepoistry = appSource.getRepository(MediumMaster) ;
+    const mediumM = await mediumRepoistry.createQueryBuilder("").getMany();
+    res.status(200).send({
+      Result: mediumM,
+    });
+    
+  }catch(error){
+    console.log(error);
+  }
+};

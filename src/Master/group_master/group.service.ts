@@ -3,6 +3,20 @@ import { GroupDto, GroupValidation } from "./group.dto";
 import { Request, Response } from "express";
 import { GroupMaster } from "./group.model";
 
+
+export const  getGroupMasterDetails = async (req: Request, res: Response) => {
+  try{
+    const groupRepoistry =appSource.getRepository(GroupMaster);
+    const groupM = await groupRepoistry.createQueryBuilder("").getMany();
+    res.status(200).send({
+      Result: groupM,
+    });
+  }
+  catch(error){
+    console.log(error);
+  }
+};
+
 export const addGroup = async (req: Request, res: Response) => {
   try {
     const payload: GroupDto = req.body;
