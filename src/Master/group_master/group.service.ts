@@ -55,3 +55,33 @@ export const getGroupCode = async (req: Request, res: Response) => {
     console.log(error);
   }
 };
+export const updateGroupMaster = async (req: Request, res: Response) => {
+  try {
+    const payload: GroupDto = req.body;
+    const validation =GroupValidation.validate(payload);
+    if (validation.error) {
+      console.log(validation.error, "Validation Error");
+      return res.status(400).json({
+        message: validation.error.details[0].message,
+      });
+    }
+    // check whether class exist
+    const groupRepository = appSource.getRepository(GroupMaster);
+    const existingClass = await groupRepository.findOneBy({
+      groupCode: payload.groupCode,
+    });
+    if (!existingClass) {
+      return res.status(400).json({
+        message: "Group Doesn't exist",
+      });
+    }
+    await groupRepository.update({ groupCode: payload.groupCode }, payload);
+    return res.status(200).json({ message: "Group Updated successfully" });
+  } catch (error) {
+    console.error("Update Error:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};

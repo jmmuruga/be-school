@@ -1,7 +1,15 @@
 import { Router } from "express";
-import { addSubject ,getsubjectCode, getSubjectDetails} from "./subject.service";
+import {
+  addSubject,
+  getsubjectCode,
+  getSubjectDetails,
+  updateSubject,
+} from "./subject.service";
 const subjectRouter = Router();
-subjectRouter.post('/addSubject' , (req,res) => addSubject(req,res));
+subjectRouter.post("/addSubject", (req, res) => addSubject(req, res));
 subjectRouter.get("/getsubjectCode", (req, res) => getsubjectCode(req, res));
-subjectRouter.get("/getSubjectDetails",(req,res) => getSubjectDetails(req,res));
+subjectRouter.get("/getSubjectDetails", (req, res) =>
+  getSubjectDetails(req, res)
+);
+subjectRouter.post("/updateSubject", (req, res) => updateSubject(req, res));
 export default subjectRouter;

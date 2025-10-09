@@ -62,3 +62,33 @@ export const getMarkCode = async (req: Request, res: Response) => {
     console.log(error);
   }
 };
+export const updateMark = async ( req : Request,res : Response) => {
+  try {
+    const payload :MarkDto = req.body;
+    const validation = MarkValidation.validate(payload);
+    if(validation.error){
+      console.log(validation.error,"Validation Error");
+      return res.status(400).json({
+        message:validation.error.details[0].message,
+      });
+    }
+    //check  whether mark exist
+    const markRepository = appSource.getRepository(MarkMaster);
+    const existingMark = await markRepository.findOneBy({
+      markCode:payload.markCode,
+    });
+    if(!existingMark){
+      return res.status(400).json({
+        message:"Mark Doesn't exist",
+      });
+    }
+    await markRepository.update({markCode:payload.markCode},payload);
+    return res.status(200).json({message:"Mark Updated successfully"});
+  }catch(error){
+    console.error("Update Error:",error);
+    return res.status(500).json({
+      message:"Internal server error",
+      error:error instanceof Error ? error.message : error,
+    });
+  }
+}

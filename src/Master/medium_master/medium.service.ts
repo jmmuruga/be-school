@@ -2,6 +2,7 @@ import { appSource } from "../../core/database/db";
 import { MediumDto, MediumValidation } from "./medium.dto";
 import { Request, Response } from "express";
 import { MediumMaster } from "./medium.model";
+import mediumRouter from "./medium.controller";
 export const addMedium = async(req : Request , res :Response)=>{
     try{
         const payload : MediumDto = req.body;
@@ -61,3 +62,34 @@ export const getMediumDetails = async (req:Request,res:Response) =>{
     console.log(error);
   }
 };
+export const updateMedium = async (req : Request, res: Response) => {
+  try{
+    const payload:MediumDto = req.body;
+    const validation = MediumValidation.validate(payload);
+    if(validation.error){
+      console.log(validation.error,"Validation Error");
+      return res.status(400).json({
+        message:validation.error.details[0].message,
+      });
+    }
+    // check whether medium exist 
+    const mediumRepoistry =appSource.getRepository(MediumMaster);
+    const existingMedium = await mediumRepoistry.findOneBy({
+      mediumCode:payload.mediumCode,
+    });
+    if(!existingMedium){
+      return res.status(400).json({
+        message:"Medium Doesn't exist",
+      });
+
+    }
+    await mediumRepoistry.update({mediumCode:payload.mediumCode},payload);
+    return res.status(200).json({ message: "Medium Updated successfully" });
+  }catch (error) {
+    console.error("Update Error:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+}
