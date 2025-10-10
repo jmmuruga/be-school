@@ -2,12 +2,11 @@ import { appSource } from "../../core/database/db";
 import { ClassDto, ClassValidation } from "./class.dto";
 import { Request, Response } from "express";
 import { classMaster } from "./class.model";
-import { GroupDto, GroupValidation } from "../group_master/group.dto";
+import { DataSource, Not } from "typeorm";
 
 export const addClass = async (req: Request, res: Response) => {
   try {
     const payload: ClassDto = req.body;
-
     const validation = ClassValidation.validate(payload);
     if (validation.error) {
       console.log(validation.error, "Validation Error");
@@ -88,6 +87,16 @@ export const updateClassMaster = async (req: Request, res: Response) => {
         message: "Class Doesn't exist",
       });
     }
+    // check name already exist
+    const nameExist = await classRepository.findBy({
+      className: payload.className,
+      classCode: Not(payload.classCode),
+    });
+    if (nameExist.length > 0) {
+      return res.status(400).json({
+        message: "Class Name Already Exist",
+      });
+    }
     await classRepository.update({ classCode: payload.classCode }, payload);
     return res.status(200).json({ message: "Class Updated successfully" });
   } catch (error) {
@@ -98,3 +107,20 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     });
   }
 };
+// export const deleteClassMasterData = async (req: Request, res: Response) => {
+//   try {
+//     const classCode = req.params;
+//     console.log(classCode, 'income')
+//    const result = await appSource.getRepository(classMaster).delete(classCode);
+
+//     if (result.affected === 0) {
+//       return res.status(404).json({ message: "Class code not found" });
+//     }
+
+//     return res.status(200).json({ message: "Class deleted successfully", result });
+
+//   } catch (error) {
+//     console.error("Delete error:", error);
+//     return res.status(500).json({ message: "Internal server error" });
+//   }
+// };

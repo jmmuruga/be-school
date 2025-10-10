@@ -2,6 +2,7 @@ import { appSource } from "../../core/database/db";
 import { SchoolDto, SchoolValidation } from "./school.dto";
 import { Request, Response } from "express";
 import { SchoolMaster } from "./school.model";
+import { Not } from "typeorm";
 
 export const addSchool = async (req: Request, res: Response) => {
   try {
@@ -70,7 +71,7 @@ export const updateSchool = async (req: Request, res: Response) => {
         message: validation.error.details[0].message,
       });
     }
-    // check whether class exist
+    // check whether school exist
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
     const existingSchool = await schoolRepoistry.findOneBy({
       schoolCode: payload.schoolCode,
@@ -80,6 +81,17 @@ export const updateSchool = async (req: Request, res: Response) => {
         message: "Class Doesn't exist",
       });
     }
+    // check school already exist
+    const schoolExist = await schoolRepoistry.findBy({
+      school: payload.school,
+      schoolCode: Not(payload.schoolCode),
+    });
+    if (schoolExist.length > 0) {
+      return res.status(400).json({
+        message: "School Name Already Exist",
+      });
+    }
+
     await schoolRepoistry.update({ schoolCode: payload.schoolCode }, payload);
     return res.status(200).json({ message: "School Updated successfully" });
   } catch (error) {

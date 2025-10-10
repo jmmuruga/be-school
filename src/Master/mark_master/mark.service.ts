@@ -2,6 +2,7 @@ import { appSource } from "../../core/database/db";
 import { MarkDto, MarkValidation } from "./mark.dto";
 import { Request, Response } from "express";
 import { MarkMaster } from "./mark.model";
+import { Not } from "typeorm";
 
 export const getMarkMasterDetails = async (req: Request, res: Response) => {
   try {
@@ -10,7 +11,7 @@ export const getMarkMasterDetails = async (req: Request, res: Response) => {
     res.status(200).send({
       Result: MarkM,
     });
-    console.log(res, 'mark')
+    console.log(res, "mark");
   } catch (error) {
     console.log(error);
   }
@@ -62,33 +63,44 @@ export const getMarkCode = async (req: Request, res: Response) => {
     console.log(error);
   }
 };
-export const updateMark = async ( req : Request,res : Response) => {
+export const updateMark = async (req: Request, res: Response) => {
   try {
-    const payload :MarkDto = req.body;
+    const payload: MarkDto = req.body;
+     console.log("Update Payload:", payload); 
     const validation = MarkValidation.validate(payload);
-    if(validation.error){
-      console.log(validation.error,"Validation Error");
+    if (validation.error) {
+      console.log(validation.error, "Validation Error");
       return res.status(400).json({
-        message:validation.error.details[0].message,
+        message: validation.error.details[0].message,
       });
     }
     //check  whether mark exist
     const markRepository = appSource.getRepository(MarkMaster);
     const existingMark = await markRepository.findOneBy({
-      markCode:payload.markCode,
+      markCode: payload.markCode,
     });
-    if(!existingMark){
+    if (!existingMark) {
       return res.status(400).json({
-        message:"Mark Doesn't exist",
+        message: "Mark Doesn't exist",
       });
     }
-    await markRepository.update({markCode:payload.markCode},payload);
-    return res.status(200).json({message:"Mark Updated successfully"});
-  }catch(error){
-    console.error("Update Error:",error);
+    // check mark already exist
+    const markExist = await markRepository.findBy({
+      mark: payload.mark,
+      markCode: Not(payload.markCode),
+    });
+    if (markExist.length > 0) {
+      return res.status(400).json({
+        message: "Mark Already Exist",
+      });
+    }
+    await markRepository.update({ markCode: payload.markCode }, payload);
+    return res.status(200).json({ message: "Mark Updated successfully" });
+  } catch (error) {
+    console.error("Update Error:", error);
     return res.status(500).json({
-      message:"Internal server error",
-      error:error instanceof Error ? error.message : error,
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
-}
+};

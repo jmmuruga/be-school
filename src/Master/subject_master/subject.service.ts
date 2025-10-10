@@ -3,6 +3,7 @@ import { SubjectDto, Subjectvalidation } from "./subject.dto";
 import { Request, Response } from "express";
 import { SubjectMaster } from "./subject.model";
 import subjectRouter from "./subject.controller";
+import { Not } from "typeorm";
 
 export const addSubject = async (req: Request, res: Response) => {
   try {
@@ -64,17 +65,17 @@ export const getSubjectDetails = async (req: Request, res: Response) => {
     console.log(error);
   }
 };
-export const updateSubject = async(req : Request, res: Response) => {
-  try{
-      const payload: SubjectDto = req.body;
-        const validation = Subjectvalidation.validate(payload);
-        if (validation.error) {
-          console.log(validation.error, "Validation Error");
-          return res.status(400).json({
-            message: validation.error.details[0].message,
-          });
-        }
-        // check whether class exist
+export const updateSubject = async (req: Request, res: Response) => {
+  try {
+    const payload: SubjectDto = req.body;
+    const validation = Subjectvalidation.validate(payload);
+    if (validation.error) {
+      console.log(validation.error, "Validation Error");
+      return res.status(400).json({
+        message: validation.error.details[0].message,
+      });
+    }
+    // check whether class exist
     const subjectRepoistry = appSource.getRepository(SubjectMaster);
     const existingSubject = await subjectRepoistry.findOneBy({
       subjectCode: payload.subjectCode,
@@ -84,7 +85,20 @@ export const updateSubject = async(req : Request, res: Response) => {
         message: "Subject Doesn't exist",
       });
     }
-  await subjectRepoistry.update({ subjectCode: payload.subjectCode }, payload);
+  //  check subject already exist
+  const subjectExist = await subjectRepoistry.findBy({
+    subjectName : payload.subjectName,
+    subjectCode : Not(payload.subjectCode)
+  })
+  if(subjectExist.length>0){
+    return res.status(400).json({
+      message : "Subject Already Exist"
+    });
+  }
+    await subjectRepoistry.update(
+      { subjectCode: payload.subjectCode },
+      payload
+    );
     return res.status(200).json({ message: "Subject Updated successfully" });
   } catch (error) {
     console.error("Update Error:", error);
@@ -93,4 +107,4 @@ export const updateSubject = async(req : Request, res: Response) => {
       error: error instanceof Error ? error.message : error,
     });
   }
-}
+};

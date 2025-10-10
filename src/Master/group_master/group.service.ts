@@ -2,17 +2,16 @@ import { appSource } from "../../core/database/db";
 import { GroupDto, GroupValidation } from "./group.dto";
 import { Request, Response } from "express";
 import { GroupMaster } from "./group.model";
+import { Not } from "typeorm";
 
-
-export const  getGroupMasterDetails = async (req: Request, res: Response) => {
-  try{
-    const groupRepoistry =appSource.getRepository(GroupMaster);
+export const getGroupMasterDetails = async (req: Request, res: Response) => {
+  try {
+    const groupRepoistry = appSource.getRepository(GroupMaster);
     const groupM = await groupRepoistry.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: groupM,
     });
-  }
-  catch(error){
+  } catch (error) {
     console.log(error);
   }
 };
@@ -58,7 +57,7 @@ export const getGroupCode = async (req: Request, res: Response) => {
 export const updateGroupMaster = async (req: Request, res: Response) => {
   try {
     const payload: GroupDto = req.body;
-    const validation =GroupValidation.validate(payload);
+    const validation = GroupValidation.validate(payload);
     if (validation.error) {
       console.log(validation.error, "Validation Error");
       return res.status(400).json({
@@ -73,6 +72,18 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     if (!existingClass) {
       return res.status(400).json({
         message: "Group Doesn't exist",
+      });
+    }
+    // check name  already exist
+    const nameExist = await groupRepository.findBy({
+      groupName: payload.groupName,
+      groupoption: payload.groupoption,
+      groupDescription: payload.groupDescription,
+      groupCode: Not(payload.groupCode),
+    });
+    if (nameExist.length > 0) {
+      return res.status(400).json({
+        message: "Group Name Already Exist",
       });
     }
     await groupRepository.update({ groupCode: payload.groupCode }, payload);
