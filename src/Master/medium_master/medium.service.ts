@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { MediumMaster } from "./medium.model";
 import mediumRouter from "./medium.controller";
 import { Not } from "typeorm";
+
 export const addMedium = async (req: Request, res: Response) => {
   try {
     const payload: MediumDto = req.body;
@@ -98,6 +99,38 @@ export const updateMedium = async (req: Request, res: Response) => {
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+export const deleteMedium = async (req: Request, res: Response) => {
+  try {
+    const mediumCode = Number(req.params.mediumCode);
+    if (isNaN(mediumCode)) {
+      return res.status(400).json({
+        message: "Invalid class code",
+      });
+    }
+    const mediumRepoistry = appSource.getRepository(MediumMaster);
+    // Check whether mediumcode exists
+    const existingMedium = await mediumRepoistry
+      .createQueryBuilder()
+      .delete()
+      .from(MediumMaster)
+      .where({ mediumCode: mediumCode })
+      .execute();
+    if (!existingMedium) {
+      return res.status(404).json({
+        message: "mediumCode  not found",
+      });
+    }
+    await mediumRepoistry.delete(mediumCode);
+    return res.status(200).json({
+      message: "mediumCode deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
     });
   }
 };

@@ -102,3 +102,35 @@ export const updateSchool = async (req: Request, res: Response) => {
     });
   }
 };
+export const deleteSchool = async (req: Request, res: Response) => {
+  try {
+    const schoolCode = Number(req.params.schoolCode);
+    if (isNaN(schoolCode)) {
+      return res.status(400).json({
+        message: "Invalid class code",
+      });
+    }
+    const schoolRepoistry = appSource.getRepository(SchoolMaster);
+    // Check whether schoolcode exists
+    const existingSchool = await schoolRepoistry
+      .createQueryBuilder()
+      .delete()
+      .from(SchoolMaster)
+      .where({ schoolCode: schoolCode })
+      .execute();
+    if (!existingSchool) {
+      return res.status(404).json({
+        message: "schoolCode  not found",
+      });
+    }
+    await schoolRepoistry.delete(schoolCode);
+    return res.status(200).json({
+      message: "schoolCode deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};

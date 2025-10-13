@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   addClass,
-  // deleteClassMasterData,
+  deleteClass,
   getClasMasterDetails,
   getClassCode,
   updateClassMaster,
@@ -17,5 +17,5 @@ classRouter.post("/updateClassMaster", (req, res) =>
 classRouter.get("/getClasMasterDetails", (req, res) =>
   getClasMasterDetails(req, res)
 );
-// classRouter.delete("/deleteClassMasterData/:classCode",(req,res) => deleteClassMasterData(req,res));
+classRouter.delete("/deleteClass/:classCode",(req,res) => deleteClass(req,res));
 export default classRouter;

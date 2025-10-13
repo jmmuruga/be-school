@@ -66,10 +66,10 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     }
     // check whether class exist
     const groupRepository = appSource.getRepository(GroupMaster);
-    const existingClass = await groupRepository.findOneBy({
+    const existingGroup = await groupRepository.findOneBy({
       groupCode: payload.groupCode,
     });
-    if (!existingClass) {
+    if (!existingGroup) {
       return res.status(400).json({
         message: "Group Doesn't exist",
       });
@@ -93,6 +93,38 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+export const deleteGroup = async (req: Request, res: Response) => {
+  try {
+    const groupCode = Number(req.params.groupCode);
+    if (isNaN(groupCode)) {
+      return res.status(400).json({
+        message: "GroupCode not found",
+      });
+    }
+    const groupRepository = appSource.getRepository(GroupMaster);
+    // Check whether groupcode exists
+    const existingGroup = await groupRepository
+      .createQueryBuilder()
+      .delete()
+      .from(GroupMaster)
+      .where({ groupCode: groupCode })
+      .execute();
+    if (!existingGroup) {
+      return res.status(404).json({
+        message: "GroupCode  not found",
+      });
+    }
+    await groupRepository.delete(groupCode);
+    return res.status(200).json({
+      message: "Group Deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal Server error",
     });
   }
 };

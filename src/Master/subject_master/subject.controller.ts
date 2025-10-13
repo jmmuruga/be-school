@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addSubject,
+  deleteSubject,
   getsubjectCode,
   getSubjectDetails,
   updateSubject,
@@ -12,4 +13,5 @@ subjectRouter.get("/getSubjectDetails", (req, res) =>
   getSubjectDetails(req, res)
 );
 subjectRouter.post("/updateSubject", (req, res) => updateSubject(req, res));
+subjectRouter.delete("/deleteSubject/:subjectCode",(req,res) => deleteSubject(req,res))
 export default subjectRouter;

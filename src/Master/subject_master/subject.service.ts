@@ -85,16 +85,16 @@ export const updateSubject = async (req: Request, res: Response) => {
         message: "Subject Doesn't exist",
       });
     }
-  //  check subject already exist
-  const subjectExist = await subjectRepoistry.findBy({
-    subjectName : payload.subjectName,
-    subjectCode : Not(payload.subjectCode)
-  })
-  if(subjectExist.length>0){
-    return res.status(400).json({
-      message : "Subject Already Exist"
+    //  check subject already exist
+    const subjectExist = await subjectRepoistry.findBy({
+      subjectName: payload.subjectName,
+      subjectCode: Not(payload.subjectCode),
     });
-  }
+    if (subjectExist.length > 0) {
+      return res.status(400).json({
+        message: "Subject Already Exist",
+      });
+    }
     await subjectRepoistry.update(
       { subjectCode: payload.subjectCode },
       payload
@@ -105,6 +105,38 @@ export const updateSubject = async (req: Request, res: Response) => {
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+export const deleteSubject = async (req: Request, res: Response) => {
+  try {
+    const subjectCode = Number(req.params.subjectCode);
+    if (isNaN(subjectCode)) {
+      return res.status(400).json({
+        message: "Invalid class code",
+      });
+    }
+    const subjectRepoistry = appSource.getRepository(SubjectMaster);
+    // Check whether subjectcode exists
+    const existingSubject = await subjectRepoistry
+      .createQueryBuilder()
+      .delete()
+      .from(SubjectMaster)
+      .where({ subjectCode: subjectCode })
+      .execute();
+    if (!existingSubject) {
+      return res.status(404).json({
+        message: "subjectCode  not found",
+      });
+    }
+    await subjectRepoistry.delete(subjectCode);
+    return res.status(200).json({
+      message: "subjectCode deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
     });
   }
 };

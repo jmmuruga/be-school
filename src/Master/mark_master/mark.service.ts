@@ -66,7 +66,7 @@ export const getMarkCode = async (req: Request, res: Response) => {
 export const updateMark = async (req: Request, res: Response) => {
   try {
     const payload: MarkDto = req.body;
-     console.log("Update Payload:", payload); 
+    console.log("Update Payload:", payload);
     const validation = MarkValidation.validate(payload);
     if (validation.error) {
       console.log(validation.error, "Validation Error");
@@ -101,6 +101,38 @@ export const updateMark = async (req: Request, res: Response) => {
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+export const deleteMarks = async (req: Request, res: Response) => {
+  try {
+    const markCode = Number(req.params.markCode);
+    if (isNaN(markCode)) {
+      return res.status(400).json({
+        message: "Invalid Mark Code",
+      });
+    }
+    const markRepository = appSource.getRepository(MarkMaster);
+    // check whether markcode exists
+    const existingMark = await markRepository
+      .createQueryBuilder()
+      .delete()
+      .from(MarkMaster)
+      .where({ markCode: markCode })
+      .execute();
+    if (!existingMark) {
+      return res.status(404).json({
+        message: "MarkCode not found",
+      });
+    }
+    await markRepository.delete(markCode);
+    return res.status(200).json({
+      message: "Mark deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
     });
   }
 };

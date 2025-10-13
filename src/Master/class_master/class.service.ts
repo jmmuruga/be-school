@@ -107,20 +107,36 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     });
   }
 };
-// export const deleteClassMasterData = async (req: Request, res: Response) => {
-//   try {
-//     const classCode = req.params;
-//     console.log(classCode, 'income')
-//    const result = await appSource.getRepository(classMaster).delete(classCode);
 
-//     if (result.affected === 0) {
-//       return res.status(404).json({ message: "Class code not found" });
-//     }
-
-//     return res.status(200).json({ message: "Class deleted successfully", result });
-
-//   } catch (error) {
-//     console.error("Delete error:", error);
-//     return res.status(500).json({ message: "Internal server error" });
-//   }
-// };
+export const deleteClass = async (req: Request, res: Response) => {
+  try {
+    const classCode = Number(req.params.classCode);
+    if (isNaN(classCode)) {
+      return res.status(400).json({
+        message: "Invalid class code",
+      });
+    }
+    const classRepository = appSource.getRepository(classMaster);
+    // Check whether classcode exists
+    const existingClass = await classRepository
+      .createQueryBuilder()
+      .delete()
+      .from(classMaster)
+      .where({ classCode: classCode })
+      .execute();
+    if (!existingClass) {
+      return res.status(404).json({
+        message: "ClassCode  not found",
+      });
+    }
+    await classRepository.delete(classCode);
+    return res.status(200).json({
+      message: "Class deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};

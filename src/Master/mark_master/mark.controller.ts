@@ -1,10 +1,12 @@
 import { Router } from "express";
 import {
   addMark,
+  deleteMarks,
   getMarkCode,
   getMarkMasterDetails,
   updateMark,
 } from "./mark.service";
+import { deleteClass } from "../class_master/class.service";
 
 const markRouter = Router();
 markRouter.post("/addMark", (req, res) => addMark(req, res));
@@ -14,3 +16,4 @@ markRouter.get("/getMarkMasterDetails", (req, res) =>
 );
 markRouter.post("/updateMark", (req, res) => updateMark(req, res));
 export default markRouter;
+markRouter.delete("/deleteMarks/:markCode", (req, res) => deleteMarks(req, res));

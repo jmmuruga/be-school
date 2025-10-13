@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addGroup,
+  deleteGroup,
   getGroupCode,
   getGroupMasterDetails,
   updateGroupMaster,
@@ -15,4 +16,5 @@ groupRouter.get("/getGroupMasterDetails", (req, res) =>
 groupRouter.post("/updateGroupMaster", (req, res) =>
   updateGroupMaster(req, res)
 );
+groupRouter.delete("/deleteGroup/:groupCode",(req,res) => deleteGroup(req,res));
 export default groupRouter;
