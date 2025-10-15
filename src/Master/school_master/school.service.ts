@@ -53,7 +53,10 @@ export const getSchoolCode = async (req: Request, res: Response) => {
 export const getSchoolDetails = async (req: Request, res: Response) => {
   try {
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
-    const schlM = await schoolRepoistry.createQueryBuilder("").getMany();
+      const schlM = await schoolRepoistry.find({
+      where: { isActive: true },
+    });
+    // const schlM = await schoolRepoistry.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: schlM,
     });
@@ -105,6 +108,8 @@ export const updateSchool = async (req: Request, res: Response) => {
 export const deleteSchool = async (req: Request, res: Response) => {
   try {
     const schoolCode = Number(req.params.schoolCode);
+    console.log("Soft deleting school:", schoolCode);
+
     if (isNaN(schoolCode)) {
       return res.status(400).json({
         message: "Invalid class code",
@@ -115,15 +120,16 @@ export const deleteSchool = async (req: Request, res: Response) => {
     const existingSchool = await schoolRepoistry
       .createQueryBuilder()
       .delete()
-      .from(SchoolMaster)
+      .update(SchoolMaster)
+      .set({isActive:false})
       .where({ schoolCode: schoolCode })
       .execute();
-    if (!existingSchool) {
+    if (!existingSchool && existingSchool.affected === 0) {
       return res.status(404).json({
         message: "schoolCode  not found",
       });
     }
-    await schoolRepoistry.delete(schoolCode);
+    // await schoolRepoistry.delete(schoolCode);
     return res.status(200).json({
       message: "schoolCode deleted successfully",
     });

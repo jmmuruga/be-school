@@ -6,7 +6,9 @@ import { DataSource, Not } from "typeorm";
 
 export const addClass = async (req: Request, res: Response) => {
   try {
+    // get the data
     const payload: ClassDto = req.body;
+    //check validation
     const validation = ClassValidation.validate(payload);
     if (validation.error) {
       console.log(validation.error, "Validation Error");
@@ -33,7 +35,7 @@ export const addClass = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
+// get the classcode
 export const getClassCode = async (req: Request, res: Response) => {
   try {
     const classRepositry = appSource.getRepository(classMaster);
@@ -59,9 +61,13 @@ export const getClassCode = async (req: Request, res: Response) => {
 export const getClasMasterDetails = async (req: Request, res: Response) => {
   try {
     const classRepositry = appSource.getRepository(classMaster);
-    const classM = await classRepositry.createQueryBuilder("").getMany();
+    //get the details
+    const classes = await classRepositry.find({
+      where: { isActive: true },
+    });
+    // const classM = await classRepositry.createQueryBuilder("").getMany();
     res.status(200).send({
-      Result: classM,
+      Result: classes,
     });
   } catch (error) {
     console.log(error);
@@ -69,8 +75,10 @@ export const getClasMasterDetails = async (req: Request, res: Response) => {
 };
 export const updateClassMaster = async (req: Request, res: Response) => {
   try {
+    //get the data
     const payload: ClassDto = req.body;
     const validation = ClassValidation.validate(payload);
+    //validation
     if (validation.error) {
       console.log(validation.error, "Validation Error");
       return res.status(400).json({
@@ -97,7 +105,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
         message: "Class Name Already Exist",
       });
     }
-    await classRepository.update({ classCode: payload.classCode }, payload);
+    await classRepository.update({ classCode: payload.classCode }, payload); //update
     return res.status(200).json({ message: "Class Updated successfully" });
   } catch (error) {
     console.error("Update Error:", error);
@@ -111,32 +119,29 @@ export const updateClassMaster = async (req: Request, res: Response) => {
 export const deleteClass = async (req: Request, res: Response) => {
   try {
     const classCode = Number(req.params.classCode);
+    console.log("Soft deleting class:", classCode);
+
     if (isNaN(classCode)) {
-      return res.status(400).json({
-        message: "Invalid class code",
-      });
+      return res.status(400).json({ message: "Invalid class code" });
     }
+
     const classRepository = appSource.getRepository(classMaster);
-    // Check whether classcode exists
+
+    // Soft delete: set activeStatus = 0
     const existingClass = await classRepository
       .createQueryBuilder()
-      .delete()
-      .from(classMaster)
-      .where({ classCode: classCode })
+      .update(classMaster)
+      .set({ isActive: false })
+      .where("classCode = :classCode", { classCode })
       .execute();
-    if (!existingClass) {
-      return res.status(404).json({
-        message: "ClassCode  not found",
-      });
+
+    if (!existingClass && existingClass.affected === 0) {
+      return res.status(404).json({ message: "Class not found" });
     }
-    await classRepository.delete(classCode);
-    return res.status(200).json({
-      message: "Class deleted successfully",
-    });
+
+    return res.status(200).json({ message: "Class soft-deleted successfully" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal server error",
-    });
+    console.error("Soft delete error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

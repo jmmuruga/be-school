@@ -57,7 +57,10 @@ export const getsubjectCode = async (req: Request, res: Response) => {
 export const getSubjectDetails = async (req: Request, res: Response) => {
   try {
     const subjectRepoistry = appSource.getRepository(SubjectMaster);
-    const subjectM = await subjectRepoistry.createQueryBuilder("").getMany();
+    const subjectM = await subjectRepoistry.find({
+      where: { isActive: true },
+    });
+    // const subjectM = await subjectRepoistry.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: subjectM,
     });
@@ -111,6 +114,8 @@ export const updateSubject = async (req: Request, res: Response) => {
 export const deleteSubject = async (req: Request, res: Response) => {
   try {
     const subjectCode = Number(req.params.subjectCode);
+    console.log("Soft deleting class:", subjectCode);
+
     if (isNaN(subjectCode)) {
       return res.status(400).json({
         message: "Invalid class code",
@@ -121,15 +126,16 @@ export const deleteSubject = async (req: Request, res: Response) => {
     const existingSubject = await subjectRepoistry
       .createQueryBuilder()
       .delete()
-      .from(SubjectMaster)
+      .update(SubjectMaster)
+      .set({ isActive: false })
       .where({ subjectCode: subjectCode })
       .execute();
-    if (!existingSubject) {
+    if (!existingSubject && existingSubject.affected === 0) {
       return res.status(404).json({
         message: "subjectCode  not found",
       });
     }
-    await subjectRepoistry.delete(subjectCode);
+    // await subjectRepoistry.delete(subjectCode);
     return res.status(200).json({
       message: "subjectCode deleted successfully",
     });

@@ -54,7 +54,10 @@ export const getMediumCode = async (req: Request, res: Response) => {
 export const getMediumDetails = async (req: Request, res: Response) => {
   try {
     const mediumRepoistry = appSource.getRepository(MediumMaster);
-    const mediumM = await mediumRepoistry.createQueryBuilder("").getMany();
+    const mediumM = await mediumRepoistry.find({
+      where: { isActive: true },
+    });
+    // const mediumM = await mediumRepoistry.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: mediumM,
     });
@@ -115,15 +118,16 @@ export const deleteMedium = async (req: Request, res: Response) => {
     const existingMedium = await mediumRepoistry
       .createQueryBuilder()
       .delete()
-      .from(MediumMaster)
+      .update(MediumMaster)
+      .set({isActive:false})
       .where({ mediumCode: mediumCode })
       .execute();
-    if (!existingMedium) {
+    if (!existingMedium && existingMedium.affected === 0) {
       return res.status(404).json({
         message: "mediumCode  not found",
       });
     }
-    await mediumRepoistry.delete(mediumCode);
+    // await mediumRepoistry.delete(mediumCode);
     return res.status(200).json({
       message: "mediumCode deleted successfully",
     });

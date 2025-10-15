@@ -7,7 +7,10 @@ import { Not } from "typeorm";
 export const getMarkMasterDetails = async (req: Request, res: Response) => {
   try {
     const markRepository = appSource.getRepository(MarkMaster);
-    const MarkM = await markRepository.createQueryBuilder("").getMany();
+    const MarkM = await markRepository.find({
+      where: { isActive: true },
+    });
+    // const MarkM = await markRepository.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: MarkM,
     });
@@ -107,6 +110,8 @@ export const updateMark = async (req: Request, res: Response) => {
 export const deleteMarks = async (req: Request, res: Response) => {
   try {
     const markCode = Number(req.params.markCode);
+    console.log("Soft deleting mark:", markCode);
+
     if (isNaN(markCode)) {
       return res.status(400).json({
         message: "Invalid Mark Code",
@@ -117,15 +122,16 @@ export const deleteMarks = async (req: Request, res: Response) => {
     const existingMark = await markRepository
       .createQueryBuilder()
       .delete()
-      .from(MarkMaster)
+      .update(MarkMaster)
+      .set({ isActive: false })
       .where({ markCode: markCode })
       .execute();
-    if (!existingMark) {
+    if (!existingMark && existingMark.affected === 0) {
       return res.status(404).json({
         message: "MarkCode not found",
       });
     }
-    await markRepository.delete(markCode);
+    // await markRepository.delete(markCode);
     return res.status(200).json({
       message: "Mark deleted successfully",
     });

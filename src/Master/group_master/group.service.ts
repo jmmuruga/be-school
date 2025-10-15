@@ -7,7 +7,10 @@ import { Not } from "typeorm";
 export const getGroupMasterDetails = async (req: Request, res: Response) => {
   try {
     const groupRepoistry = appSource.getRepository(GroupMaster);
-    const groupM = await groupRepoistry.createQueryBuilder("").getMany();
+  const groupM = await groupRepoistry.find({
+      where: { isActive: true },
+    });
+    // const groupM = await groupRepoistry.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: groupM,
     });
@@ -99,6 +102,8 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
 export const deleteGroup = async (req: Request, res: Response) => {
   try {
     const groupCode = Number(req.params.groupCode);
+    console.log('Soft deleting group:', groupCode);
+
     if (isNaN(groupCode)) {
       return res.status(400).json({
         message: "GroupCode not found",
@@ -109,15 +114,16 @@ export const deleteGroup = async (req: Request, res: Response) => {
     const existingGroup = await groupRepository
       .createQueryBuilder()
       .delete()
-      .from(GroupMaster)
+      .update(GroupMaster)
+      .set({isActive:false})
       .where({ groupCode: groupCode })
       .execute();
-    if (!existingGroup) {
+    if (!existingGroup && existingGroup.affected === 0) {
       return res.status(404).json({
         message: "GroupCode  not found",
       });
     }
-    await groupRepository.delete(groupCode);
+    // await groupRepository.delete(groupCode);
     return res.status(200).json({
       message: "Group Deleted successfully",
     });
