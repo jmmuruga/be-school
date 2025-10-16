@@ -111,18 +111,19 @@ export const deleteGroup = async (req: Request, res: Response) => {
     }
     const groupRepository = appSource.getRepository(GroupMaster);
     // Check whether groupcode exists
-    const existingGroup = await groupRepository
+  const existingGroup = await  groupRepository.findOneBy({groupCode:groupCode})
+    if (!existingGroup ) {
+      return res.status(404).json({
+        message: "GroupCode  not found",
+      });
+    }
+   await groupRepository 
       .createQueryBuilder()
       .delete()
       .update(GroupMaster)
       .set({isActive:false})
       .where({ groupCode: groupCode })
       .execute();
-    if (!existingGroup && existingGroup.affected === 0) {
-      return res.status(404).json({
-        message: "GroupCode  not found",
-      });
-    }
     // await groupRepository.delete(groupCode);
     return res.status(200).json({
       message: "Group Deleted successfully",

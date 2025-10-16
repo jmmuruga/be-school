@@ -123,18 +123,22 @@ export const deleteSubject = async (req: Request, res: Response) => {
     }
     const subjectRepoistry = appSource.getRepository(SubjectMaster);
     // Check whether subjectcode exists
-    const existingSubject = await subjectRepoistry
+    const existingSubject = await subjectRepoistry.findOneBy({
+      subjectCode: subjectCode,
+    });
+    if (!existingSubject) {
+      return res.status(404).json({
+        message: "subjectCode  not found",
+      });
+    }
+    // set active status
+    await subjectRepoistry
       .createQueryBuilder()
       .delete()
       .update(SubjectMaster)
       .set({ isActive: false })
       .where({ subjectCode: subjectCode })
       .execute();
-    if (!existingSubject && existingSubject.affected === 0) {
-      return res.status(404).json({
-        message: "subjectCode  not found",
-      });
-    }
     // await subjectRepoistry.delete(subjectCode);
     return res.status(200).json({
       message: "subjectCode deleted successfully",

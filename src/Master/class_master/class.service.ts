@@ -119,7 +119,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
 export const deleteClass = async (req: Request, res: Response) => {
   try {
     const classCode = Number(req.params.classCode);
-    console.log("Soft deleting class:", classCode);
+    console.log(" deleting class:", classCode);
 
     if (isNaN(classCode)) {
       return res.status(400).json({ message: "Invalid class code" });
@@ -127,19 +127,21 @@ export const deleteClass = async (req: Request, res: Response) => {
 
     const classRepository = appSource.getRepository(classMaster);
 
-    // Soft delete: set activeStatus = 0
-    const existingClass = await classRepository
+    //  check whether exist code 
+    const existingClass = await classRepository.findOneBy({classCode : classCode})
+
+    if (!existingClass) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+          // delete and active 
+    await classRepository
       .createQueryBuilder()
       .update(classMaster)
       .set({ isActive: false })
-      .where("classCode = :classCode", { classCode })
+      .where( { classCode  : classCode })
       .execute();
 
-    if (!existingClass && existingClass.affected === 0) {
-      return res.status(404).json({ message: "Class not found" });
-    }
-
-    return res.status(200).json({ message: "Class soft-deleted successfully" });
+    return res.status(200).json({ message: "Class deleted successfully" });
   } catch (error) {
     console.error("Soft delete error:", error);
     return res.status(500).json({ message: "Internal server error" });

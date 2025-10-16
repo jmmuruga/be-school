@@ -119,18 +119,20 @@ export const deleteMarks = async (req: Request, res: Response) => {
     }
     const markRepository = appSource.getRepository(MarkMaster);
     // check whether markcode exists
-    const existingMark = await markRepository
+    const existingMark = await markRepository.findOneBy({ markCode: markCode });
+
+    if (!existingMark) {
+      return res.status(404).json({
+        message: "MarkCode not found",
+      });
+    }
+    await markRepository
       .createQueryBuilder()
       .delete()
       .update(MarkMaster)
       .set({ isActive: false })
       .where({ markCode: markCode })
       .execute();
-    if (!existingMark && existingMark.affected === 0) {
-      return res.status(404).json({
-        message: "MarkCode not found",
-      });
-    }
     // await markRepository.delete(markCode);
     return res.status(200).json({
       message: "Mark deleted successfully",

@@ -53,7 +53,7 @@ export const getSchoolCode = async (req: Request, res: Response) => {
 export const getSchoolDetails = async (req: Request, res: Response) => {
   try {
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
-      const schlM = await schoolRepoistry.find({
+    const schlM = await schoolRepoistry.find({
       where: { isActive: true },
     });
     // const schlM = await schoolRepoistry.createQueryBuilder("").getMany();
@@ -117,18 +117,21 @@ export const deleteSchool = async (req: Request, res: Response) => {
     }
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
     // Check whether schoolcode exists
-    const existingSchool = await schoolRepoistry
-      .createQueryBuilder()
-      .delete()
-      .update(SchoolMaster)
-      .set({isActive:false})
-      .where({ schoolCode: schoolCode })
-      .execute();
-    if (!existingSchool && existingSchool.affected === 0) {
+    const existingSchool = await schoolRepoistry.findOneBy({
+      schoolCode: schoolCode,
+    });
+    if (!existingSchool) {
       return res.status(404).json({
         message: "schoolCode  not found",
       });
     }
+    await schoolRepoistry
+      .createQueryBuilder()
+      .delete()
+      .update(SchoolMaster)
+      .set({ isActive: false })
+      .where({ schoolCode: schoolCode })
+      .execute();
     // await schoolRepoistry.delete(schoolCode);
     return res.status(200).json({
       message: "schoolCode deleted successfully",

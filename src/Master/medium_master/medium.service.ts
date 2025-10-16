@@ -115,18 +115,19 @@ export const deleteMedium = async (req: Request, res: Response) => {
     }
     const mediumRepoistry = appSource.getRepository(MediumMaster);
     // Check whether mediumcode exists
-    const existingMedium = await mediumRepoistry
+    const existingMedium = await mediumRepoistry.findOneBy({mediumCode:mediumCode})
+    if (!existingMedium) {
+      return res.status(404).json({
+        message: "mediumCode  not found",
+      });
+    }
+     await mediumRepoistry
       .createQueryBuilder()
       .delete()
       .update(MediumMaster)
       .set({isActive:false})
       .where({ mediumCode: mediumCode })
       .execute();
-    if (!existingMedium && existingMedium.affected === 0) {
-      return res.status(404).json({
-        message: "mediumCode  not found",
-      });
-    }
     // await mediumRepoistry.delete(mediumCode);
     return res.status(200).json({
       message: "mediumCode deleted successfully",
