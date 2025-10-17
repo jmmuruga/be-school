@@ -8,17 +8,19 @@ export class GroupMaster {
   id: number;
   @Column()
   groupCode: number;
-  @Column({ default: '' })
+  @Column({ default: "" })
   groupoption: string;
   @Column()
   groupName: string;
   @Column()
   groupDescription: string;
-  @Column({default: true})
+  @Column({ default: true })
   isActive: boolean;
-  @Column({nullable:true})
+  @Column({ default: true })
+  status: boolean;
+  @Column({ nullable: true })
   created_UserId: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

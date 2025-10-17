@@ -69,7 +69,7 @@ export const getMarkCode = async (req: Request, res: Response) => {
 export const updateMark = async (req: Request, res: Response) => {
   try {
     const payload: MarkDto = req.body;
-    console.log("Update Payload:", payload);
+    // console.log("Update Payload:", payload);
     const validation = MarkValidation.validate(payload);
     if (validation.error) {
       console.log(validation.error, "Validation Error");
@@ -110,7 +110,7 @@ export const updateMark = async (req: Request, res: Response) => {
 export const deleteMarks = async (req: Request, res: Response) => {
   try {
     const markCode = Number(req.params.markCode);
-    console.log("Soft deleting mark:", markCode);
+    // console.log("Soft deleting mark:", markCode);
 
     if (isNaN(markCode)) {
       return res.status(400).json({

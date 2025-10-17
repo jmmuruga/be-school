@@ -1,5 +1,5 @@
 import { appSource } from "../../core/database/db";
-import { GroupDto, GroupValidation } from "./group.dto";
+import { GroupDto, groupStatus, GroupValidation } from "./group.dto";
 import { Request, Response } from "express";
 import { GroupMaster } from "./group.model";
 import { Not } from "typeorm";
@@ -102,7 +102,7 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
 export const deleteGroup = async (req: Request, res: Response) => {
   try {
     const groupCode = Number(req.params.groupCode);
-    console.log('Soft deleting group:', groupCode);
+    // console.log('Soft deleting group:', groupCode);
 
     if (isNaN(groupCode)) {
       return res.status(400).json({
@@ -133,5 +133,30 @@ export const deleteGroup = async (req: Request, res: Response) => {
     return res.status(500).json({
       message: "Internal Server error",
     });
+  }
+};
+export const updateGroupStatus = async (req: Request, res: Response) => {
+  try {
+    const payload: groupStatus = req.body;
+
+    const classRepository = appSource.getRepository(GroupMaster);
+    //  check whether exist code
+    const existingClass = await classRepository.findOneBy({
+      groupCode: payload.groupCode,
+    });
+    if (!existingClass) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+    await classRepository
+      .createQueryBuilder()
+      .update(GroupMaster)
+      .set({ status: payload.status })
+      .where({ groupCode: payload.groupCode })
+      .execute();
+
+    return res.status(200).json({ message: "Group Status updated" });
+  } catch (error) {
+    console.error("delete error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

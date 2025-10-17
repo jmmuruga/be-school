@@ -12,7 +12,9 @@ export class classMaster {
   className: string;
   @Column({default: true})
   isActive: boolean;
-  @Column({nullable: true})
+  @Column({default: true})
+  status: boolean;
+  @Column({nullable:true})
   created_UserId: string;
   @Column({nullable: true})
   updated_UserId: string;

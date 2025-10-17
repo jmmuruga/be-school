@@ -5,6 +5,7 @@ import {
   getClasMasterDetails,
   getClassCode,
   updateClassMaster,
+  updateStatusClass,
 } from "./class.service";
 
 const classRouter = Router();
@@ -19,3 +20,4 @@ classRouter.get("/getClasMasterDetails", (req, res) =>
 );
 classRouter.delete("/deleteClass/:classCode",(req,res) => deleteClass(req,res));
 export default classRouter;
+classRouter.post("/updateStatusClass",(req,res) => updateStatusClass(req,res));

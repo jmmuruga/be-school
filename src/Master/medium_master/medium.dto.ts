@@ -4,6 +4,7 @@ export const MediumValidation = Joi.object({
   mediumCode: Joi.number().required(),
   medium: Joi.string().required(),
   isActive: Joi.boolean().optional(),
+  updateStatus:Joi.boolean().optional(),
   created_UserId: Joi.string().optional(),
   updated_UserId: Joi.string().optional(),
 });
@@ -11,6 +12,7 @@ export interface MediumDto {
   mediumCode: number;
   medium: string;
   isActive: boolean;
+  updateStatus:boolean;
   created_UserId: string;
   updated_UserId: string;
 }

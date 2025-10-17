@@ -18,6 +18,8 @@ export class SubjectMaster {
     selectedClasses: string
     @Column({default:true})
     isActive: boolean
+   @Column({default:true})
+   status:boolean
    @Column({nullable:true})
     created_UserId: string
     @Column({nullable:true})

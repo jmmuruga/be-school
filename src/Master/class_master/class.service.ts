@@ -1,5 +1,5 @@
 import { appSource } from "../../core/database/db";
-import { ClassDto, ClassValidation } from "./class.dto";
+import { ClassDto, classStatus, ClassValidation } from "./class.dto";
 import { Request, Response } from "express";
 import { classMaster } from "./class.model";
 import { DataSource, Not } from "typeorm";
@@ -119,7 +119,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
 export const deleteClass = async (req: Request, res: Response) => {
   try {
     const classCode = Number(req.params.classCode);
-    console.log(" deleting class:", classCode);
+    // console.log(" deleting class:", classCode);
 
     if (isNaN(classCode)) {
       return res.status(400).json({ message: "Invalid class code" });
@@ -127,23 +127,50 @@ export const deleteClass = async (req: Request, res: Response) => {
 
     const classRepository = appSource.getRepository(classMaster);
 
-    //  check whether exist code 
-    const existingClass = await classRepository.findOneBy({classCode : classCode})
+    //  check whether exist code
+    const existingClass = await classRepository.findOneBy({
+      classCode: classCode,
+    });
 
     if (!existingClass) {
       return res.status(404).json({ message: "Class not found" });
     }
-          // delete and active 
+    // delete and active
     await classRepository
       .createQueryBuilder()
       .update(classMaster)
       .set({ isActive: false })
-      .where( { classCode  : classCode })
+      .where({ classCode: classCode })
       .execute();
 
     return res.status(200).json({ message: "Class deleted successfully" });
   } catch (error) {
-    console.error("Soft delete error:", error);
+    console.error("delete error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+export const updateStatusClass = async (req: Request, res: Response) => {
+  try {
+    const payload: classStatus = req.body;
+
+    const classRepository = appSource.getRepository(classMaster);
+    //  check whether exist code
+    const existingClass = await classRepository.findOneBy({
+      classCode: payload.classCode,
+    });
+    if (!existingClass) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+    await classRepository
+      .createQueryBuilder()
+      .update(classMaster)
+      .set({ status: payload.status })
+      .where({ classCode: payload.classCode })
+      .execute();
+
+    return res.status(200).json({ message: "Class  Status updated" });
+  } catch (error) {
+    console.error("delete error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

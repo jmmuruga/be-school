@@ -5,6 +5,7 @@ import {
   getGroupCode,
   getGroupMasterDetails,
   updateGroupMaster,
+  updateGroupStatus,
 } from "./group.service";
 
 const groupRouter = Router();
@@ -18,3 +19,5 @@ groupRouter.post("/updateGroupMaster", (req, res) =>
 );
 groupRouter.delete("/deleteGroup/:groupCode",(req,res) => deleteGroup(req,res));
 export default groupRouter;
+groupRouter.post("/updateGroupStatus",(req,res) => updateGroupStatus(req,res));
+

@@ -108,7 +108,7 @@ export const updateSchool = async (req: Request, res: Response) => {
 export const deleteSchool = async (req: Request, res: Response) => {
   try {
     const schoolCode = Number(req.params.schoolCode);
-    console.log("Soft deleting school:", schoolCode);
+    // console.log("Soft deleting school:", schoolCode);
 
     if (isNaN(schoolCode)) {
       return res.status(400).json({

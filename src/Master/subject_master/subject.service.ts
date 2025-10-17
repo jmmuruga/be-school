@@ -114,7 +114,7 @@ export const updateSubject = async (req: Request, res: Response) => {
 export const deleteSubject = async (req: Request, res: Response) => {
   try {
     const subjectCode = Number(req.params.subjectCode);
-    console.log("Soft deleting class:", subjectCode);
+    // console.log("Soft deleting class:", subjectCode);
 
     if (isNaN(subjectCode)) {
       return res.status(400).json({
