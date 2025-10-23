@@ -16,3 +16,8 @@ export interface MediumDto {
   created_UserId: string;
   updated_UserId: string;
 }
+
+export interface mediumStatus{
+  mediumCode : number;
+  status : boolean;
+}

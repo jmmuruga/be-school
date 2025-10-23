@@ -170,7 +170,7 @@ export const updateStatusClass = async (req: Request, res: Response) => {
 
     return res.status(200).json({ message: "Class  Status updated" });
   } catch (error) {
-    console.error("delete error:", error);
+    console.error("update error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

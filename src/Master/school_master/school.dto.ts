@@ -16,3 +16,8 @@ export interface SchoolDto {
   created_UserId: string;
   updated_UserId: string;
 }
+
+export interface schoolStatus{
+  schoolCode : number;
+  status : boolean;
+}

@@ -1,5 +1,5 @@
 import { appSource } from "../../core/database/db";
-import { SchoolDto, SchoolValidation } from "./school.dto";
+import { SchoolDto, schoolStatus, SchoolValidation } from "./school.dto";
 import { Request, Response } from "express";
 import { SchoolMaster } from "./school.model";
 import { Not } from "typeorm";
@@ -138,6 +138,35 @@ export const deleteSchool = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+export const updateSchoolStatus = async (req: Request, res: Response) => {
+  try {
+    const payload: schoolStatus = req.body;  
+    const schoolRepoistry = appSource.getRepository(SchoolMaster);
+    const existingSchool = await schoolRepoistry.findOneBy({
+      schoolCode: payload.schoolCode,
+    });
+    if (!existingSchool) {
+      return res.status(400).json({
+        message: "School not found",
+      });
+    } 
+    await schoolRepoistry
+      .createQueryBuilder()
+      .update(SchoolMaster)
+      .set({ status: payload.status })
+      .where({ schoolCode: payload.schoolCode })
+      .execute();
+    return res.status(200).json({
+      message: "School status updated successfully",
+    });
+  }
+    catch (error) { 
+    console.error("update error",error);
     return res.status(500).json({
       message: "Internal server error",
     });

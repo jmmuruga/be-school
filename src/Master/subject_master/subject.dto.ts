@@ -1,3 +1,4 @@
+import e from "express";
 import * as Joi from "joi";
 
 export const Subjectvalidation = Joi.object({
@@ -19,4 +20,9 @@ export interface SubjectDto {
   updateStatus: boolean;
   created_UserId: string;
   updated_UserId: string;
+}
+
+export interface subjectStatus {
+  subjectCode: number;
+  status: boolean;
 }

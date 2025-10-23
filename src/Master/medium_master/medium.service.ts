@@ -1,5 +1,5 @@
 import { appSource } from "../../core/database/db";
-import { MediumDto, MediumValidation } from "./medium.dto";
+import { MediumDto, mediumStatus, MediumValidation } from "./medium.dto";
 import { Request, Response } from "express";
 import { MediumMaster } from "./medium.model";
 import mediumRouter from "./medium.controller";
@@ -7,7 +7,9 @@ import { Not } from "typeorm";
 
 export const addMedium = async (req: Request, res: Response) => {
   try {
+    // get the data
     const payload: MediumDto = req.body;
+    //check validation
     const validation = MediumValidation.validate(payload);
     if (validation.error) {
       return res.status(400).json({
@@ -67,7 +69,9 @@ export const getMediumDetails = async (req: Request, res: Response) => {
 };
 export const updateMedium = async (req: Request, res: Response) => {
   try {
+    // get the data
     const payload: MediumDto = req.body;
+    //check validation
     const validation = MediumValidation.validate(payload);
     if (validation.error) {
       console.log(validation.error, "Validation Error");
@@ -115,17 +119,19 @@ export const deleteMedium = async (req: Request, res: Response) => {
     }
     const mediumRepoistry = appSource.getRepository(MediumMaster);
     // Check whether mediumcode exists
-    const existingMedium = await mediumRepoistry.findOneBy({mediumCode:mediumCode})
+    const existingMedium = await mediumRepoistry.findOneBy({
+      mediumCode: mediumCode,
+    });
     if (!existingMedium) {
       return res.status(404).json({
         message: "mediumCode  not found",
       });
     }
-     await mediumRepoistry
+    //delete and active
+    await mediumRepoistry
       .createQueryBuilder()
-      .delete()
       .update(MediumMaster)
-      .set({isActive:false})
+      .set({ isActive: false })
       .where({ mediumCode: mediumCode })
       .execute();
     // await mediumRepoistry.delete(mediumCode);
@@ -134,6 +140,34 @@ export const deleteMedium = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+export const updateMediumStatus = async (req: Request, res: Response) => {
+  try {
+    const payload: mediumStatus = req.body;
+    const mediumRepoistry = appSource.getRepository(MediumMaster);
+    const existingMedium = await mediumRepoistry.findOneBy({
+      mediumCode: payload.mediumCode,
+    });
+    if (!existingMedium) {
+      return res.status(400).json({
+        message: "Medium not found",
+      });
+    }
+    await mediumRepoistry
+      .createQueryBuilder()
+      .update(MediumMaster)
+      .set({ status: payload.status })
+      .where({ mediumCode: payload.mediumCode })
+      .execute();
+    return res
+      .status(200)
+      .json({ message: "Medium status updated successfully" });
+  } catch (error) {
+    console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
     });

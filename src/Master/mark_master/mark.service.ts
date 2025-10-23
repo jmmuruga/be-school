@@ -1,5 +1,5 @@
 import { appSource } from "../../core/database/db";
-import { MarkDto, MarkValidation } from "./mark.dto";
+import { MarkDto, markStatus, MarkValidation } from "./mark.dto";
 import { Request, Response } from "express";
 import { MarkMaster } from "./mark.model";
 import { Not } from "typeorm";
@@ -140,6 +140,35 @@ export const deleteMarks = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+export const updateMarkStatus = async (req: Request, res: Response) => {
+  try {
+    const payload: markStatus = req.body;
+    const markRepository = appSource.getRepository(MarkMaster);
+    // check whether markcode exists
+    const existingMark = await markRepository.findOneBy({ 
+      markCode: payload.markCode,
+    });
+    if (!existingMark) {
+      return res.status(400).json({
+        message: "Mark not found",
+      });
+    }
+    await markRepository
+      .createQueryBuilder()
+      .update(MarkMaster)
+      .set({ status: payload.status })
+      .where({ markCode: payload.markCode })
+      .execute();
+    return res.status(200).json({
+      message: "Mark status updated successfully",
+    });
+  } catch (error) {
+    console.error("update error",error);
+    return res.status(500).json({ 
       message: "Internal server error",
     });
   }

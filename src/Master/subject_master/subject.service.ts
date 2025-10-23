@@ -1,5 +1,5 @@
 import { appSource } from "../../core/database/db";
-import { SubjectDto, Subjectvalidation } from "./subject.dto";
+import { SubjectDto, subjectStatus, Subjectvalidation } from "./subject.dto";
 import { Request, Response } from "express";
 import { SubjectMaster } from "./subject.model";
 import subjectRouter from "./subject.controller";
@@ -145,6 +145,34 @@ export const deleteSubject = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+export const updateSubjectStatus = async (req: Request, res: Response) => {
+  try {
+    const payload: subjectStatus = req.body;
+    const subjectRepoistry = appSource.getRepository(SubjectMaster);
+    const existingSubject = await subjectRepoistry.findOneBy({
+      subjectCode: payload.subjectCode,
+    });
+    if (!existingSubject) {
+      return res.status(400).json({
+        message: "Subject not found",
+      });
+    }
+    await subjectRepoistry
+      .createQueryBuilder()
+      .update(SubjectMaster)
+      .set({ status: payload.status })
+      .where({ subjectCode: payload.subjectCode })
+      .execute();
+    return res
+      .status(200)
+      .json({ message: "Subject status updated successfully" });
+  } catch (error) {
+    console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
     });

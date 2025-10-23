@@ -17,3 +17,8 @@ export interface MarkDto {
   created_UserId: string;
   updated_UserId: string;
 }
+
+export interface markStatus{
+  markCode : number;
+  status : boolean;
+}

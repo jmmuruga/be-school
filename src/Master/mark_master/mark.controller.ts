@@ -5,6 +5,7 @@ import {
   getMarkCode,
   getMarkMasterDetails,
   updateMark,
+  updateMarkStatus,
 } from "./mark.service";
 import { deleteClass } from "../class_master/class.service";
 
@@ -17,3 +18,4 @@ markRouter.get("/getMarkMasterDetails", (req, res) =>
 markRouter.post("/updateMark", (req, res) => updateMark(req, res));
 export default markRouter;
 markRouter.delete("/deleteMarks/:markCode", (req, res) => deleteMarks(req, res));
+markRouter.post("/updateMarkStatus",(req,res) => updateMarkStatus(req,res));
