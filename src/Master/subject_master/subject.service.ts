@@ -24,11 +24,11 @@ export const addSubject = async (req: Request, res: Response) => {
 
     if (existingSubject) {
       return res.status(400).json({
-        message: "Subject  already exists",
+        ErrorMessage: "Subject  already exists",
       });
     }
     await subjectRepository.save(payload);
-    return res.status(200).json({ message: "Subject added successfully" });
+    return res.status(200).json({ IsSuccess: "Subject Added Successfully !!" });
   } catch (error) {
     console.log(error);
   }
@@ -85,7 +85,7 @@ export const updateSubject = async (req: Request, res: Response) => {
     });
     if (!existingSubject) {
       return res.status(400).json({
-        message: "Subject Doesn't exist",
+        ErrorMessage: "Subject Doesn't exist",
       });
     }
     //  check subject already exist
@@ -95,14 +95,16 @@ export const updateSubject = async (req: Request, res: Response) => {
     });
     if (subjectExist.length > 0) {
       return res.status(400).json({
-        message: "Subject Already Exist",
+        ErrorMessage: "Subject Already Exist",
       });
     }
     await subjectRepoistry.update(
       { subjectCode: payload.subjectCode },
       payload
     );
-    return res.status(200).json({ message: "Subject Updated successfully" });
+    return res
+      .status(200)
+      .json({ IsSuccess: "Subject Updated Successfully !!" });
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({
@@ -118,7 +120,7 @@ export const deleteSubject = async (req: Request, res: Response) => {
 
     if (isNaN(subjectCode)) {
       return res.status(400).json({
-        message: "Invalid class code",
+        ErrorMessage: "Invalid class code",
       });
     }
     const subjectRepoistry = appSource.getRepository(SubjectMaster);
@@ -128,7 +130,7 @@ export const deleteSubject = async (req: Request, res: Response) => {
     });
     if (!existingSubject) {
       return res.status(404).json({
-        message: "subjectCode  not found",
+        ErrorMessage: "subjectCode  not found",
       });
     }
     // set active status
@@ -141,7 +143,7 @@ export const deleteSubject = async (req: Request, res: Response) => {
       .execute();
     // await subjectRepoistry.delete(subjectCode);
     return res.status(200).json({
-      message: "subjectCode deleted successfully",
+      IsSuccess: "Subject Deleted Successfully !!",
     });
   } catch (error) {
     console.error(error);
@@ -159,7 +161,7 @@ export const updateSubjectStatus = async (req: Request, res: Response) => {
     });
     if (!existingSubject) {
       return res.status(400).json({
-        message: "Subject not found",
+        ErrorMessage: "Subject not found",
       });
     }
     await subjectRepoistry
@@ -170,7 +172,7 @@ export const updateSubjectStatus = async (req: Request, res: Response) => {
       .execute();
     return res
       .status(200)
-      .json({ message: "Subject status updated successfully" });
+      .json({ IsSuccess: "Subject Status updated Successfully" });
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({

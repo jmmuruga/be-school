@@ -20,11 +20,11 @@ export const addSchool = async (req: Request, res: Response) => {
 
     if (existingSchool) {
       return res.status(400).json({
-        message: "School  already exists",
+        ErrorMessage: "School  already exists",
       });
     }
     await schoolRepoistry.save(payload);
-    return res.status(200).json({ message: "School added successfully" });
+    return res.status(200).json({ IsSuccess: "School Added Successfully !!" });
   } catch (error) {
     console.log(error);
   }
@@ -81,7 +81,7 @@ export const updateSchool = async (req: Request, res: Response) => {
     });
     if (!existingSchool) {
       return res.status(400).json({
-        message: "Class Doesn't exist",
+        ErrorMessage: "Class Doesn't exist",
       });
     }
     // check school already exist
@@ -91,12 +91,12 @@ export const updateSchool = async (req: Request, res: Response) => {
     });
     if (schoolExist.length > 0) {
       return res.status(400).json({
-        message: "School Name Already Exist",
+        ErrorMessage: "School Name Already Exist",
       });
     }
 
     await schoolRepoistry.update({ schoolCode: payload.schoolCode }, payload);
-    return res.status(200).json({ message: "School Updated successfully" });
+    return res.status(200).json({ IsSuccess: "School Updated Successfully !!" });
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({
@@ -112,7 +112,7 @@ export const deleteSchool = async (req: Request, res: Response) => {
 
     if (isNaN(schoolCode)) {
       return res.status(400).json({
-        message: "Invalid class code",
+        ErrorMessage: "Invalid class code",
       });
     }
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
@@ -122,7 +122,7 @@ export const deleteSchool = async (req: Request, res: Response) => {
     });
     if (!existingSchool) {
       return res.status(404).json({
-        message: "schoolCode  not found",
+        ErrorMessage: "schoolCode  not found",
       });
     }
     await schoolRepoistry
@@ -134,7 +134,7 @@ export const deleteSchool = async (req: Request, res: Response) => {
       .execute();
     // await schoolRepoistry.delete(schoolCode);
     return res.status(200).json({
-      message: "schoolCode deleted successfully",
+      IsSuccess: "School Deleted successfully",
     });
   } catch (error) {
     console.error(error);
@@ -152,7 +152,7 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
     });
     if (!existingSchool) {
       return res.status(400).json({
-        message: "School not found",
+        ErrorMessage: "School not found",
       });
     } 
     await schoolRepoistry
@@ -162,7 +162,7 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
       .where({ schoolCode: payload.schoolCode })
       .execute();
     return res.status(200).json({
-      message: "School status updated successfully",
+      IsSuccess: "School Status Updated Successfully !!",
     });
   }
     catch (error) { 

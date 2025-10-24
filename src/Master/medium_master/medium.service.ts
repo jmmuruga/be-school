@@ -23,11 +23,11 @@ export const addMedium = async (req: Request, res: Response) => {
 
     if (existingMedium) {
       return res.status(400).json({
-        message: "Medium already exists",
+        ErrorMessage: "Medium already exists",
       });
     }
     await mediumRepoistry.save(payload);
-    return res.status(200).json({ message: "Medium added successfully" });
+    return res.status(200).json({ IsSuccess: "Medium Added Successfully !!" });
   } catch (error) {
     console.log(error);
   }
@@ -79,28 +79,28 @@ export const updateMedium = async (req: Request, res: Response) => {
         message: validation.error.details[0].message,
       });
     }
-    // check whether medium exist
+    // check whether medium exist code
     const mediumRepoistry = appSource.getRepository(MediumMaster);
     const existingMedium = await mediumRepoistry.findOneBy({
       mediumCode: payload.mediumCode,
     });
     if (!existingMedium) {
       return res.status(400).json({
-        message: "Medium Doesn't exist",
+        ErrorMessage: "Medium Doesn't exist",
       });
     }
-    // check medium already exists
+    // check medium  already exists
     const mediumExist = await mediumRepoistry.findBy({
       medium: payload.medium,
       mediumCode: Not(payload.mediumCode),
     });
     if (mediumExist.length > 0) {
       return res.status(400).json({
-        message: "Medium Already Exist",
+        ErrorMessage: "Medium Already Exist",
       });
     }
     await mediumRepoistry.update({ mediumCode: payload.mediumCode }, payload);
-    return res.status(200).json({ message: "Medium Updated successfully" });
+    return res.status(200).json({ IsSuccess: "Medium Updated Successfully !!" });
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({
@@ -124,7 +124,7 @@ export const deleteMedium = async (req: Request, res: Response) => {
     });
     if (!existingMedium) {
       return res.status(404).json({
-        message: "mediumCode  not found",
+        ErrorMessage: "mediumCode  not found",
       });
     }
     //delete and active
@@ -136,7 +136,7 @@ export const deleteMedium = async (req: Request, res: Response) => {
       .execute();
     // await mediumRepoistry.delete(mediumCode);
     return res.status(200).json({
-      message: "mediumCode deleted successfully",
+      IsSuccess: "Medium Deleted successfully !!",
     });
   } catch (error) {
     console.error(error);
@@ -154,7 +154,7 @@ export const updateMediumStatus = async (req: Request, res: Response) => {
     });
     if (!existingMedium) {
       return res.status(400).json({
-        message: "Medium not found",
+        ErrorMessage: "Medium not found",
       });
     }
     await mediumRepoistry
@@ -165,7 +165,7 @@ export const updateMediumStatus = async (req: Request, res: Response) => {
       .execute();
     return res
       .status(200)
-      .json({ message: "Medium status updated successfully" });
+      .json({ IsSuccess: "Medium Status updated Successfully !" });
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({

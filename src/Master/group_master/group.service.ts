@@ -7,7 +7,7 @@ import { Not } from "typeorm";
 export const getGroupMasterDetails = async (req: Request, res: Response) => {
   try {
     const groupRepoistry = appSource.getRepository(GroupMaster);
-  const groupM = await groupRepoistry.find({
+    const groupM = await groupRepoistry.find({
       where: { isActive: true },
     });
     // const groupM = await groupRepoistry.createQueryBuilder("").getMany();
@@ -30,7 +30,7 @@ export const addGroup = async (req: Request, res: Response) => {
     }
     const groupRepoistry = appSource.getRepository(GroupMaster);
     await groupRepoistry.save(payload);
-    return res.status(200).json({ message: "Group added successfully" });
+    return res.status(200).json({ IsSuccess: "Group Added Successfully !!" });
   } catch (error) {
     console.log(error);
   }
@@ -74,7 +74,7 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     });
     if (!existingGroup) {
       return res.status(400).json({
-        message: "Group Doesn't exist",
+        ErrorMessage: "Group Doesn't exist",
       });
     }
     // check name  already exist
@@ -86,11 +86,11 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     });
     if (nameExist.length > 0) {
       return res.status(400).json({
-        message: "Group Name Already Exist",
+        ErrorMessage: "Group Name Already Exist",
       });
     }
     await groupRepository.update({ groupCode: payload.groupCode }, payload);
-    return res.status(200).json({ message: "Group Updated successfully" });
+    return res.status(200).json({ IsSuccess: "Group Updated successfully !!" });
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({
@@ -111,22 +111,24 @@ export const deleteGroup = async (req: Request, res: Response) => {
     }
     const groupRepository = appSource.getRepository(GroupMaster);
     // Check whether groupcode exists
-  const existingGroup = await  groupRepository.findOneBy({groupCode:groupCode})
-    if (!existingGroup ) {
+    const existingGroup = await groupRepository.findOneBy({
+      groupCode: groupCode,
+    });
+    if (!existingGroup) {
       return res.status(404).json({
-        message: "GroupCode  not found",
+        ErrorMessage: "GroupCode  not found",
       });
     }
-   await groupRepository 
+    await groupRepository
       .createQueryBuilder()
       .delete()
       .update(GroupMaster)
-      .set({isActive:false})
+      .set({ isActive: false })
       .where({ groupCode: groupCode })
       .execute();
     // await groupRepository.delete(groupCode);
     return res.status(200).json({
-      message: "Group Deleted successfully",
+      IsSuccess: "Group Deleted Successfully !!",
     });
   } catch (error) {
     console.error(error);
@@ -145,7 +147,7 @@ export const updateGroupStatus = async (req: Request, res: Response) => {
       groupCode: payload.groupCode,
     });
     if (!existingClass) {
-      return res.status(404).json({ message: "Group not found" });
+      return res.status(404).json({ ErrorMessage: "Group Not Found" });
     }
     await classRepository
       .createQueryBuilder()
@@ -154,7 +156,9 @@ export const updateGroupStatus = async (req: Request, res: Response) => {
       .where({ groupCode: payload.groupCode })
       .execute();
 
-    return res.status(200).json({ message: "Group Status updated" });
+    return res
+      .status(200)
+      .json({ IsSuccess: "Group Status Updated Successfully" });
   } catch (error) {
     console.error("delete error:", error);
     return res.status(500).json({ message: "Internal server error" });

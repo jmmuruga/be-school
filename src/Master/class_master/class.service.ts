@@ -29,7 +29,7 @@ export const addClass = async (req: Request, res: Response) => {
 
     await classRepository.save(payload);
 
-    return res.status(200).json({ message: "Class added successfully" });
+    return res.status(200).json({ IsSuccess: "Class Added Successfully !!" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -106,7 +106,9 @@ export const updateClassMaster = async (req: Request, res: Response) => {
       });
     }
     await classRepository.update({ classCode: payload.classCode }, payload); //update
-    return res.status(200).json({ message: "Class Updated successfully" });
+    return res
+      .status(200)
+      .json({ IsSuccess: "Class Updated successfully  !!" });
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({
@@ -122,7 +124,7 @@ export const deleteClass = async (req: Request, res: Response) => {
     // console.log(" deleting class:", classCode);
 
     if (isNaN(classCode)) {
-      return res.status(400).json({ message: "Invalid class code" });
+      return res.status(400).json({ ErrorMessage: "Invalid class code" });
     }
 
     const classRepository = appSource.getRepository(classMaster);
@@ -133,7 +135,7 @@ export const deleteClass = async (req: Request, res: Response) => {
     });
 
     if (!existingClass) {
-      return res.status(404).json({ message: "Class not found" });
+      return res.status(404).json({ ErrorMessage: "Class not found" });
     }
     // delete and active
     await classRepository
@@ -143,7 +145,7 @@ export const deleteClass = async (req: Request, res: Response) => {
       .where({ classCode: classCode })
       .execute();
 
-    return res.status(200).json({ message: "Class deleted successfully" });
+    return res.status(200).json({ IsSuccess: "Class Deleted Successfully !!" });
   } catch (error) {
     console.error("delete error:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -159,7 +161,7 @@ export const updateStatusClass = async (req: Request, res: Response) => {
       classCode: payload.classCode,
     });
     if (!existingClass) {
-      return res.status(404).json({ message: "Class not found" });
+      return res.status(404).json({ ErrorMessage: "Class not found" });
     }
     await classRepository
       .createQueryBuilder()
@@ -168,7 +170,9 @@ export const updateStatusClass = async (req: Request, res: Response) => {
       .where({ classCode: payload.classCode })
       .execute();
 
-    return res.status(200).json({ message: "Class  Status updated" });
+    return res
+      .status(200)
+      .json({ IsSuccess: "Class  Status updated Successfully !! " });
   } catch (error) {
     console.error("update error:", error);
     return res.status(500).json({ message: "Internal server error" });

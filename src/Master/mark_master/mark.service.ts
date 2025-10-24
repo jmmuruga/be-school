@@ -36,11 +36,11 @@ export const addMark = async (req: Request, res: Response) => {
     });
     if (existingMark) {
       return res.status(400).json({
-        message: "Mark already exists",
+        ErrorMessage: "Mark already exists",
       });
     }
     await markRepository.save(payload);
-    return res.status(200).json({ message: "Mark added successfully" });
+    return res.status(200).json({ IsSuccess: "Mark Added Successfully !!" });
   } catch (error) {
     console.log(error);
   }
@@ -84,7 +84,7 @@ export const updateMark = async (req: Request, res: Response) => {
     });
     if (!existingMark) {
       return res.status(400).json({
-        message: "Mark Doesn't exist",
+        ErrorMessage: "Mark Doesn't exist",
       });
     }
     // check mark already exist
@@ -94,11 +94,11 @@ export const updateMark = async (req: Request, res: Response) => {
     });
     if (markExist.length > 0) {
       return res.status(400).json({
-        message: "Mark Already Exist",
+        ErrorMessage: "Mark Already Exist",
       });
     }
     await markRepository.update({ markCode: payload.markCode }, payload);
-    return res.status(200).json({ message: "Mark Updated successfully" });
+    return res.status(200).json({ IsSuccess: "Mark Updated successfully" });
   } catch (error) {
     console.error("Update Error:", error);
     return res.status(500).json({
@@ -123,7 +123,7 @@ export const deleteMarks = async (req: Request, res: Response) => {
 
     if (!existingMark) {
       return res.status(404).json({
-        message: "MarkCode not found",
+        ErrorMessage: "MarkCode not found",
       });
     }
     await markRepository
@@ -135,7 +135,7 @@ export const deleteMarks = async (req: Request, res: Response) => {
       .execute();
     // await markRepository.delete(markCode);
     return res.status(200).json({
-      message: "Mark deleted successfully",
+      IsSuccess: "Mark deleted successfully !!",
     });
   } catch (error) {
     console.error(error);
@@ -154,7 +154,7 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
     });
     if (!existingMark) {
       return res.status(400).json({
-        message: "Mark not found",
+        ErrorMessage: "Mark not found",
       });
     }
     await markRepository
@@ -164,7 +164,7 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
       .where({ markCode: payload.markCode })
       .execute();
     return res.status(200).json({
-      message: "Mark status updated successfully",
+      IsSuccess: "Mark status updated Successfully !",
     });
   } catch (error) {
     console.error("update error",error);
