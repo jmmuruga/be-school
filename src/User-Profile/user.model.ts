@@ -9,7 +9,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  UserId: number;
+  UserID: number;
   @Column()
   userName: string;
   @Column()
@@ -24,9 +24,19 @@ export class User {
   roleType: string;
   @Column()
   staffNo: string;
-  @Column({default:true})
+  @Column()
+  userAccess: string;
+  @Column()
+  dashboardAccess: string;
+  @Column()
+  masterParent: string;
+  @Column()
+  questionsParent: string;
+  @Column()
+  profileParent: string;
+  @Column({ default: true })
   isActive: boolean;
-   @Column()
+  @Column()
   created_UserId: string;
   @Column()
   updated_UserId: string;
