@@ -18,27 +18,29 @@ export class User {
   confirmPassword: string;
   @Column()
   email: string;
-  @Column()
-  phone: number;
+@Column({ type: 'nvarchar', length: 15 })
+phone: string;
   @Column()
   roleType: string;
   @Column()
   staffNo: string;
   @Column()
-  userAccess: string;
-  @Column()
-  dashboardAccess: string;
-  @Column()
-  masterParent: string;
-  @Column()
-  questionsParent: string;
-  @Column()
-  profileParent: string;
+  // userAccess: boolean;
+  // @Column()
+  // dashboardAccess: boolean;
+  // @Column()
+  // masterParent: string;
+  // @Column()
+  // questionsParent: string;
+  // @Column()
+  // profileParent: string;
   @Column({ default: true })
   isActive: boolean;
-  @Column()
+  @Column({default:true})
+  status:boolean;
+  @Column({nullable:true})
   created_UserId: string;
-  @Column()
+  @Column({nullable:true})
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
