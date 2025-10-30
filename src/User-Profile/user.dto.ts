@@ -26,11 +26,6 @@ export interface UserDto {
   confirmPassword: string;
   roleType: string;
   staffNo: string;
-  // userAccess: boolean;
-  // dashboardAccess: boolean;
-  // masterParent: string;
-  // questionsParent: string;
-  // profileParent: string;
   phone: string;
   isActive: boolean;
   updateStatus:boolean;

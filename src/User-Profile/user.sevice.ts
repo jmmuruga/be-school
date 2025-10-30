@@ -2,7 +2,8 @@ import { UserDto, UserStatus, UserValidation } from "./user.dto";
 import { Request, Response } from "express";
 import { User } from "./user.model";
 import { appSource } from "../core/database/db";
-import { Not } from "typeorm";
+import { In, Not } from "typeorm";
+import { ValidationException } from "../exceptions/ValidationException";
 
 export const addUser = async (req: Request, res: Response) => {
   try {
@@ -15,16 +16,72 @@ export const addUser = async (req: Request, res: Response) => {
     }
     const userRepoistry = appSource.getRepository(User);
     // check data whether existing
-    const existingUser = await userRepoistry.findOneBy({
-      userName: payload.userName,
-    });
+
+    const existingUser = await userRepoistry
+      .createQueryBuilder("user")
+      .where("user.phone = :phone", { phone: payload.phone })
+      .orWhere("user.email = :email", { email: payload.email })
+      .orWhere("user.userName = :userName", { userName: payload.userName })
+      .getOne();
     if (existingUser) {
-      return res.status(400).json({
-        message: "user Name already exists ",
-      });
+      const existing = [];
+       if (existingUser.userName === payload.userName) existing.push("username");
+      if (existingUser.phone === payload.phone) existing.push("phone number");
+      if (existingUser.email === payload.email) existing.push("email");
+     
+      if (existing.length > 0) {
+        return res.status(400).json({
+          ErrorMessage: `User ${existing.join(", ")} already exists`,
+        });
+      }
     }
+
+    // if (existingUser) {
+    //   const existing =
+    //     existingUser.phone === payload.phone
+    //       ? "phone number"
+    //       : existingUser.email === payload.email
+    //       ? "email"
+    //       : "username";
+    //   return res.status(400).json({
+    //     ErrorMessage: `User  ${existing} Already Exists`,
+    //   });
+    // }
+    //   if (existingUser) {
+    //   ErrorMessage :
+    //      "User already exists (phone, email, or username already in use)",
+    // }
+    // if (existingUser) {
+    //   return res.status(400).json({
+    //         ErrorMessage: "User Already Exists",
+    //       });
+    // }
+    // const existingUser = await userRepoistry.findOneBy({
+    //   userName: payload.userName,
+    // });
+    // const emailExisting = await userRepoistry.findOneBy({
+    //   email: payload.email,
+    // });
+    // const phoneExisting = await userRepoistry.findOneBy({
+    //   phone: payload.phone,
+    // });
+    // if (existingUser) {
+    //   return res.status(400).json({
+    //     message: "User Already Exists ",
+    //   });
+    // }
+    // if (emailExisting) {
+    //   return res.status(400).json({
+    //     message: "Email Already Exists ",
+    //   });
+    // }
+    // if (phoneExisting) {
+    //   return res.status(400).json({
+    //     message: "Phone Number Already Exists ",
+    //   });
+    // }
     await userRepoistry.save(payload);
-    return res.status(200).json({ message: "User added successfully" });
+    return res.status(200).json({ IsSuccess: "User Added Successfully !!" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -78,12 +135,13 @@ export const updateUserLogin = async (req: Request, res: Response) => {
     }
     // check whether user exist
     const userRepository = appSource.getRepository(User);
+
     const existingUser = await userRepository.findOneBy({
       UserID: payload.UserID,
     });
     if (!existingUser) {
       return res.status(400).json({
-        message: "User Doesn't exist ",
+        ErrorMessage: "User Doesn't exist ",
       });
     }
     // check name already exist
@@ -93,7 +151,27 @@ export const updateUserLogin = async (req: Request, res: Response) => {
     });
     if (nameExist.length > 0) {
       return res.status(400).json({
-        message: "User Name Already Exist",
+        ErrorMessage: "User Name Already Exist",
+      });
+    }
+    // check phone number already exist 
+    const phoneExist = await userRepository.findBy({
+      phone:payload.phone,
+      UserID: Not(payload.UserID)
+    });
+    if(phoneExist.length>0){
+      return res.status(400).json({
+        ErrorMessage: "Phone Number  Already Exist",
+      });
+    }
+    // check email already exist 
+    const emailExist = await userRepository.findBy({
+      email:payload.email,
+      UserID: Not(payload.UserID)
+    });
+    if(emailExist.length>0){
+      return res.status(400).json({
+        ErrorMessage: "Email  Already Exist",
       });
     }
     await userRepository.update({ UserID: payload.UserID }, payload);
