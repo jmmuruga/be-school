@@ -7,7 +7,7 @@ export const UserValidation = Joi.object({
   confirmPassword: Joi.string().required(),
   roleType: Joi.string().required(),
   staffNo: Joi.string().required(),
-  phone: Joi.number().required(),
+  phone: Joi.string().required(),
   // userAccess: Joi.boolean().optional(),
   // dashboardAccess: Joi.boolean().optional(),
   // masterParent: Joi.string().optional(),

@@ -24,7 +24,7 @@ export class User {
   roleType: string;
   @Column()
   staffNo: string;
-  @Column()
+  // @Column()
   // userAccess: boolean;
   // @Column()
   // dashboardAccess: boolean;
