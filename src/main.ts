@@ -15,6 +15,7 @@ import userRouter from "./User-Profile/user.controller";
 import objectquesRouter from "./Question bank/objective-question/objective-question.controller";
 import QuesGenerateRouter from "./Question bank/question-paper-generate/ques-paper-generate.controller";
 import onlinetestRouter from "./Test Board/onlinetest.controller";
+import StaffRouter from "./Staff-Profile/staff-Profile.controller";
 const app = express();
 
 dotenv.config();
@@ -41,6 +42,8 @@ app.use('/signupRouter',cors(corsOptions),signupRouter);
 app.use('/userRouter',cors(corsOptions),userRouter);
 app.use('/objectquesRouter',cors(corsOptions),objectquesRouter);
 app.use('/onlinetestRouter',cors(corsOptions),onlinetestRouter);
+app.use('/StaffRouter',cors(corsOptions),StaffRouter);
+
 // app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter)
 app.listen(PORT, () => console.log(`server upon port ${PORT}`));
 

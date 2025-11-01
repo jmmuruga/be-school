@@ -10,9 +10,11 @@ import { SubjectMaster } from "../../Master/subject_master/subject.model";
 // import { Signup } from "../../Signup/signup.model";
 import { Signup } from "../../Signup/signup.model";
 import { User } from "../../User-Profile/user.model";
-import { Quesgenerate } from "../../Question bank/question-paper-generate/ques-paper-generate.model";
 
-const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,Signup,User
+import { Quesgenerate } from "../../Question bank/question-paper-generate/ques-paper-generate.model";
+import { Staff } from "../../Staff-Profile/staff-Profile.model";
+
+const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,Signup,User,Staff
     
 ]
 
