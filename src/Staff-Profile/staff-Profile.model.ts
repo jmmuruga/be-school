@@ -28,6 +28,8 @@ export class Staff {
   MajorSubject: string;
   @Column({ default: true })
   isActive: boolean;
+   @Column({ default: true })
+  status: boolean;
   @Column({ nullable: true })
   created_UserId: string;
   @Column({ nullable: true })
