@@ -2,25 +2,67 @@ import { appSource } from "../core/database/db";
 import { SignupDto, SignupValidation } from "./signup.dto";
 import { Request, Response } from "express";
 import { Signup } from "./signup.model";
-export const addSignup = async(req : Request , res :Response)=>{
-    try{
-        const payload : SignupDto = req.body;
-        const validation = SignupValidation.validate(payload);
-        if(validation.error){
-            return res.status(400).json({
-                message: validation.error.details[0].message
-            })
-        }
-        const signupRepository = appSource.getRepository(Signup);
-        await signupRepository.save({
-            ...payload,
-            aadhaar: String(payload.aadhaar),
-            contact: String(payload.contact)
-        });
-        return res.status(200).json({message : "Signup added successfully"})
+export const addSignup = async (req: Request, res: Response) => {
+  try {
+    const payload: SignupDto = req.body;
+    const validation = SignupValidation.validate(payload);
+    if (validation.error) {
+      return res.status(400).json({
+        message: validation.error.details[0].message,
+      });
     }
-    catch(error){
-        console.log(error)
+    // check when existing data
+
+    const signupRepository = appSource.getRepository(Signup);
+    const nameExist = await signupRepository.findOneBy({
+      UserName: payload.UserName,
+    });
+    if (nameExist) {
+      return res.status(400).json({
+        ErrorMessage: "UserName Already Exist",
+      });
+    }
+    const emailExist = await signupRepository.findOneBy({
+      email: payload.email,
+    });
+    if (emailExist) {
+      return res.status(400).json({
+        ErrorMessage: "Email Already Exist",
+      });
+    }
+    const aatharExist = await signupRepository.findOneBy({
+      aadhaar: payload.aadhaar,
+    });
+    if (aatharExist) {
+      return res.status(400).json({
+        ErrorMessage: "Aathar No Is Already Exist !! Please Try Another Way !",
+      });
+    }
+    const contactExist = await signupRepository.findOneBy({
+      contact: payload.contact,
+    });
+    if (contactExist) {
+      return res.status(400).json({
+        ErrorMessage: "Contact No Already Exist !! Please Another No",
+      });
     }
 
-}
+    await signupRepository.save(payload);
+    return res.status(200).json({ IsSuccess: "Signup added successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ ErrorMessage: "Internal server error" });
+  }
+};
+export const getDetails = async (req: Request, res: Response) => {
+  try {
+    const registerRepositry = appSource.getRepository(Signup);
+    // get the details
+    const registerR = await registerRepositry.find();
+    res.status(200).send({
+      Result: registerR,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};

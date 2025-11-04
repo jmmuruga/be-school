@@ -38,7 +38,7 @@ app.use('/markRouter',cors(corsOptions),markRouter);
 app.use('/mediumRouter',cors(corsOptions),mediumRouter);
 app.use('/schoolRouter',cors(corsOptions),schoolRouter);
 app.use('/subjectRouter',cors(corsOptions),subjectRouter);
-app.use('/signupRouter',cors(corsOptions),signupRouter);
+app.use("/signupRouter", cors(corsOptions), signupRouter); 
 app.use('/userRouter',cors(corsOptions),userRouter);
 app.use('/objectquesRouter',cors(corsOptions),objectquesRouter);
 app.use('/onlinetestRouter',cors(corsOptions),onlinetestRouter);

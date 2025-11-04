@@ -10,13 +10,20 @@ export const SignupValidation = Joi.object({
   gender: Joi.string().required(),
   address: Joi.string().required(),
   standard: Joi.string().required(),
-  medium: Joi.string().allow(null),
-  otherMedium: Joi.string().allow(null),
+ medium: Joi.string().allow('', null),
+otherMedium: Joi.when('medium', {
+  is: 'Other',
+  then: Joi.string().required().messages({
+    'string.empty': 'Please specify the other medium',
+  }),
+  otherwise: Joi.string().allow('', null),
+}),
+
   board: Joi.string().required(),
   school: Joi.string().required(),
   schoolAddress: Joi.string().required(),
-  isActive: Joi.boolean().optional(),
-  contact: Joi.number().required(),
+  // isActive: Joi.boolean().optional(),
+  contact: Joi.string().required(),
   created_UserId: Joi.string().optional(),
   updated_UserId: Joi.string().optional(),
 });
@@ -27,7 +34,7 @@ export interface SignupDto {
   UserName: string;
   password: string;
   email: string;
-  aadhaar: number;
+  aadhaar: string;
   gender: string;
   address: string;
   standard: string;
@@ -36,7 +43,7 @@ export interface SignupDto {
   board: string;
   school: string;
   schoolAddress: string;
-  contact: number;
+  contact: string;
   created_UserId: string;
   updated_UserId: string;
 }
