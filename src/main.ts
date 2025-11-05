@@ -13,9 +13,11 @@ import subjectRouter from "./Master/subject_master/subject.controller";
 import signupRouter from "./Signup/signup.controller";
 import userRouter from "./User-Profile/user.controller";
 import objectquesRouter from "./Question bank/objective-question/objective-question.controller";
-import QuesGenerateRouter from "./Question bank/question-paper-generate/ques-paper-generate.controller";
+// import QuesGenerateRouter from "./Question bank/question-paper-generate/ques-paper-generate.controller";
 import onlinetestRouter from "./Test Board/onlinetest.controller";
 import StaffRouter from "./Staff-Profile/staff-Profile.controller";
+import QuesGenerateRouter from "./Question bank/question-paper-generate/ques-paper-generate.controller";
+import questionRouter from "./Question bank/question-prepare/questionpre.controller";
 const app = express();
 
 dotenv.config();
@@ -41,6 +43,8 @@ app.use('/subjectRouter',cors(corsOptions),subjectRouter);
 app.use("/signupRouter", cors(corsOptions), signupRouter); 
 app.use('/userRouter',cors(corsOptions),userRouter);
 app.use('/objectquesRouter',cors(corsOptions),objectquesRouter);
+app.use('/questionRouter', cors(corsOptions), questionRouter);
+app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter);
 app.use('/onlinetestRouter',cors(corsOptions),onlinetestRouter);
 app.use('/StaffRouter',cors(corsOptions),StaffRouter);
 

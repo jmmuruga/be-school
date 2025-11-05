@@ -15,8 +15,8 @@ export class objectiveques {
   type: string;
   @Column()
   question: string;
-  @Column()
-   answerType:string;
+  // @Column()
+  //  answerType:string;
   @Column()
   ImagePath: string;
   @Column()
