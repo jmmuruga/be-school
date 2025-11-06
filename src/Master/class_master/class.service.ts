@@ -16,6 +16,7 @@ export const addClass = async (req: Request, res: Response) => {
         message: validation.error.details[0].message,
       });
     }
+    // check data whether existing
     const classRepository = appSource.getRepository(classMaster);
     const existingClass = await classRepository.findOneBy({
       className: payload.className,

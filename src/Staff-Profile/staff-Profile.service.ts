@@ -20,11 +20,32 @@ export const addStaff = async (req: Request, res: Response) => {
       staffName: payload.staffName,
       staffNo: payload.staffNo,
     });
+
     if (existingName) {
       return res.status(400).json({
         ErrorMessage: "Staff Already Exists",
       });
     }
+    // check data whether existing
+    const emailExisting = await staffRepository.findBy({
+      email:payload.email,
+      staffNo:Not(payload.staffNo)
+    });
+    if(emailExisting.length> 0){
+      return res.status(400).json({
+        ErrorMessage : "Email Already Exists"
+      });
+    }
+    const phoneExisting = await staffRepository.findBy({
+      contactNo:payload.contactNo,
+      staffNo:Not(payload.staffNo)
+    });
+    if(phoneExisting.length> 0){
+      return res.status(400).json({
+        ErrorMessage : "Contact no Already Exists"
+      })
+    }
+
     await staffRepository.save(payload);
     return res.status(200).json({ IsSuccess: "Staff Added Successfully !!" });
   } catch (error) {
@@ -86,9 +107,27 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
     });
     if (nameExist.length > 0) {
       return res.status(400).json({
-        ErrorMessage: "Staff Name Already Exist",
+        ErrorMessage: "Staff Name Already Existing",
       });
     }
+    const emailExisting = await staffRepository.findBy({
+      email:payload.email,
+      staffNo :Not(payload.staffNo)
+    });
+     if(emailExisting.length>0){
+      return res.status(400).json({
+        ErrorMessage:"Email Already Existing"
+      })
+     }
+     const contactExisting = await staffRepository.findBy({
+      contactNo:payload.contactNo,
+      staffNo:Not(payload.staffNo)
+     });
+     if(contactExisting.length>0){
+      return res.status(400).json({
+        ErrorMessage:"Contact no Already Existing"
+      })
+     }
     await staffRepository.update({ staffNo: payload.staffNo }, payload);
     return res.status(200).json({ IsSuccess: "Staff Updated Successfully !!" });
   } catch (error) {
