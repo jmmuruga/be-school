@@ -72,6 +72,8 @@ export const getStaffNo = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+
   }
 };
 export const getStaffDetails = async (req: Request, res: Response) => {
@@ -84,6 +86,8 @@ export const getStaffDetails = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+
   }
 };
 export const updateStaffDetls = async (req: Request, res: Response) => {

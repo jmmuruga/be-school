@@ -5,24 +5,23 @@ export const SignupValidation = Joi.object({
   fatherName: Joi.string().required(),
   UserName: Joi.string().required(),
   password: Joi.string().required(),
+  confirmPassword: Joi.string().required(),
   email: Joi.string().email().required(),
   aadhaar: Joi.number().required(),
   gender: Joi.string().required(),
   address: Joi.string().required(),
   standard: Joi.string().required(),
- medium: Joi.string().allow('', null),
-otherMedium: Joi.when('medium', {
-  is: 'Other',
-  then: Joi.string().required().messages({
-    'string.empty': 'Please specify the other medium',
+  medium: Joi.string().allow("", null),
+  otherMedium: Joi.when("medium", {
+    is: "Other",
+    then: Joi.string().required().messages({
+      "string.empty": "Please specify the other medium",
+    }),
+    otherwise: Joi.string().allow("", null),
   }),
-  otherwise: Joi.string().allow('', null),
-}),
-
   board: Joi.string().required(),
   school: Joi.string().required(),
   schoolAddress: Joi.string().required(),
-  // isActive: Joi.boolean().optional(),
   contact: Joi.string().required(),
   created_UserId: Joi.string().optional(),
   updated_UserId: Joi.string().optional(),
@@ -33,6 +32,7 @@ export interface SignupDto {
   fatherName: string;
   UserName: string;
   password: string;
+  confirmPassword: string;
   email: string;
   aadhaar: string;
   gender: string;

@@ -15,7 +15,10 @@ export const getGroupMasterDetails = async (req: Request, res: Response) => {
       Result: groupM,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 
@@ -32,7 +35,10 @@ export const addGroup = async (req: Request, res: Response) => {
     await groupRepoistry.save(payload);
     return res.status(200).json({ IsSuccess: "Group Added Successfully !!" });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 
@@ -54,7 +60,11 @@ export const getGroupCode = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+    // console.log(error);
   }
 };
 export const updateGroupMaster = async (req: Request, res: Response) => {
@@ -92,7 +102,7 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     await groupRepository.update({ groupCode: payload.groupCode }, payload);
     return res.status(200).json({ IsSuccess: "Group Updated successfully !!" });
   } catch (error) {
-    console.error("Update Error:", error);
+    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -131,9 +141,10 @@ export const deleteGroup = async (req: Request, res: Response) => {
       IsSuccess: "Group Deleted Successfully !!",
     });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({
-      message: "Internal Server error",
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -160,7 +171,10 @@ export const updateGroupStatus = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Group Status Updated Successfully" });
   } catch (error) {
-    console.error("delete error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    // console.error("delete error:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };

@@ -46,12 +46,14 @@ export const addSignup = async (req: Request, res: Response) => {
         ErrorMessage: "Contact No Already Exist !! Please Another No",
       });
     }
-
     await signupRepository.save(payload);
-    return res.status(200).json({ IsSuccess: "Signup added successfully" });
+    return res.status(200).json({ IsSuccess: "Student Register Successfully" });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ ErrorMessage: "Internal server error" });
+    // console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const getDetails = async (req: Request, res: Response) => {
@@ -63,6 +65,10 @@ export const getDetails = async (req: Request, res: Response) => {
       Result: registerR,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+    // console.log(error);
   }
 };

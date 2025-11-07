@@ -30,7 +30,11 @@ export const addSubject = async (req: Request, res: Response) => {
     await subjectRepository.save(payload);
     return res.status(200).json({ IsSuccess: "Subject Added Successfully !!" });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const getsubjectCode = async (req: Request, res: Response) => {
@@ -51,7 +55,10 @@ export const getsubjectCode = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const getSubjectDetails = async (req: Request, res: Response) => {
@@ -65,7 +72,11 @@ export const getSubjectDetails = async (req: Request, res: Response) => {
       Result: subjectM,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const updateSubject = async (req: Request, res: Response) => {
@@ -146,9 +157,10 @@ export const deleteSubject = async (req: Request, res: Response) => {
       IsSuccess: "Subject Deleted Successfully !!",
     });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({
       message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -174,9 +186,10 @@ export const updateSubjectStatus = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Subject Status updated Successfully" });
   } catch (error) {
-    console.error("Update Error:", error);
+    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };

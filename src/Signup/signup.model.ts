@@ -16,6 +16,8 @@ export class Signup {
   @Column()
   password: string;
   @Column()
+  confirmPassword: string;
+  @Column()
   email: string;
   @Column({ type: "nvarchar", length: 20 })
   aadhaar: string;
@@ -37,9 +39,9 @@ export class Signup {
   schoolAddress: string;
   @Column({ type: "nvarchar", length: 15 })
   contact: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   created_UserId: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

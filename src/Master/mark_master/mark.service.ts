@@ -16,7 +16,10 @@ export const getMarkMasterDetails = async (req: Request, res: Response) => {
     });
     console.log(res, "mark");
   } catch (error) {
-    console.log(error);
+  return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 
@@ -42,7 +45,10 @@ export const addMark = async (req: Request, res: Response) => {
     await markRepository.save(payload);
     return res.status(200).json({ IsSuccess: "Mark Added Successfully !!" });
   } catch (error) {
-    console.log(error);
+   return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const getMarkCode = async (req: Request, res: Response) => {
@@ -63,7 +69,10 @@ export const getMarkCode = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const updateMark = async (req: Request, res: Response) => {
@@ -138,9 +147,9 @@ export const deleteMarks = async (req: Request, res: Response) => {
       IsSuccess: "Mark deleted successfully !!",
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
+   return res.status(500).json({
       message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -167,9 +176,10 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
       IsSuccess: "Mark status updated Successfully !",
     });
   } catch (error) {
-    console.error("update error",error);
-    return res.status(500).json({ 
+    // console.error("update error",error);
+     return res.status(500).json({
       message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };

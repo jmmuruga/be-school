@@ -32,8 +32,10 @@ export const addClass = async (req: Request, res: Response) => {
 
     return res.status(200).json({ IsSuccess: "Class Added Successfully !!" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 // get the classcode
@@ -55,7 +57,11 @@ export const getClassCode = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 
@@ -71,7 +77,10 @@ export const getClasMasterDetails = async (req: Request, res: Response) => {
       Result: classes,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const updateClassMaster = async (req: Request, res: Response) => {
@@ -111,7 +120,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Class Updated successfully  !!" });
   } catch (error) {
-    console.error("Update Error:", error);
+    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -148,8 +157,11 @@ export const deleteClass = async (req: Request, res: Response) => {
 
     return res.status(200).json({ IsSuccess: "Class Deleted Successfully !!" });
   } catch (error) {
-    console.error("delete error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    // console.error("delete error:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const updateStatusClass = async (req: Request, res: Response) => {
@@ -175,7 +187,10 @@ export const updateStatusClass = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Class  Status updated Successfully !! " });
   } catch (error) {
-    console.error("update error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    // console.error("update error:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };

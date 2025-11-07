@@ -50,7 +50,11 @@ export const getMediumCode = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
+     return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const getMediumDetails = async (req: Request, res: Response) => {
@@ -64,7 +68,11 @@ export const getMediumDetails = async (req: Request, res: Response) => {
       Result: mediumM,
     });
   } catch (error) {
-    console.log(error);
+     return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+    // console.log(error);
   }
 };
 export const updateMedium = async (req: Request, res: Response) => {
@@ -102,7 +110,7 @@ export const updateMedium = async (req: Request, res: Response) => {
     await mediumRepoistry.update({ mediumCode: payload.mediumCode }, payload);
     return res.status(200).json({ IsSuccess: "Medium Updated Successfully !!" });
   } catch (error) {
-    console.error("Update Error:", error);
+    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -139,9 +147,10 @@ export const deleteMedium = async (req: Request, res: Response) => {
       IsSuccess: "Medium Deleted successfully !!",
     });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({
       message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -167,9 +176,10 @@ export const updateMediumStatus = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Medium Status updated Successfully !" });
   } catch (error) {
-    console.error("Update Error:", error);
+    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
