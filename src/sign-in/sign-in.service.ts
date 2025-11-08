@@ -60,15 +60,15 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     });
   }
   try {
-    console.log("DB Password:", student.password);
-    console.log("Entered Password:", payload.Password);
+    // console.log("DB Password:", student.password);
+    // console.log("Entered Password:", payload.Password);
     if (student.password !== payload.Password) {
-      console.log("Password mismatch ");
+      // console.log("Password mismatch ");
       return res.status(401).send({
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
-    console.log("Password match ");
+    // console.log("Password match ");
     return res.status(200).send({
       IsSuccess: "SignIn Successfully",
       user: {
@@ -77,26 +77,10 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    console.error("Sign-in error:", error);
+    // console.error("Sign-in error:", error);
     return res.status(500).send({
       ErrorMessage: "Internal Server Error",
     });
   }
 };
 
-export const getDetails = async (req: Request, res: Response) => {
-  try {
-    const registerRepositry = appSource.getRepository(signIn);
-    // get the details
-    const registerR = await registerRepositry.find();
-    res.status(200).send({
-      Result: registerR,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
-    });
-    // console.log(error);
-  }
-};
