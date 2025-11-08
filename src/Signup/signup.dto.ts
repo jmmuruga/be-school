@@ -8,6 +8,7 @@ export const SignupValidation = Joi.object({
   confirmPassword: Joi.string().required(),
   email: Joi.string().email().required(),
   aadhaar: Joi.number().required(),
+  dateOfBirth:Joi.string().required(),
   gender: Joi.string().required(),
   address: Joi.string().required(),
   standard: Joi.string().required(),
@@ -36,6 +37,7 @@ export interface SignupDto {
   email: string;
   aadhaar: string;
   gender: string;
+  dateOfBirth:string;
   address: string;
   standard: string;
   medium?: string;

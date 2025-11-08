@@ -14,9 +14,10 @@ import { User } from "../../User-Profile/user.model";
 import { Quesgenerate } from "../../Question bank/question-paper-generate/ques-paper-generate.model";
 import { Staff } from "../../Staff-Profile/staff-Profile.model";
 import { objectiveques } from "../../Question bank/objective-question/objective-question.model";
+import { SignIn } from "../../sign-in/sign-in.model";
 
 const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,User,Staff,Signup,objectiveques,
-    Quesgenerate
+    Quesgenerate,SignIn
 ]
 
 export const appSource = new DataSource({

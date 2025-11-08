@@ -18,6 +18,7 @@ import onlinetestRouter from "./Test Board/onlinetest.controller";
 import StaffRouter from "./Staff-Profile/staff-Profile.controller";
 import QuesGenerateRouter from "./Question bank/question-paper-generate/ques-paper-generate.controller";
 import questionRouter from "./Question bank/question-prepare/questionpre.controller";
+import signInRouter from "./sign-in/sign-in.controller";
 const app = express();
 
 dotenv.config();
@@ -42,6 +43,7 @@ app.use('/schoolRouter',cors(corsOptions),schoolRouter);
 app.use('/subjectRouter',cors(corsOptions),subjectRouter);
 app.use("/signupRouter", cors(corsOptions), signupRouter); 
 app.use('/userRouter',cors(corsOptions),userRouter);
+app.use('/signInRouter',cors(corsOptions),signInRouter);
 app.use('/objectquesRouter',cors(corsOptions),objectquesRouter);
 app.use('/questionRouter', cors(corsOptions), questionRouter);
 app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter);

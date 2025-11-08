@@ -24,6 +24,8 @@ export class Signup {
   @Column()
   gender: string;
   @Column()
+  dateOfBirth:string;
+  @Column()
   address: string;
   @Column()
   standard: string;

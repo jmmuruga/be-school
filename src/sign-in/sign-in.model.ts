@@ -10,13 +10,13 @@ export class SignIn {
   @Column()
   role: string;
   @Column()
-  email: string;
+  emailOrPhone: string;
   @Column()
   password: string;
   @Column()
-  dateOfBirth: Date;
+  Password: string;
   @Column()
-  AdmissionNo: string;
+  usernameOrAdmission: string;
   @Column({default:true})
   isActive: boolean;
   @Column({nullable:true})

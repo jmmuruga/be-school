@@ -1,22 +1,23 @@
 import * as Joi from "joi";
 
 export const SignInvalidation = Joi.object({
-  role: Joi.string().required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().required(),
-  AdmissionNo: Joi.string().required(),
-  dateOfBirth: Joi.date().required(),
+  role: Joi.string().optional(),
+  email: Joi.string().email().optional(),
+  password: Joi.string().optional(),
+  usernameOrAdmission: Joi.string().optional(),
+  Password: Joi.date().optional(),
   isActive: Joi.boolean().optional(),
   created_UserId: Joi.string().optional(),
   updated_UserId: Joi.string().optional(),
 });
 export interface SignInDto {
   role: string;
-  email: string;
+  emailOrPhone: string;
   password: string;
-  AdmissionNo: string;
-  dateOfBirth: Date;
+  usernameOrAdmission: string;
+  Password: string;
   isActive: boolean;
   created_UserId: string;
   updated_UserId: string;
 }
+
