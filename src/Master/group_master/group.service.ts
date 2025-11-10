@@ -31,7 +31,17 @@ export const addGroup = async (req: Request, res: Response) => {
         message: validation.error.details[0].message,
       });
     }
+    // check data whether existing
     const groupRepoistry = appSource.getRepository(GroupMaster);
+    const existingClass = await groupRepoistry.findOneBy({
+      groupName: payload.groupName,
+    });
+
+    if (existingClass) {
+      return res.status(400).json({
+        ErrorMessage: "Group Name already exists",
+      });
+    }
     await groupRepoistry.save(payload);
     return res.status(200).json({ IsSuccess: "Group Added Successfully !!" });
   } catch (error) {
@@ -79,12 +89,12 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     }
     // check whether class exist
     const groupRepository = appSource.getRepository(GroupMaster);
-    const existingGroup = await groupRepository.findOneBy({
+    const existingGroup = await groupRepository.findBy({
       groupCode: payload.groupCode,
     });
     if (!existingGroup) {
       return res.status(400).json({
-        ErrorMessage: "Group Doesn't exist",
+        ErrorMessage: "Group Already exist",
       });
     }
     // check name  already exist

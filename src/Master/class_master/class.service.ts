@@ -24,12 +24,11 @@ export const addClass = async (req: Request, res: Response) => {
 
     if (existingClass) {
       return res.status(400).json({
-        message: "Class Name already exists",
+        ErrorMessage: "Class Name already exists",
       });
     }
 
     await classRepository.save(payload);
-
     return res.status(200).json({ IsSuccess: "Class Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -102,7 +101,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     });
     if (!existingClass) {
       return res.status(400).json({
-        message: "Class Doesn't exist",
+        ErrorMessage: "Class Doesn't exist",
       });
     }
     // check name already exist
@@ -112,7 +111,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     });
     if (nameExist.length > 0) {
       return res.status(400).json({
-        message: "Class Name Already Exist",
+        ErrorMessage: "Class Name Already Exist",
       });
     }
     await classRepository.update({ classCode: payload.classCode }, payload); //update
