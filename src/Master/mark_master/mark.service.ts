@@ -81,7 +81,6 @@ export const updateMark = async (req: Request, res: Response) => {
     // console.log("Update Payload:", payload);
     const validation = MarkValidation.validate(payload);
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
       return res.status(400).json({
         message: validation.error.details[0].message,
       });

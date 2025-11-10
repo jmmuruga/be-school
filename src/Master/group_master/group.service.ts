@@ -82,7 +82,6 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     const payload: GroupDto = req.body;
     const validation = GroupValidation.validate(payload);
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -112,7 +111,6 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     await groupRepository.update({ groupCode: payload.groupCode }, payload);
     return res.status(200).json({ IsSuccess: "Group Updated successfully !!" });
   } catch (error) {
-    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -122,7 +120,6 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
 export const deleteGroup = async (req: Request, res: Response) => {
   try {
     const groupCode = Number(req.params.groupCode);
-    // console.log('Soft deleting group:', groupCode);
 
     if (isNaN(groupCode)) {
       return res.status(400).json({
@@ -151,7 +148,6 @@ export const deleteGroup = async (req: Request, res: Response) => {
       IsSuccess: "Group Deleted Successfully !!",
     });
   } catch (error) {
-    // console.error(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -181,7 +177,6 @@ export const updateGroupStatus = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Group Status Updated Successfully" });
   } catch (error) {
-    // console.error("delete error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

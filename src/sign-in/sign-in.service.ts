@@ -18,15 +18,11 @@ export const signIn = async (req: Request, res: Response) => {
     });
   }
   try {
-    console.log("DB Password:", user.password);
-    console.log("Entered Password:", payload.password);
     if (user.password !== payload.password) {
-      console.log("Password mismatch ");
       return res.status(401).send({
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
-    console.log("Password match ");
     return res.status(200).send({
       IsSuccess: "SignIn Successfully",
       user: {
@@ -37,7 +33,6 @@ export const signIn = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    console.error("Sign-in error:", error);
     return res.status(500).send({
       ErrorMessage: "Internal Server Error",
     });
@@ -60,27 +55,21 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     });
   }
   try {
-    // console.log("DB Password:", student.password);
-    // console.log("Entered Password:", payload.Password);
     if (student.password !== payload.Password) {
-      // console.log("Password mismatch ");
       return res.status(401).send({
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
-    // console.log("Password match ");
     return res.status(200).send({
-      IsSuccess: "SignIn Successfully",
+      IsSuccess: "Sign-in Successfully",
       user: {
         name: student.UserName,
         email: student.email,
       },
     });
   } catch (error: any) {
-    // console.error("Sign-in error:", error);
     return res.status(500).send({
       ErrorMessage: "Internal Server Error",
     });
   }
 };
-

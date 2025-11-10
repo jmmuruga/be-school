@@ -11,7 +11,7 @@ export const addClass = async (req: Request, res: Response) => {
     //check validation
     const validation = ClassValidation.validate(payload);
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
+      // console.log(validation.error, "Validation Error");
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -89,7 +89,6 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     const validation = ClassValidation.validate(payload);
     //validation
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -119,7 +118,6 @@ export const updateClassMaster = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Class Updated successfully  !!" });
   } catch (error) {
-    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -130,14 +128,11 @@ export const updateClassMaster = async (req: Request, res: Response) => {
 export const deleteClass = async (req: Request, res: Response) => {
   try {
     const classCode = Number(req.params.classCode);
-    // console.log(" deleting class:", classCode);
-
     if (isNaN(classCode)) {
       return res.status(400).json({ ErrorMessage: "Invalid class code" });
     }
 
     const classRepository = appSource.getRepository(classMaster);
-
     //  check whether exist code
     const existingClass = await classRepository.findOneBy({
       classCode: classCode,
@@ -156,7 +151,6 @@ export const deleteClass = async (req: Request, res: Response) => {
 
     return res.status(200).json({ IsSuccess: "Class Deleted Successfully !!" });
   } catch (error) {
-    // console.error("delete error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -186,7 +180,6 @@ export const updateStatusClass = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Class  Status updated Successfully !! " });
   } catch (error) {
-    // console.error("update error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

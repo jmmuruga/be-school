@@ -106,7 +106,6 @@ export const updateUserLogin = async (req: Request, res: Response) => {
     const validation = UserValidation.validate(payload);
     // validation
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
       return res.status(400).json({
         message: validation.error.details[0].message,
       });

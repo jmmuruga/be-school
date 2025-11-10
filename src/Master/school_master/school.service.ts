@@ -26,8 +26,7 @@ export const addSchool = async (req: Request, res: Response) => {
     await schoolRepoistry.save(payload);
     return res.status(200).json({ IsSuccess: "School Added Successfully !!" });
   } catch (error) {
-    // console.log(error);
-     return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -51,7 +50,7 @@ export const getSchoolCode = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-     return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -63,12 +62,11 @@ export const getSchoolDetails = async (req: Request, res: Response) => {
     const schlM = await schoolRepoistry.find({
       where: { isActive: true },
     });
-    // const schlM = await schoolRepoistry.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: schlM,
     });
   } catch (error) {
-   return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -79,7 +77,6 @@ export const updateSchool = async (req: Request, res: Response) => {
     const payload: SchoolDto = req.body;
     const validation = SchoolValidation.validate(payload);
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -106,9 +103,10 @@ export const updateSchool = async (req: Request, res: Response) => {
     }
 
     await schoolRepoistry.update({ schoolCode: payload.schoolCode }, payload);
-    return res.status(200).json({ IsSuccess: "School Updated Successfully !!" });
+    return res
+      .status(200)
+      .json({ IsSuccess: "School Updated Successfully !!" });
   } catch (error) {
-    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -118,7 +116,6 @@ export const updateSchool = async (req: Request, res: Response) => {
 export const deleteSchool = async (req: Request, res: Response) => {
   try {
     const schoolCode = Number(req.params.schoolCode);
-    // console.log("Soft deleting school:", schoolCode);
 
     if (isNaN(schoolCode)) {
       return res.status(400).json({
@@ -147,7 +144,6 @@ export const deleteSchool = async (req: Request, res: Response) => {
       IsSuccess: "School Deleted successfully",
     });
   } catch (error) {
-    // console.error(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -156,7 +152,7 @@ export const deleteSchool = async (req: Request, res: Response) => {
 };
 export const updateSchoolStatus = async (req: Request, res: Response) => {
   try {
-    const payload: schoolStatus = req.body;  
+    const payload: schoolStatus = req.body;
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
     const existingSchool = await schoolRepoistry.findOneBy({
       schoolCode: payload.schoolCode,
@@ -165,7 +161,7 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
       return res.status(400).json({
         ErrorMessage: "School not found",
       });
-    } 
+    }
     await schoolRepoistry
       .createQueryBuilder()
       .update(SchoolMaster)
@@ -175,10 +171,8 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
     return res.status(200).json({
       IsSuccess: "School Status Updated Successfully !!",
     });
-  }
-    catch (error) { 
-    // console.error("update error",error);
-   return res.status(500).json({
+  } catch (error) {
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });

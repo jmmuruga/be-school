@@ -84,7 +84,6 @@ export const updateSubject = async (req: Request, res: Response) => {
     const payload: SubjectDto = req.body;
     const validation = Subjectvalidation.validate(payload);
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -109,6 +108,7 @@ export const updateSubject = async (req: Request, res: Response) => {
         ErrorMessage: "Subject Already Exist",
       });
     }
+
     await subjectRepoistry.update(
       { subjectCode: payload.subjectCode },
       payload
@@ -117,7 +117,6 @@ export const updateSubject = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Subject Updated Successfully !!" });
   } catch (error) {
-    console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -127,7 +126,6 @@ export const updateSubject = async (req: Request, res: Response) => {
 export const deleteSubject = async (req: Request, res: Response) => {
   try {
     const subjectCode = Number(req.params.subjectCode);
-    // console.log("Soft deleting class:", subjectCode);
 
     if (isNaN(subjectCode)) {
       return res.status(400).json({
@@ -157,7 +155,6 @@ export const deleteSubject = async (req: Request, res: Response) => {
       IsSuccess: "Subject Deleted Successfully !!",
     });
   } catch (error) {
-    // console.error(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -186,7 +183,6 @@ export const updateSubjectStatus = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Subject Status updated Successfully" });
   } catch (error) {
-    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
