@@ -5,9 +5,8 @@ export const objectquesValidation = Joi.object({
   subject: Joi.string().required(),
   type: Joi.string().required(),
   question: Joi.string().required(),
-  ImageaPath: Joi.string().optional(),
+  studentImage: Joi.string().optional(),
   FilePath: Joi.string().optional(),
-//  answerType: Joi.string().required(),
   option1:Joi.string().optional(),
   option2: Joi.string().optional(),
   option3: Joi.string().optional(),
@@ -22,9 +21,8 @@ export interface objectivequesDto {
   subject: string;
   type: string;
   question: string;
-  ImagePath: string;
+  studentImage:string;
   FilePath: string;
-  // answerType: string;
   option1: string;
   option2: string;
   option3: string;

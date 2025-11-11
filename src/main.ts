@@ -49,7 +49,8 @@ app.use('/questionRouter', cors(corsOptions), questionRouter);
 app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter);
 app.use('/onlinetestRouter',cors(corsOptions),onlinetestRouter);
 app.use('/StaffRouter',cors(corsOptions),StaffRouter);
-
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 // app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter)
 app.listen(PORT, () => console.log(`server upon port ${PORT}`));
 

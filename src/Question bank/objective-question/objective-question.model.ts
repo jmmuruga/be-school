@@ -15,11 +15,10 @@ export class objectiveques {
   type: string;
   @Column()
   question: string;
-  // @Column()
-  //  answerType:string;
-  @Column()
-  ImagePath: string;
-  @Column()
+  @Column({ type: "ntext", nullable: true })
+  studentImage: string;
+
+  @Column({ nullable: true })
   FilePath: string;
   @Column()
   option1: string;
@@ -31,11 +30,11 @@ export class objectiveques {
   option4: string;
   @Column()
   correctanswer: string;
-  @Column({default:true})
+  @Column({ default: true })
   isActive: Boolean;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   created_UserId: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
