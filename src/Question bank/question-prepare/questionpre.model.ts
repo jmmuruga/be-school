@@ -20,9 +20,9 @@ export class Question {
   mark: number;
   @Column()
   question: string;
-  @Column({ type: "ntext" })
+  @Column({ type: "text", nullable: true })
   studentImage: string;
-  @Column()
+  @Column({ nullable: true })
   FilePath: string;
   @Column({ default: true })
   isActive: Boolean;
