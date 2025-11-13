@@ -15,7 +15,7 @@ export const addObjectiveques = async (req: Request, res: Response) => {
     const questionRepoistry = appSource.getRepository(objectiveques);
      
     await questionRepoistry.save(payload);
-    console.log("Received payload:", payload);
+    // console.log("Received payload:", payload);
     return res.status(200).json({ IsSuccess: "Question added successfully" });
   } catch (error) {
      return res.status(500).json({

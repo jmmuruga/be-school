@@ -14,7 +14,7 @@ export const addQuesgene = async(req : Request , res :Response)=>{
         }
         const QuesgenerateRepository = appSource.getRepository(Quesgenerate);
         await QuesgenerateRepository.save(payload);
-        return res.status(200).json({message : "QuesGenerate added successfully"})
+        return res.status(200).json({IsSuccess : "QuesGenerate Print successfully"})
     }
     catch(error){
         console.log(error)

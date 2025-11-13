@@ -10,13 +10,12 @@ export const getMarkMasterDetails = async (req: Request, res: Response) => {
     const MarkM = await markRepository.find({
       where: { isActive: true },
     });
-    // const MarkM = await markRepository.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: MarkM,
     });
-    console.log(res, "mark");
+    // console.log(res, "mark");
   } catch (error) {
-  return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -45,7 +44,7 @@ export const addMark = async (req: Request, res: Response) => {
     await markRepository.save(payload);
     return res.status(200).json({ IsSuccess: "Mark Added Successfully !!" });
   } catch (error) {
-   return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -146,7 +145,7 @@ export const deleteMarks = async (req: Request, res: Response) => {
       IsSuccess: "Mark deleted successfully !!",
     });
   } catch (error) {
-   return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -157,7 +156,7 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
     const payload: markStatus = req.body;
     const markRepository = appSource.getRepository(MarkMaster);
     // check whether markcode exists
-    const existingMark = await markRepository.findOneBy({ 
+    const existingMark = await markRepository.findOneBy({
       markCode: payload.markCode,
     });
     if (!existingMark) {
@@ -176,7 +175,7 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
     });
   } catch (error) {
     // console.error("update error",error);
-     return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });

@@ -30,7 +30,6 @@ export const addSubject = async (req: Request, res: Response) => {
     await subjectRepository.save(payload);
     return res.status(200).json({ IsSuccess: "Subject Added Successfully !!" });
   } catch (error) {
-    // console.log(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -67,12 +66,10 @@ export const getSubjectDetails = async (req: Request, res: Response) => {
     const subjectM = await subjectRepoistry.find({
       where: { isActive: true },
     });
-    // const subjectM = await subjectRepoistry.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: subjectM,
     });
   } catch (error) {
-    // console.log(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
