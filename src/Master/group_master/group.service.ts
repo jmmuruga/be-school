@@ -35,6 +35,7 @@ export const addGroup = async (req: Request, res: Response) => {
     const groupRepoistry = appSource.getRepository(GroupMaster);
     const existingClass = await groupRepoistry.findOneBy({
       groupName: payload.groupName,
+      groupoption : payload.groupoption
     });
 
     if (existingClass) {
