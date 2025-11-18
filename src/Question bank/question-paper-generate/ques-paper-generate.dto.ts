@@ -1,7 +1,7 @@
 import * as Joi from "joi";
 export const QuesgenerateValidation = Joi.object({
   scheme: Joi.string().required(),
-  class: Joi.string().required(),
+  standard: Joi.string().required(),
   subject: Joi.string().required(),
   total: Joi.number().required(),
    onemark: Joi.number().optional().allow(null),
@@ -14,7 +14,7 @@ export const QuesgenerateValidation = Joi.object({
 });
 export interface QuesgenerateDto {
   scheme: string;
-  class: string;
+  standard: string;
   subject: string;
   total: number;
   onemark:number;

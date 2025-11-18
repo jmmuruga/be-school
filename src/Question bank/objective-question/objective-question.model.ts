@@ -20,6 +20,8 @@ export class objectiveques {
   @Column({ nullable: true })
   FilePath: string;
   @Column()
+  optionType: string;
+  @Column()
   option1: string;
   @Column()
   option2: string;

@@ -11,7 +11,7 @@ export class Quesgenerate {
   @Column()
   scheme: string;
   @Column()
-  class: string;
+  standard: string;
   @Column()
   subject: string;
   @Column()
