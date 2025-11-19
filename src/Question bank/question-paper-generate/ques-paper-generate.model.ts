@@ -9,7 +9,7 @@ export class Quesgenerate {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  scheme: string;
+  type: string;
   @Column()
   standard: string;
   @Column()

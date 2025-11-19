@@ -1,6 +1,6 @@
 import * as Joi from "joi";
 export const QuesgenerateValidation = Joi.object({
-  scheme: Joi.string().required(),
+  type: Joi.string().required(),
   standard: Joi.string().required(),
   subject: Joi.string().required(),
   total: Joi.number().required(),
@@ -13,7 +13,7 @@ export const QuesgenerateValidation = Joi.object({
   updated_UserId: Joi.string().optional(),
 });
 export interface QuesgenerateDto {
-  scheme: string;
+  type: string;
   standard: string;
   subject: string;
   total: number;

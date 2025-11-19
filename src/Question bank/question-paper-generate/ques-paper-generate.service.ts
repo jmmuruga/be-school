@@ -5,6 +5,7 @@ import { Quesgenerate } from "./ques-paper-generate.model";
 import { QuesgenerateDto } from "./ques-paper-generate.dto";
 import { objectiveques } from "../objective-question/objective-question.model";
 import { objectivequesDto } from "../objective-question/objective-question.dto";
+import { Question } from "../question-prepare/questionpre.model";
 export const addQuesgene = async (req: Request, res: Response) => {
   try {
     const payload: QuesgenerateDto = req.body;
@@ -25,35 +26,72 @@ export const addQuesgene = async (req: Request, res: Response) => {
 };
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
   try {
-    const {
-      subject,
-      standard: standard,
-      type: scheme,
-      question: onemark,
-    } = req.params;
+    const { subject, standard, type, questionCount, oneMax } = req.params;
+    console.log(req.params);
+    console.log("received oneMax ", oneMax);
     const objectiveRepo = appSource.getRepository(objectiveques);
 
-    const question = await objectiveRepo.findOneBy({
-      subject: subject,
-      standard: standard,
-      type: scheme,
-      question: onemark,
+    const questions = await objectiveRepo.query(
+      `SELECT TOP ${oneMax} *
+        FROM objectiveques
+WHERE subject = '${subject}'
+  AND standard = '${standard}'
+  AND type = '${type}';`
+    );
+    return res.status(200).json({
+      IsSuccess: "successfully",
+      Result: questions,
     });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+export const getQuestionAns = async (req: Request, res: Response) => {
+  try {
+    const { subject, standard, type, twomark,
+      threemark,
+      fivemark, twoMax, threeMax, fiveMax } = req.params;
+    console.log(req.params);
+    console.log("received twoMax ", twoMax);
+    console.log("received threeMax ", threeMax);
+    console.log("received fiveMax ", fiveMax);
 
-    if (!question) {
-      return res.status(404).json({
-        ErrorMessage: "One Mark Question Does Not Exist",
-      });
-    }
-   return res.status(200).json({
-  IsSuccess: "successfully",
-  data: {
-    subject: question.subject,
-    standard: question.standard,
-    type: question.type,
-    question: question.question,
-  },
-});
+    const quesAnsRepo = appSource.getRepository(Question);
+
+   const query = `
+      SELECT TOP ${twomark} * FROM question
+      WHERE subject = '${subject}'
+        AND standard = '${standard}'
+        AND type = '${type}'
+        AND mark = 2
+      
+
+      UNION ALL
+
+      SELECT TOP ${threemark} * FROM question
+      WHERE subject = '${subject}'
+        AND standard = '${standard}'
+        AND type = '${type}'
+        AND mark = 3
+        
+
+      UNION ALL
+
+      SELECT TOP ${fivemark} * FROM question
+      WHERE subject = '${subject}'
+        AND standard = '${standard}'
+        AND type = '${type}'
+        AND mark = 5
+      
+    `;
+
+    const questions = await quesAnsRepo.query(query);
+
+    return res.status(200).json({
+      IsSuccess: "successfully",
+      Result: questions,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Something went wrong" });
