@@ -49,51 +49,82 @@ WHERE subject = '${subject}'
 };
 export const getQuestionAns = async (req: Request, res: Response) => {
   try {
-    const { subject, standard, type, twomark,
+    const {
+      subject,
+      standard,
+      type,
+      twomark,
       threemark,
-      fivemark, twoMax, threeMax, fiveMax } = req.params;
+      fivemark,
+      twoMax,
+      threeMax,
+      fiveMax,
+    } = req.params;
     console.log(req.params);
     console.log("received twoMax ", twoMax);
     console.log("received threeMax ", threeMax);
     console.log("received fiveMax ", fiveMax);
 
     const quesAnsRepo = appSource.getRepository(Question);
+    // Convert to number
+    const twoUserMax = Number(twoMax);
+    const threeUserMax = Number(threeMax);
+    const fiveUserMax = Number(fiveMax);
 
-   const query = `
-      SELECT TOP ${twomark} * FROM question
+    // 1️⃣ Count DB totals for each mark
+    const twoDb = await quesAnsRepo.count({
+      where: { subject, standard, type, mark: 2 },
+    });
+
+    const threeDb = await quesAnsRepo.count({
+      where: { subject, standard, type, mark: 3 },
+    });
+
+    const fiveDb = await quesAnsRepo.count({
+      where: { subject, standard, type, mark: 5 },
+    });
+
+    // 2️⃣ Calculate final MAX based on DB + User Max
+    const finalTwoMax = Math.min(twoDb, twoUserMax);
+    const finalThreeMax = Math.min(threeDb, threeUserMax);
+    const finalFiveMax = Math.min(fiveDb, fiveUserMax);
+
+    // console.log("Final max limits:", { finalTwoMax, finalThreeMax, finalFiveMax });
+
+    const query = `
+      SELECT TOP ${finalTwoMax} * FROM question
       WHERE subject = '${subject}'
         AND standard = '${standard}'
         AND type = '${type}'
         AND mark = 2
       
-
       UNION ALL
 
-      SELECT TOP ${threemark} * FROM question
+      SELECT TOP ${finalThreeMax} * FROM question
       WHERE subject = '${subject}'
         AND standard = '${standard}'
         AND type = '${type}'
         AND mark = 3
-        
-
       UNION ALL
 
-      SELECT TOP ${fivemark} * FROM question
+      SELECT TOP ${finalFiveMax} * FROM question
       WHERE subject = '${subject}'
         AND standard = '${standard}'
         AND type = '${type}'
-        AND mark = 5
-      
+        AND mark = 5 
     `;
 
     const questions = await quesAnsRepo.query(query);
 
     return res.status(200).json({
-      IsSuccess: "successfully",
+      IsSuccess: " Genarated  Question Paper Successfully ",
       Result: questions,
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };

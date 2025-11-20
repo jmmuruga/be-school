@@ -4,15 +4,14 @@ export const objectquesValidation = Joi.object({
   standard: Joi.string().required(),
   subject: Joi.string().required(),
   type: Joi.string().required(),
-  question: Joi.string().required(),
+  question: Joi.string().optional().allow(null, ""),
   studentImage: Joi.string().optional().allow(null, ""),
-  optionType:Joi.string().required(),
-  FilePath: Joi.string().optional().allow(null, ""),
+  optionType: Joi.string().optional().allow(null, ""),
   option1: Joi.string().optional().allow(null, ""),
   option2: Joi.string().optional().allow(null, ""),
   option3: Joi.string().optional().allow(null, ""),
   option4: Joi.string().optional().allow(null, ""),
-  correctanswer: Joi.string().required(),
+  correctanswer: Joi.string().optional().allow(null, ""),
   isActive: Joi.boolean().optional(),
   created_UserId: Joi.string().optional().allow(null, ""),
   updated_UserId: Joi.string().optional().allow(null, ""),
@@ -24,7 +23,6 @@ export interface objectivequesDto {
   question: string;
   studentImage: string;
   optionType: string;
-  FilePath: string;
   option1: string;
   option2: string;
   option3: string;

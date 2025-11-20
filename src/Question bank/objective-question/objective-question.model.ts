@@ -17,8 +17,6 @@ export class objectiveques {
   question: string;
   @Column({ type: "ntext", nullable: true })
   studentImage: string;
-  @Column({ nullable: true })
-  FilePath: string;
   @Column()
   optionType: string;
   @Column()
