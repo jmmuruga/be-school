@@ -7,7 +7,6 @@ export const QuestionValidation = Joi.object({
   mark: Joi.number().required(),
   question: Joi.string().optional().allow(null, ""),
   studentImage: Joi.string().optional().allow(null, ""),
-  FilePath: Joi.string().optional().allow(null, ""),
   isActive: Joi.boolean().optional(),
   created_UserId: Joi.string().optional().allow(null, ""),
   updated_UserId:Joi.string().optional().allow(null, ""),

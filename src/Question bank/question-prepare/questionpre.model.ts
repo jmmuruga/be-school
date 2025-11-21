@@ -22,8 +22,6 @@ export class Question {
   question: string;
   @Column({ type: "text", nullable: true })
   studentImage: string;
-  @Column({ nullable: true })
-  FilePath: string;
   @Column({ default: true })
   isActive: Boolean;
   @Column({ nullable: true })
