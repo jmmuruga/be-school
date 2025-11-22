@@ -36,7 +36,9 @@ export const getObjectiveQuestions = async (req: Request, res: Response) => {
         FROM objectiveques
 WHERE subject = '${subject}'
   AND standard = '${standard}'
-  AND type = '${type}';`
+  AND type = '${type}'
+  
+  ;`
     );
     return res.status(200).json({
       IsSuccess: "successfully",
@@ -71,7 +73,7 @@ export const getQuestionAns = async (req: Request, res: Response) => {
     const threeUserMax = Number(threeMax);
     const fiveUserMax = Number(fiveMax);
 
-    // 1️⃣ Count DB totals for each mark
+    // 1️ Count DB totals for each mark
     const twoDb = await quesAnsRepo.count({
       where: { subject, standard, type, mark: 2 },
     });
@@ -84,7 +86,7 @@ export const getQuestionAns = async (req: Request, res: Response) => {
       where: { subject, standard, type, mark: 5 },
     });
 
-    // 2️⃣ Calculate final MAX based on DB + User Max
+    // 2️ Calculate final MAX based on DB + User Max
     const finalTwoMax = Math.min(twoDb, twoUserMax);
     const finalThreeMax = Math.min(threeDb, threeUserMax);
     const finalFiveMax = Math.min(fiveDb, fiveUserMax);
