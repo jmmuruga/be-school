@@ -4,7 +4,7 @@ export const QuesgenerateValidation = Joi.object({
   standard: Joi.string().required(),
   subject: Joi.string().required(),
   total: Joi.number().required(),
-   onemark: Joi.number().optional().allow(null),
+  onemark: Joi.number().optional().allow(null),
   twomark: Joi.number().optional().allow(null),
   threemark: Joi.number().optional().allow(null),
   fivemark: Joi.number().optional().allow(null),

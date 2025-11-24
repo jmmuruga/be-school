@@ -16,6 +16,21 @@ export const addQuestion = async (req: Request, res: Response) => {
     }
 
     const questionRepoistry = appSource.getRepository(Question);
+      const existing = await questionRepoistry.findOne({
+      where: {
+        standard: payload.standard,
+        subject: payload.subject,
+        type: payload.type,
+        mark: payload.mark,
+        question: payload.question,
+      },
+    });
+
+    if (existing) {
+      return res.status(409).json({
+        ErrorMessage: "This question already exists!",
+      });
+    }
     await questionRepoistry.save(payload);
     return res.status(200).json({ IsSuccess: "Question added successfully" });
   } catch (error) {

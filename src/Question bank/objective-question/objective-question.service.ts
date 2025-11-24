@@ -13,7 +13,20 @@ export const addObjectiveques = async (req: Request, res: Response) => {
       });
     }
     const questionRepoistry = appSource.getRepository(objectiveques);
-     
+      const existing = await questionRepoistry.findOne({
+      where: {
+        standard: payload.standard,
+        subject: payload.subject,
+        type: payload.type,
+        question: payload.question,
+      },
+    });
+
+    if (existing) {
+      return res.status(409).json({
+        ErrorMessage: "This question already exists!",
+      });
+    }
     await questionRepoistry.save(payload);
     // console.log("Received payload:", payload);
     return res.status(200).json({ IsSuccess: "Question added successfully" });
