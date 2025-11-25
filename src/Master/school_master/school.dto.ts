@@ -5,8 +5,8 @@ export const SchoolValidation = Joi.object({
   school: Joi.string().required(),
   isActive: Joi.boolean().optional(),
   updateStatus:Joi.boolean().optional(),
-  created_UserId: Joi.string().optional(),
-  updated_UserId: Joi.string().optional(),
+  created_UserId: Joi.string().required(),
+  updated_UserId: Joi.string().optional().allow(null , ""),
 });
 export interface SchoolDto {
   schoolCode: number;

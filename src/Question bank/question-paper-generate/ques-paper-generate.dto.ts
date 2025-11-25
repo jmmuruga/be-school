@@ -9,8 +9,8 @@ export const QuesgenerateValidation = Joi.object({
   threemark: Joi.number().optional().allow(null),
   fivemark: Joi.number().optional().allow(null),
   isActive: Joi.boolean().optional(),
-  created_UserId: Joi.string().optional(),
-  updated_UserId: Joi.string().optional(),
+  created_UserId: Joi.string().required(),
+  updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface QuesgenerateDto {
   type: string;

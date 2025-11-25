@@ -5,8 +5,8 @@ export const MediumValidation = Joi.object({
   medium: Joi.string().required(),
   isActive: Joi.boolean().optional(),
   updateStatus:Joi.boolean().optional(),
-  created_UserId: Joi.string().optional(),
-  updated_UserId: Joi.string().optional(),
+  created_UserId: Joi.string().required(),
+  updated_UserId: Joi.string().optional().allow(null , ""),
 });
 export interface MediumDto {
   mediumCode: number;

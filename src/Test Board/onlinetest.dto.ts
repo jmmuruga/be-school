@@ -5,8 +5,8 @@ export const OnlineTestValidation = Joi.object({
   TestType: Joi.string().required(),
   Numofquestion: Joi.number().required(),
   isActive: Joi.boolean().optional(),
-  created_UserId: Joi.string().optional(),
-  updated_UserId: Joi.string().optional(),
+  created_UserId: Joi.string().required(),
+  updated_UserId: Joi.string().optional().allow(null , ""),
 });
 export interface onlinetestDto {
   Subject: string;

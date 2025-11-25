@@ -15,8 +15,8 @@ export const UserValidation = Joi.object({
   // profileParent: Joi.string().optional(),
   isActive: Joi.boolean().optional(),
     updateStatus:Joi.boolean().optional(),
-  created_UserId: Joi.string().optional(),
-  updated_UserId: Joi.string().optional(),
+  created_UserId: Joi.string().required(),
+  updated_UserId: Joi.string().optional().allow(null , ""),
 });
 export interface UserDto {
   UserID: number;

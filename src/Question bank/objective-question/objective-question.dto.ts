@@ -13,7 +13,7 @@ export const objectquesValidation = Joi.object({
   option4: Joi.string().optional().allow(null, ""),
   correctanswer: Joi.string().optional().allow(null, ""),
   isActive: Joi.boolean().optional(),
-  created_UserId: Joi.string().optional().allow(null, ""),
+  created_UserId: Joi.string().required(),
   updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface objectivequesDto {
