@@ -5,6 +5,8 @@ export const QuesgenerateValidation = Joi.object({
   subject: Joi.string().required(),
   total: Joi.number().required(),
   onemark: Joi.number().optional().allow(null),
+
+  optionType: Joi.string().optional().allow(null),
   twomark: Joi.number().optional().allow(null),
   threemark: Joi.number().optional().allow(null),
   fivemark: Joi.number().optional().allow(null),
@@ -17,11 +19,16 @@ export interface QuesgenerateDto {
   standard: string;
   subject: string;
   total: number;
-  onemark:number;
-  twomark:number;
-  threemark:number;
-  fivemark:number;
-  isActive:Boolean;
+  onemark: number;
+  optionType: string;
+  option1: string;
+  option2: string;
+  option3: string;
+  option4: string;
+  twomark: number;
+  threemark: number;
+  fivemark: number;
+  isActive: Boolean;
   created_UserId: string;
   updated_UserId: string;
 }

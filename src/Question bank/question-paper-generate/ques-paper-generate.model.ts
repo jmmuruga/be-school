@@ -15,20 +15,22 @@ export class Quesgenerate {
   @Column()
   subject: string;
   @Column()
-  total: number; 
+  total: number;
   @Column()
-  onemark:number;
+  onemark: number;
   @Column()
-  twomark:number;
+  optionType: string;
   @Column()
-  threemark:number;
+  twomark: number;
   @Column()
-  fivemark:number;
-  @Column({default:true})
+  threemark: number;
+  @Column()
+  fivemark: number;
+  @Column({ default: true })
   isActive: Boolean;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   created_UserId: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

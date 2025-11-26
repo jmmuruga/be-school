@@ -67,6 +67,7 @@ export const getQuestionAns = async (req: Request, res: Response) => {
     console.log("received threeMax ", threeMax);
     console.log("received fiveMax ", fiveMax);
 
+
     const quesAnsRepo = appSource.getRepository(Question);
     // Convert to number
     const twoUserMax = Number(twoMax);
