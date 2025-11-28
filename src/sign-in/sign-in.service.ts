@@ -65,6 +65,8 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       user: {
         name: student.UserName,
         email: student.email,
+        studentid:student.id
+
       },
     });
   } catch (error: any) {
