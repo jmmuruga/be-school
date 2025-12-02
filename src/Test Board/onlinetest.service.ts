@@ -1,11 +1,8 @@
 import { appSource } from "../core/database/db";
 import { Request, Response } from "express";
 import { onlinetest } from "./onlinetest.model";
-import { Signup } from "../Signup/signup.model";
-import { SignInDto
- } from "../sign-in/sign-in.dto";
- import { SignupValidation } from "../Signup/signup.dto";
 import { onlinetestDto, OnlineTestValidation } from "./onlinetest.dto";
+import { objectiveques } from "../Question bank/objective-question/objective-question.model";
 export const addOnlinetest = async (req: Request, res: Response) => {
   try {
     const payload: onlinetestDto = req.body;
@@ -57,5 +54,30 @@ export const getStudentId = async (req: Request, res: Response) => {
       ErrorMessage: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
+  }
+};
+export const getObjectiveQuestions = async (req: Request, res: Response) => {
+  try {
+    const { subject, standard, type, question, } = req.params;
+    console.log(req.params);
+    // console.log("received oneMax ", oneMax);
+    const objectiveRepo = appSource.getRepository(objectiveques);
+
+    const questions = await objectiveRepo.query(
+      `SELECT TOP ${question} *
+        FROM objectiveques
+WHERE subject = '${subject}'
+  AND standard = '${standard}'
+  AND type = '${type}'
+  
+  ;`
+    );
+    return res.status(200).json({
+      IsSuccess: "successfully",
+      Result: questions,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Something went wrong" });
   }
 };
