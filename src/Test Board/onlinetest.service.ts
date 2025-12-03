@@ -58,7 +58,7 @@ export const getStudentId = async (req: Request, res: Response) => {
 };
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
   try {
-    const { subject, standard, type, question, } = req.params;
+    const { subject, standard, type, question } = req.params;
     console.log(req.params);
     // console.log("received oneMax ", oneMax);
     const objectiveRepo = appSource.getRepository(objectiveques);
