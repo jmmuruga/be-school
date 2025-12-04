@@ -19,6 +19,8 @@ import StaffRouter from "./Staff-Profile/staff-Profile.controller";
 import QuesGenerateRouter from "./Question bank/question-paper-generate/ques-paper-generate.controller";
 import questionRouter from "./Question bank/question-prepare/questionpre.controller";
 import signInRouter from "./sign-in/sign-in.controller";
+import userRightRouter from "./User-Rights/user-rights.controller";
+
 const app = express();
 
 dotenv.config();
@@ -49,6 +51,7 @@ app.use('/questionRouter', cors(corsOptions), questionRouter);
 app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter);
 app.use('/onlinetestRouter',cors(corsOptions),onlinetestRouter);
 app.use('/StaffRouter',cors(corsOptions),StaffRouter);
+app.use('/userRightRouter',cors(corsOptions),userRightRouter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 // app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter)

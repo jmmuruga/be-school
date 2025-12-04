@@ -24,16 +24,6 @@ export class User {
   roleType: string;
   @Column()
   staffNo: string;
-  // @Column()
-  // userAccess: boolean;
-  // @Column()
-  // dashboardAccess: boolean;
-  // @Column()
-  // masterParent: string;
-  // @Column()
-  // questionsParent: string;
-  // @Column()
-  // profileParent: string;
   @Column({ default: true })
   isActive: boolean;
   @Column({ default: true })

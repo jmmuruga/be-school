@@ -17,8 +17,10 @@ import { objectiveques } from "../../Question bank/objective-question/objective-
 import { SignIn } from "../../sign-in/sign-in.model";
 import { Question } from "../../Question bank/question-prepare/questionpre.model";
 import { onlinetest } from "../../Test Board/onlinetest.model";
+import userRightRouter from "../../User-Rights/user-rights.controller";
+import { UserRight } from "../../User-Rights/user-rights.model";
 const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,User,Staff,Signup,objectiveques,
-    Quesgenerate,SignIn,Question,onlinetest
+    Quesgenerate,SignIn,Question,onlinetest,UserRight
 ]
 
 export const appSource = new DataSource({

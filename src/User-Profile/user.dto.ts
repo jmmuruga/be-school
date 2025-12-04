@@ -8,15 +8,10 @@ export const UserValidation = Joi.object({
   roleType: Joi.string().required(),
   staffNo: Joi.string().required(),
   phone: Joi.string().required(),
-  // userAccess: Joi.boolean().optional(),
-  // dashboardAccess: Joi.boolean().optional(),
-  // masterParent: Joi.string().optional(),
-  // questionsParent: Joi.string().optional(),
-  // profileParent: Joi.string().optional(),
   isActive: Joi.boolean().optional(),
-    updateStatus:Joi.boolean().optional(),
+  updateStatus: Joi.boolean().optional(),
   created_UserId: Joi.string().required(),
-  updated_UserId: Joi.string().optional().allow(null , ""),
+  updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface UserDto {
   UserID: number;
@@ -28,11 +23,11 @@ export interface UserDto {
   staffNo: string;
   phone: string;
   isActive: boolean;
-  updateStatus:boolean;
+  updateStatus: boolean;
   created_UserId: string;
   updated_UserId: string;
 }
-export interface UserStatus{
-  UserID : number;
-  status : boolean;
+export interface UserStatus {
+  UserID: number;
+  status: boolean;
 }
