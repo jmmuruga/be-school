@@ -29,7 +29,11 @@ export const signIn = async (req: Request, res: Response) => {
         id: user.UserID,
         name: user.userName,
         email: user.email,
-        role: user.roleType,
+        roleType: user.roleType,
+        phone:user.phone,
+        staffNo:user.staffNo,
+         password:user.password
+
       },
     });
   } catch (error: any) {

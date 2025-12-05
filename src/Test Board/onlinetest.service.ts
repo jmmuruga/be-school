@@ -69,7 +69,6 @@ export const getObjectiveQuestions = async (req: Request, res: Response) => {
 WHERE subject = '${subject}'
   AND standard = '${standard}'
   AND type = '${type}'
-  
   ;`
     );
     return res.status(200).json({
