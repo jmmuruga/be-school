@@ -64,15 +64,18 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
+    // console.log('Student School from DB:', student.school);
     return res.status(200).send({
       IsSuccess: "Sign-in Successfully",
       user: {
         name: student.UserName,
         email: student.email,
-        studentid:student.id
-
+        studentid:student.id,
+        studentschool:student.school
+ 
       },
     });
+    
   } catch (error: any) {
     return res.status(500).send({
       ErrorMessage: "Internal Server Error",
@@ -97,13 +100,14 @@ export const getStudentId = async (req: Request, res: Response) => {
     }
 
     const student = students[0];
-   console.log('Student data:', student);
+  //  console.log('Student data:', student);
+  
     return res.status(200).json({
       IsSuccess: true,
       Result: student,
     });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({
       IsSuccess: false,
       ErrorMessage: "Internal server error",

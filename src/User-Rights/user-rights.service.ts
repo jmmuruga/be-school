@@ -16,9 +16,7 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
         message: validation.error.details[0].message,
       });
     }
-
     const repo = appSource.getRepository(UserRight);
-
     // Ensure selectedForms is an array and has entries
     if (
       !payload.selectedForms ||
@@ -35,7 +33,6 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
     await repo.delete({
       UserRightTypeId: payload.UserRightTypeId,
     });
-
     // Prepare data for insert
     let insertData: any[] = [];
 
@@ -67,7 +64,6 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
         }
       }
     }
-
     if (insertData.length === 0) {
       return res.status(400).json({
         message: "No forms to insert",
@@ -89,46 +85,6 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
   }
 };
 
-// export const addUserRight = async (req: Request, res: Response) => {
-//   try {
-//     const payload: UserRightDto = req.body;
-//     const validation = UserRightValidation.validate(payload);
-//     if (validation.error) {
-//       return res.status(400).json({
-//         message: validation.error.details[0].message,
-//       });
-//     }
-//     const userRightRepository = appSource.getRepository(UserRight);
-//     // check
-//   const allFormCodes = Object.values(payload.selectedForms)
-//   .flat()
-//   .map((f: any) => f.formCode);
-
-// // check duplicates for this user type
-// const userRepoistry = appSource.getRepository(UserRight);
-
-// const nameExist = await userRepoistry.find({
-//   where: {
-//     formCode: In(allFormCodes),
-//     UserRightTypeId: Not(payload.UserRightTypeId),
-//   },
-// });
-
-// if (nameExist.length > 0) {
-//   return res.status(400).json({
-//     ErrorMessage: "FormCode already exists for another user type!",
-//   });
-// }
-//     await userRightRepository.save(payload);
-//     return res.status(200).json({ IsSuccess: "Added Successfully" });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({
-//       message: "Internal server error",
-//       error: error instanceof Error ? error.message : error,
-//     });
-//   }
-// };
 export const getUserRightId = async (req: Request, res: Response) => {
   try {
     const userRightRepositary = appSource.getRepository(UserRight);
@@ -167,7 +123,11 @@ export const getUserRightDetails = async (req: Request, res: Response) => {
       Result: userM,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
+      return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const updateUserRight = async (req: Request, res: Response) => {
