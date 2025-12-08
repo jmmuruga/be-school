@@ -74,7 +74,7 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
     await repo.save(insertData);
 
     return res.status(200).json({
-      IsSuccess: "User rights saved/updated successfully",
+      IsSuccess: "User rights saved successfully",
     });
   } catch (error) {
     console.error(error);
@@ -103,7 +103,7 @@ export const getUserRightId = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

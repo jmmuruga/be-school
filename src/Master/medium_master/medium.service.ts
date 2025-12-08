@@ -50,7 +50,7 @@ export const getMediumCode = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
      return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -72,7 +72,6 @@ export const getMediumDetails = async (req: Request, res: Response) => {
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
-    // console.log(error);
   }
 };
 export const updateMedium = async (req: Request, res: Response) => {
