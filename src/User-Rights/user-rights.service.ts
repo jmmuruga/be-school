@@ -28,12 +28,17 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
         message: "Please select at least one form",
       });
     }
-
+const existing = await repo.find({
+  where: { UserRightTypeId: payload.UserRightTypeId },
+});
     // Delete old records for this userType (and company if relevant)
-    await repo.delete({
-      UserRightTypeId: payload.UserRightTypeId,
-    });
-    // Prepare data for insert
+   if (existing.length > 0) {
+  // Existing = Update mode (delete and reinsert)
+  await repo.delete({ UserRightTypeId: payload.UserRightTypeId });
+} else {
+ return;
+}
+ 
     let insertData: any[] = [];
 
     if (Array.isArray(payload.selectedForms)) {
