@@ -20,7 +20,7 @@ import QuesGenerateRouter from "./Question bank/question-paper-generate/ques-pap
 import questionRouter from "./Question bank/question-prepare/questionpre.controller";
 import signInRouter from "./sign-in/sign-in.controller";
 import userRightRouter from "./User-Rights/user-rights.controller";
-
+ import studentscoreRouter from "./Student-Result/student-result.controller";
 const app = express();
 
 dotenv.config();
@@ -52,6 +52,7 @@ app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter);
 app.use('/onlinetestRouter',cors(corsOptions),onlinetestRouter);
 app.use('/StaffRouter',cors(corsOptions),StaffRouter);
 app.use('/userRightRouter',cors(corsOptions),userRightRouter);
+app.use('/studentscoreRouter',cors(corsOptions),studentscoreRouter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 // app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter)

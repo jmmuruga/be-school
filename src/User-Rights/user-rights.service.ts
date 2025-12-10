@@ -82,7 +82,6 @@ const existing = await repo.find({
       IsSuccess: "User rights saved successfully",
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -128,7 +127,7 @@ export const getUserRightDetails = async (req: Request, res: Response) => {
       Result: userM,
     });
   } catch (error) {
-    // console.log(error);
+    
       return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

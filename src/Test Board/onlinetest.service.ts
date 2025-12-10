@@ -13,11 +13,11 @@ export const addOnlinetest = async (req: Request, res: Response) => {
       });
     }
     const onlinetestRepoistry = appSource.getRepository(onlinetest);
-    console.log('payload',payload);
+    // console.log('payload',payload);
     await onlinetestRepoistry.save(payload);
     return res.status(200).json({ IsSuccess: "Start successfully" });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -76,7 +76,7 @@ WHERE subject = '${subject}'
       Result: questions,
     });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
