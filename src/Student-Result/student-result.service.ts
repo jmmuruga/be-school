@@ -16,11 +16,13 @@ export const AddStudentScoreResult = async (req: Request, res: Response) => {
     const studentscoreRepository = appSource.getRepository(studentScoreResult);
     console.log("payload", payload);
     await studentscoreRepository.save(payload);
+    console.log('Save successful');
     return res.status(200).json({ IsSuccess: "save successfully" });
   } catch (error) {
-    return res.status(500).json({
-      message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
-    });
+     console.error('Save error:', error);
+  return res.status(500).json({
+    message: "Failed to save student score",
+    error: error instanceof Error ? error.message : error,
+  });
   }
 };
