@@ -20,8 +20,9 @@ import { onlinetest } from "../../Test Board/onlinetest.model";
 import userRightRouter from "../../User-Rights/user-rights.controller";
 import { UserRight } from "../../User-Rights/user-rights.model";
 import { studentScoreResult } from "../../Student-Result/student-result.model";
+import { logs } from "../../logs/logs.model";
 const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,User,Staff,Signup,objectiveques,
-    Quesgenerate,SignIn,Question,onlinetest,UserRight,studentScoreResult
+    Quesgenerate,SignIn,Question,onlinetest,UserRight,studentScoreResult,logs
 ]
 
 export const appSource = new DataSource({

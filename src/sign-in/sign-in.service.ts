@@ -71,7 +71,8 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         name: student.UserName,
         email: student.email,
         studentid:student.id,
-        studentschool:student.school
+        studentschool:student.school,
+        standard:student.standard
  
       },
     });

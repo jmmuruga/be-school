@@ -21,6 +21,7 @@ import questionRouter from "./Question bank/question-prepare/questionpre.control
 import signInRouter from "./sign-in/sign-in.controller";
 import userRightRouter from "./User-Rights/user-rights.controller";
  import studentscoreRouter from "./Student-Result/student-result.controller";
+ import logsRouter from "./logs/logs.controller";
 const app = express();
 
 dotenv.config();
@@ -53,6 +54,7 @@ app.use('/onlinetestRouter',cors(corsOptions),onlinetestRouter);
 app.use('/StaffRouter',cors(corsOptions),StaffRouter);
 app.use('/userRightRouter',cors(corsOptions),userRightRouter);
 app.use('/studentscoreRouter',cors(corsOptions),studentscoreRouter);
+app.use('/logsRouter',cors(corsOptions),logsRouter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 // app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter)
