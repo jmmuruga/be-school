@@ -6,6 +6,8 @@ import { QuesgenerateDto } from "./ques-paper-generate.dto";
 import { objectiveques } from "../objective-question/objective-question.model";
 import { objectivequesDto } from "../objective-question/objective-question.dto";
 import { Question } from "../question-prepare/questionpre.model";
+import { logsDto } from "../../logs/logs.dto";
+import { InsertLog } from "../../logs/logs.service";
 export const addQuesgene = async (req: Request, res: Response) => {
   try {
     const payload: QuesgenerateDto = req.body;
@@ -17,18 +19,25 @@ export const addQuesgene = async (req: Request, res: Response) => {
     }
     const QuesgenerateRepository = appSource.getRepository(Quesgenerate);
     await QuesgenerateRepository.save(payload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `QuesGenerate Print Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "QuesGenerate Print successfully" });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
   }
 };
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
   try {
     const { subject, standard, type, questionCount, oneMax } = req.params;
     console.log(req.params);
-    console.log("received oneMax ", oneMax);
+    // console.log("received oneMax ", oneMax);
     const objectiveRepo = appSource.getRepository(objectiveques);
 
     const questions = await objectiveRepo.query(
@@ -62,11 +71,10 @@ export const getQuestionAns = async (req: Request, res: Response) => {
       threeMax,
       fiveMax,
     } = req.params;
-    console.log(req.params);
-    console.log("received twoMax ", twoMax);
-    console.log("received threeMax ", threeMax);
-    console.log("received fiveMax ", fiveMax);
-
+    // console.log(req.params);
+    // console.log("received twoMax ", twoMax);
+    // console.log("received threeMax ", threeMax);
+    // console.log("received fiveMax ", fiveMax);
 
     const quesAnsRepo = appSource.getRepository(Question);
     // Convert to number

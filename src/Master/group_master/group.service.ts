@@ -3,6 +3,8 @@ import { GroupDto, groupStatus, GroupValidation } from "./group.dto";
 import { Request, Response } from "express";
 import { GroupMaster } from "./group.model";
 import { Not } from "typeorm";
+import { logsDto } from "../../logs/logs.dto";
+import { InsertLog } from "../../logs/logs.service";
 
 export const getGroupMasterDetails = async (req: Request, res: Response) => {
   try {
@@ -44,6 +46,13 @@ export const addGroup = async (req: Request, res: Response) => {
       });
     }
     await groupRepoistry.save(payload);
+       const logsPayload: logsDto = {
+          UserId: Number(payload.created_UserId),
+          UserName:null,
+          statusCode: 200,
+          Message: `Group Added  Successfully By - `,
+        };
+          await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Group Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -110,6 +119,14 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
       });
     }
     await groupRepository.update({ groupCode: payload.groupCode }, payload);
+
+       const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName:null,
+      statusCode: 200,
+      Message: `Group Updated Successfully By - `,
+    };
+      await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Group Updated successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -144,6 +161,7 @@ export const deleteGroup = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ groupCode: groupCode })
       .execute();
+      
     // await groupRepository.delete(groupCode);
     return res.status(200).json({
       IsSuccess: "Group Deleted Successfully !!",

@@ -3,6 +3,8 @@ import { MarkDto, markStatus, MarkValidation } from "./mark.dto";
 import { Request, Response } from "express";
 import { MarkMaster } from "./mark.model";
 import { Not } from "typeorm";
+import { InsertLog } from "../../logs/logs.service";
+import { logsDto } from "../../logs/logs.dto";
 
 export const getMarkMasterDetails = async (req: Request, res: Response) => {
   try {
@@ -42,6 +44,15 @@ export const addMark = async (req: Request, res: Response) => {
       });
     }
     await markRepository.save(payload);
+
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Mark Added Successfully By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res.status(200).json({ IsSuccess: "Mark Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -105,6 +116,13 @@ export const updateMark = async (req: Request, res: Response) => {
       });
     }
     await markRepository.update({ markCode: payload.markCode }, payload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Mark Updated Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Mark Updated successfully" });
   } catch (error) {
     console.error("Update Error:", error);

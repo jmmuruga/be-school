@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { onlinetest } from "./onlinetest.model";
 import { onlinetestDto, OnlineTestValidation } from "./onlinetest.dto";
 import { objectiveques } from "../Question bank/objective-question/objective-question.model";
+import { InsertLog } from "../logs/logs.service";
+import { logsDto } from "../logs/logs.dto";
 export const addOnlinetest = async (req: Request, res: Response) => {
   try {
     const payload: onlinetestDto = req.body;
@@ -15,6 +17,13 @@ export const addOnlinetest = async (req: Request, res: Response) => {
     const onlinetestRepoistry = appSource.getRepository(onlinetest);
     // console.log('payload',payload);
     await onlinetestRepoistry.save(payload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Start  Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Start successfully" });
   } catch (error) {
     // console.log(error);
@@ -42,7 +51,7 @@ export const getStudentId = async (req: Request, res: Response) => {
     }
 
     const student = students[0];
-   console.log('Student data:', student);
+    console.log("Student data:", student);
     return res.status(200).json({
       IsSuccess: true,
       Result: student,

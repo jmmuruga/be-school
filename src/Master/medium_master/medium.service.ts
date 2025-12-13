@@ -4,6 +4,8 @@ import { Request, Response } from "express";
 import { MediumMaster } from "./medium.model";
 import mediumRouter from "./medium.controller";
 import { Not } from "typeorm";
+import { InsertLog } from "../../logs/logs.service";
+import { logsDto } from "../../logs/logs.dto";
 
 export const addMedium = async (req: Request, res: Response) => {
   try {
@@ -27,9 +29,23 @@ export const addMedium = async (req: Request, res: Response) => {
       });
     }
     await mediumRepoistry.save(payload);
+
+       const logsPayload: logsDto = {
+          UserId: Number(payload.created_UserId),
+          UserName:null,
+          statusCode: 200,
+          Message: `Medium Added Successfully By - `,
+        };
+          await InsertLog(logsPayload);
+
     return res.status(200).json({ IsSuccess: "Medium Added Successfully !!" });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
+       return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+
   }
 };
 export const getMediumCode = async (req: Request, res: Response) => {
@@ -50,7 +66,7 @@ export const getMediumCode = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
      return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -107,6 +123,15 @@ export const updateMedium = async (req: Request, res: Response) => {
       });
     }
     await mediumRepoistry.update({ mediumCode: payload.mediumCode }, payload);
+     
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName:null,
+      statusCode: 200,
+      Message: `Medium Updated Successfully By - `,
+    };
+      await InsertLog(logsPayload);
+
     return res.status(200).json({ IsSuccess: "Medium Updated Successfully !!" });
   } catch (error) {
     // console.error("Update Error:", error);

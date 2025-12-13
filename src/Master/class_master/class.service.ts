@@ -3,6 +3,8 @@ import { ClassDto, classStatus, ClassValidation } from "./class.dto";
 import { Request, Response } from "express";
 import { classMaster } from "./class.model";
 import { DataSource, Not } from "typeorm";
+import { logsDto } from "../../logs/logs.dto";
+import { InsertLog } from "../../logs/logs.service";
 
 export const addClass = async (req: Request, res: Response) => {
   try {
@@ -29,6 +31,14 @@ export const addClass = async (req: Request, res: Response) => {
     }
 
     await classRepository.save(payload);
+     const logsPayload: logsDto = {
+          UserId: Number(payload.created_UserId),
+          UserName:null,
+          statusCode: 200,
+          Message: `Class Added Successfully By - `,
+        
+        };
+          await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Class Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -114,6 +124,15 @@ export const updateClassMaster = async (req: Request, res: Response) => {
       });
     }
     await classRepository.update({ classCode: payload.classCode }, payload); //update
+    
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName:null,
+      statusCode: 200,
+      Message: `class Updated Successfully By - `,
+    
+    };
+      await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Class Updated successfully  !!" });
@@ -148,7 +167,9 @@ export const deleteClass = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ classCode: classCode })
       .execute();
+    
 
+      
     return res.status(200).json({ IsSuccess: "Class Deleted Successfully !!" });
   } catch (error) {
     return res.status(500).json({

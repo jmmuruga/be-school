@@ -3,6 +3,8 @@ import { objectivequesDto } from "./objective-question.dto";
 import { objectquesValidation } from "./objective-question.dto";
 import { Response, Request } from "express";
 import { objectiveques } from "./objective-question.model";
+import { InsertLog } from "../../logs/logs.service";
+import { logsDto } from "../../logs/logs.dto";
 export const addObjectiveques = async (req: Request, res: Response) => {
   try {
     const payload: objectivequesDto = req.body;
@@ -28,15 +30,21 @@ export const addObjectiveques = async (req: Request, res: Response) => {
     });
 
     if (existing) {
-      console.log("Duplicate found, updating instead…", payload);
+      // console.log("Duplicate found, updating instead…", payload);
       return res.status(409).json({
         ErrorMessage: "This question already exists!",
       });
     }
 
     await questionRepoistry.save(payload);
-
-    console.log("Received payload:", payload);
+        const logsPayload: logsDto = {
+           UserId: Number(payload.created_UserId),
+           UserName:null,
+           statusCode: 200,
+           Message: `Question Added Successfully By - `,
+         };
+           await InsertLog(logsPayload);
+    // console.log("Received payload:", payload);
     return res.status(200).json({ IsSuccess: "Question added successfully" });
   } catch (error) {
     console.log(error, "error");

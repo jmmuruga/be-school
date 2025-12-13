@@ -5,6 +5,8 @@ import { appSource } from "../core/database/db";
 import { Staff } from "./staff-Profile.model";
 import { Not } from "typeorm";
 import { invalid } from "joi";
+import { logsDto } from "../logs/logs.dto";
+import { InsertLog } from "../logs/logs.service";
 export const addStaff = async (req: Request, res: Response) => {
   try {
     const payload: StaffDto = req.body;
@@ -47,9 +49,16 @@ export const addStaff = async (req: Request, res: Response) => {
     }
 
     await staffRepository.save(payload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName:null,
+      statusCode: 200,
+      Message: `Staff Added Successfully By - `,
+    };
+      await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Staff Added Successfully !!" });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -71,7 +80,6 @@ export const getStaffNo = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Internal server error" });
 
   }
@@ -85,7 +93,7 @@ export const getStaffDetails = async (req: Request, res: Response) => {
       Result: StaffS,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({ message: "Internal server error" });
 
   }
@@ -133,9 +141,18 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
       })
      }
     await staffRepository.update({ staffNo: payload.staffNo }, payload);
+
+         const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName:null,
+      statusCode: 200,
+      Message: `Staff Updated Successfully By - `,
+    };
+      await InsertLog(logsPayload);
+
     return res.status(200).json({ IsSuccess: "Staff Updated Successfully !!" });
   } catch (error) {
-    console.error("Update Error:", error);
+    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -145,7 +162,7 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
 export const deleteStaff = async (req: Request, res: Response) => {
   try {
     const staffNo = Number(req.params.staffNo);
-    console.log("deleting Staff:", staffNo);
+    // console.log("deleting Staff:", staffNo);
     if (isNaN(staffNo)) {
       return res.status(400).json({ ErrorMessage: "Invalid Staff No" });
     }
@@ -155,8 +172,10 @@ export const deleteStaff = async (req: Request, res: Response) => {
       staffNo: staffNo,
     });
     if (!existingStaff) {
-      return res.status(404).json({ ErrorMessage: "Satff not found" });
+      return res.status(404).json({ ErrorMessage: "Staff not found" });
     }
+  
+    
     // delete and active
     await staffRepository
       .createQueryBuilder()
@@ -164,11 +183,19 @@ export const deleteStaff = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ staffNo: staffNo })
       .execute();
+    //      const logsPayload: logsDto = {
+    //   UserId: Number(payload.updated_UserId),
+    //   UserName:null,
+    //   statusCode: 200,
+    //   Message: `Staff delete Successfully By - `,
+    
+    // };
+    //   await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Staff Deleted SuccessFullyy !!" });
   } catch (error) {
-    console.error("delete error:", error);
+    // console.error("delete error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -194,7 +221,7 @@ export const updateStaffStatus = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Staff Status updated Successfully !" });
   } catch (error) {
-    console.error("Update Error:", error);
+    // console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
     });

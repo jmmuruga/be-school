@@ -2,6 +2,8 @@ import { appSource } from "../core/database/db";
 import { SignupDto, SignupValidation } from "./signup.dto";
 import { Request, Response } from "express";
 import { Signup } from "./signup.model";
+import { InsertLog } from "../logs/logs.service";
+import { logsDto } from "../logs/logs.dto";
 export const addSignup = async (req: Request, res: Response) => {
   try {
     const payload: SignupDto = req.body;
@@ -47,6 +49,14 @@ export const addSignup = async (req: Request, res: Response) => {
       });
     }
     await signupRepository.save(payload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Student Register Successfully By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res.status(200).json({ IsSuccess: "Student Register Successfully" });
   } catch (error) {
     // console.log(error);

@@ -3,6 +3,8 @@ import { SchoolDto, schoolStatus, SchoolValidation } from "./school.dto";
 import { Request, Response } from "express";
 import { SchoolMaster } from "./school.model";
 import { Not } from "typeorm";
+import { logsDto } from "../../logs/logs.dto";
+import { InsertLog } from "../../logs/logs.service";
 
 export const addSchool = async (req: Request, res: Response) => {
   try {
@@ -24,6 +26,15 @@ export const addSchool = async (req: Request, res: Response) => {
       });
     }
     await schoolRepoistry.save(payload);
+
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `School Added Successfully By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res.status(200).json({ IsSuccess: "School Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -88,7 +99,7 @@ export const updateSchool = async (req: Request, res: Response) => {
     });
     if (!existingSchool) {
       return res.status(400).json({
-        ErrorMessage: "Class Doesn't exist",
+        ErrorMessage: "School Doesn't exist",
       });
     }
     // check school already exist
@@ -103,6 +114,15 @@ export const updateSchool = async (req: Request, res: Response) => {
     }
 
     await schoolRepoistry.update({ schoolCode: payload.schoolCode }, payload);
+
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `School Updated Successfully By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res
       .status(200)
       .json({ IsSuccess: "School Updated Successfully !!" });
@@ -119,7 +139,7 @@ export const deleteSchool = async (req: Request, res: Response) => {
 
     if (isNaN(schoolCode)) {
       return res.status(400).json({
-        ErrorMessage: "Invalid class code",
+        ErrorMessage: "Invalid school code",
       });
     }
     const schoolRepoistry = appSource.getRepository(SchoolMaster);

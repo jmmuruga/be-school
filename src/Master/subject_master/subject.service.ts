@@ -4,6 +4,8 @@ import { Request, Response } from "express";
 import { SubjectMaster } from "./subject.model";
 import subjectRouter from "./subject.controller";
 import { Not } from "typeorm";
+import { InsertLog } from "../../logs/logs.service";
+import { logsDto } from "../../logs/logs.dto";
 
 export const addSubject = async (req: Request, res: Response) => {
   try {
@@ -28,6 +30,15 @@ export const addSubject = async (req: Request, res: Response) => {
       });
     }
     await subjectRepository.save(payload);
+
+       const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName:null,
+      statusCode: 200,
+      Message: `Subject Added Successfully By - `,
+    };
+      await InsertLog(logsPayload);
+
     return res.status(200).json({ IsSuccess: "Subject Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -110,6 +121,14 @@ export const updateSubject = async (req: Request, res: Response) => {
       { subjectCode: payload.subjectCode },
       payload
     );
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Subject Updated Successfully By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res
       .status(200)
       .json({ IsSuccess: "Subject Updated Successfully !!" });
@@ -147,6 +166,15 @@ export const deleteSubject = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ subjectCode: subjectCode })
       .execute();
+
+    //       const logsPayload: logsDto = {
+    //   UserId: Number(payload.created_UserId),
+    //   UserName:null,
+    //   statusCode: 200,
+    //   Message: `Staff Added Successfully By - `,
+    // };
+    //   await InsertLog(logsPayload);
+
     // await subjectRepoistry.delete(subjectCode);
     return res.status(200).json({
       IsSuccess: "Subject Deleted Successfully !!",
@@ -176,6 +204,8 @@ export const updateSubjectStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ subjectCode: payload.subjectCode })
       .execute();
+
+
     return res
       .status(200)
       .json({ IsSuccess: "Subject Status updated Successfully" });

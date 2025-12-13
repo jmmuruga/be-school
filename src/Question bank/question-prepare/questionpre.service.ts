@@ -2,6 +2,8 @@ import { appSource } from "../../core/database/db";
 import { QuestionDto, QuestionValidation } from "./questionpre.dto";
 import { Response, Request } from "express";
 import { Question } from "./questionpre.model";
+import { InsertLog } from "../../logs/logs.service";
+import { logsDto } from "../../logs/logs.dto";
 export const addQuestion = async (req: Request, res: Response) => {
   try {
     const payload: QuestionDto = req.body;
@@ -16,7 +18,7 @@ export const addQuestion = async (req: Request, res: Response) => {
     }
 
     const questionRepoistry = appSource.getRepository(Question);
-      const existing = await questionRepoistry.findOne({
+    const existing = await questionRepoistry.findOne({
       where: {
         standard: payload.standard,
         subject: payload.subject,
@@ -32,6 +34,14 @@ export const addQuestion = async (req: Request, res: Response) => {
       });
     }
     await questionRepoistry.save(payload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Question Added Successfully By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res.status(200).json({ IsSuccess: "Question added successfully" });
   } catch (error) {
     // console.log(error);

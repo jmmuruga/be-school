@@ -5,6 +5,8 @@ import { UserRightValidation } from "./user-rights.dto";
 import { UserRight } from "./user-rights.model";
 import { not } from "joi";
 import { In, Not, Repository } from "typeorm";
+import { InsertLog } from "../logs/logs.service";
+import { logsDto } from "../logs/logs.dto";
 export const addOrUpdateUserRight = async (req: Request, res: Response) => {
   try {
     const payload: UserRightDto = req.body;
@@ -28,17 +30,17 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
         message: "Please select at least one form",
       });
     }
-const existing = await repo.find({
-  where: { UserRightTypeId: payload.UserRightTypeId },
-});
+    const existing = await repo.find({
+      where: { UserRightTypeId: payload.UserRightTypeId },
+    });
     // Delete old records for this userType (and company if relevant)
-   if (existing.length > 0) {
-  // Existing = Update mode (delete and reinsert)
-  await repo.delete({ UserRightTypeId: payload.UserRightTypeId });
-} else {
- return;
-}
- 
+    if (existing.length > 0) {
+      // Existing = Update mode (delete and reinsert)
+      await repo.delete({ UserRightTypeId: payload.UserRightTypeId });
+    } else {
+      return;
+    }
+
     let insertData: any[] = [];
 
     if (Array.isArray(payload.selectedForms)) {
@@ -77,7 +79,14 @@ const existing = await repo.find({
 
     // Insert new records
     await repo.save(insertData);
-
+    
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `User rights saved Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({
       IsSuccess: "User rights saved successfully",
     });
@@ -116,62 +125,17 @@ export const getUserRightId = async (req: Request, res: Response) => {
 };
 export const getUserRightDetails = async (req: Request, res: Response) => {
   try {
-    const {userRightTypeId} = req.params;
+    const { userRightTypeId } = req.params;
     const userRepoistry = appSource.getRepository(UserRight);
     // get the details
     const userM = await userRepoistry.findBy({
-      UserRightTypeId : userRightTypeId
+      UserRightTypeId: userRightTypeId,
     });
 
     res.status(200).send({
       Result: userM,
     });
   } catch (error) {
-    
-      return res.status(500).json({
-      message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
-    });
-  }
-};
-export const updateUserRight = async (req: Request, res: Response) => {
-  try {
-    // get the data
-    const payload: UserRightDto = req.body;
-    const validation = UserRightValidation.validate(payload);
-    // validation
-    if (validation.error) {
-      return res.status(400).json({
-        message: validation.error.details[0].message,
-      });
-    }
-    // check whether already exist
- const allFormCodes = Object.values(payload.selectedForms)
-  .flat()
-  .map((f: any) => f.formCode);
-
-// check duplicates for this user type
-const userRepoistry = appSource.getRepository(UserRight);
-
-const nameExist = await userRepoistry.find({
-  where: {
-    formCode: In(allFormCodes),
-    UserRightTypeId: Not(payload.UserRightTypeId),
-  },
-});
-
-if (nameExist.length > 0) {
-  return res.status(400).json({
-    ErrorMessage: "FormCode already exists for another user type!",
-  });
-}
-    await userRepoistry.update(
-      { UserRightTypeId: payload.UserRightTypeId },
-      payload
-    );
-    return res.status(200).json({ IsSuccess: "User Updated Successfully !!" });
-  } catch (error) {
-    console.error("Update Error:", error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

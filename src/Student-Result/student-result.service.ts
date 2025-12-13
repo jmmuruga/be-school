@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { studentScoreResult } from "./student-result.model";
 import { studentScoreResultDto } from "./student-result.dto";
 import { studentScoreResultValidation } from "./student-result.dto";
+import { InsertLog } from "../logs/logs.service";
+import { logsDto } from "../logs/logs.dto";
 
 export const AddStudentScoreResult = async (req: Request, res: Response) => {
   try {
@@ -16,13 +18,20 @@ export const AddStudentScoreResult = async (req: Request, res: Response) => {
     const studentscoreRepository = appSource.getRepository(studentScoreResult);
     console.log("payload", payload);
     await studentscoreRepository.save(payload);
-    console.log('Save successful');
+    //     const logsPayload: logsDto = {
+    //       UserId: Number(payload.created_UserId),
+    //       UserName:null,
+    //       statusCode: 200,
+    //       Message: `Save Successfully By - `,
+    //     };
+    //       await InsertLog(logsPayload);
+    // // console.log('Save successful');
     return res.status(200).json({ IsSuccess: "save successfully" });
   } catch (error) {
-     console.error('Save error:', error);
-  return res.status(500).json({
-    message: "Failed to save student score",
-    error: error instanceof Error ? error.message : error,
-  });
+    //  console.error('Save error:', error);
+      return res.status(500).json({
+      message: "Failed to save student score",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };

@@ -5,6 +5,8 @@ import { SignIn } from "./sign-in.model";
 import { User } from "../User-Profile/user.model";
 import { createTestAccount } from "nodemailer";
 import { Signup } from "../Signup/signup.model";
+import { logsDto } from "../logs/logs.dto";
+import { InsertLog } from "../logs/logs.service";
 export const signIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const userRepository = appSource.getRepository(User);
@@ -23,6 +25,14 @@ export const signIn = async (req: Request, res: Response) => {
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
+        //  const logsPayload: logsDto = {
+        //    UserId: Number(payload.created_UserId),
+        //    UserName:null,
+        //    statusCode: 200,
+        //    Message: `Admin or User Successfully By - `,
+        //  };
+        //    await InsertLog(logsPayload);
+
     return res.status(200).send({
       IsSuccess: "SignIn Successfully",
       user: {
@@ -64,6 +74,13 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
+    //     const logsPayload: logsDto = {
+    //   UserId: Number(payload.created_UserId),
+    //   UserName:null,
+    //   statusCode: 200,
+    //   Message: `Student sign in Successfully By - `,
+    // };
+    //   await InsertLog(logsPayload);
     // console.log('Student School from DB:', student.school);
     return res.status(200).send({
       IsSuccess: "Sign-in Successfully",
@@ -76,6 +93,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
  
       },
     });
+   
     
   } catch (error: any) {
     return res.status(500).send({

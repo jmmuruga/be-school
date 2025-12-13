@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { User } from "./user.model";
 import { appSource } from "../core/database/db";
 import { In, Not } from "typeorm";
+import { logsDto } from "../logs/logs.dto";
+import { InsertLog } from "../logs/logs.service";
 // import { ValidationException } from "../exceptions/ValidationException";
 
 export const addUser = async (req: Request, res: Response) => {
@@ -59,6 +61,13 @@ export const addUser = async (req: Request, res: Response) => {
       });
     }
     await userRepoistry.save(payload);
+        const logsPayload: logsDto = {
+          UserId: Number(payload.created_UserId),
+          UserName:null,
+          statusCode: 200,
+          Message: `User Added Successfully By - `,
+        };
+          await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -176,6 +185,13 @@ export const updateUserLogin = async (req: Request, res: Response) => {
     }
 
     await userRepository.update({ UserID: payload.UserID }, payload);
+        const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName:null,
+      statusCode: 200,
+      Message: `User Updated Successfully By - `,
+    };
+      await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Updated Successfully !!!" });
   } catch (error) {
     console.error("Update Error:", error);
@@ -211,7 +227,13 @@ export const deleteUser = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ UserID: UserID })
       .execute();
-
+  //  const logsPayload: logsDto = {
+  //         UserId:loginUserId,
+  //         UserName:null,
+  //         statusCode: 200,
+  //         Message: `User Added Successfully By - `,
+  //       };
+  //         await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Deleted Successfully !!" });
   } catch (error) {
     return res.status(500).json({
