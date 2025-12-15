@@ -61,13 +61,13 @@ export const addUser = async (req: Request, res: Response) => {
       });
     }
     await userRepoistry.save(payload);
-        const logsPayload: logsDto = {
-          UserId: Number(payload.created_UserId),
-          UserName:null,
-          statusCode: 200,
-          Message: `User Added Successfully By - `,
-        };
-          await InsertLog(logsPayload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `User Added Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -185,13 +185,13 @@ export const updateUserLogin = async (req: Request, res: Response) => {
     }
 
     await userRepository.update({ UserID: payload.UserID }, payload);
-        const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName:null,
+      UserName: null,
       statusCode: 200,
       Message: `User Updated Successfully By - `,
     };
-      await InsertLog(logsPayload);
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Updated Successfully !!!" });
   } catch (error) {
     console.error("Update Error:", error);
@@ -227,13 +227,13 @@ export const deleteUser = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ UserID: UserID })
       .execute();
-  //  const logsPayload: logsDto = {
-  //         UserId:loginUserId,
-  //         UserName:null,
-  //         statusCode: 200,
-  //         Message: `User Added Successfully By - `,
-  //       };
-  //         await InsertLog(logsPayload);
+    const logsPayload: logsDto = {
+      UserId: UserID,
+      UserName: null,
+      statusCode: 200,
+      Message: `User deleted Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Deleted Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -242,13 +242,53 @@ export const deleteUser = async (req: Request, res: Response) => {
     });
   }
 };
+// export const updateUserStatus = async (req: Request, res: Response) => {
+//   try {
+//     const payload: UserStatus = req.body;
+//     const userRepository = appSource.getRepository(User);
+//     const existingUser = await userRepository.findOneBy({
+//       UserID: payload.UserID,
+//       // userName: payload.userName,
+//     });
+//     if (!existingUser) {
+//       return res.status(400).json({
+//         ErrorMessage: "User not found",
+//       });
+//     }
+//     await userRepository
+//       .createQueryBuilder()
+//       .update(User)
+//       .set({ status: payload.status })
+//       .where({ UserID: payload.UserID })
+//       .execute();
+
+//     const logsPayload: logsDto = {
+//       UserId: payload.UserID,
+//       UserName: null,
+//       statusCode: 200,
+//       Message: `Changed  Status User Details  for ${existingUser.userName} to ${payload.status}By - `,
+//     };
+//     await InsertLog(logsPayload);
+//     return res
+//       .status(200)
+//       .json({ IsSuccess: "User Status updated Successfully !" });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Internal server error",
+//       error: error instanceof Error ? error.message : error,
+//     });
+//   }
+// };
+
 export const updateUserStatus = async (req: Request, res: Response) => {
   try {
     const payload: UserStatus = req.body;
     const userRepository = appSource.getRepository(User);
+
     const existingUser = await userRepository.findOneBy({
       UserID: payload.UserID,
     });
+
     if (!existingUser) {
       return res.status(400).json({
         ErrorMessage: "User not found",
@@ -260,9 +300,17 @@ export const updateUserStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ UserID: payload.UserID })
       .execute();
-    return res
-      .status(200)
-      .json({ IsSuccess: "User Status updated Successfully !" });
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed Status for  ${existingUser.userName} to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
+
+    return res.status(200).json({
+      IsSuccess: "User Status updated Successfully !",
+    });
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",

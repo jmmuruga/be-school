@@ -30,22 +30,21 @@ export const addMedium = async (req: Request, res: Response) => {
     }
     await mediumRepoistry.save(payload);
 
-       const logsPayload: logsDto = {
-          UserId: Number(payload.created_UserId),
-          UserName:null,
-          statusCode: 200,
-          Message: `Medium Added Successfully By - `,
-        };
-          await InsertLog(logsPayload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Medium Added Successfully By - `,
+    };
+    await InsertLog(logsPayload);
 
     return res.status(200).json({ IsSuccess: "Medium Added Successfully !!" });
   } catch (error) {
     // console.log(error);
-       return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
-
   }
 };
 export const getMediumCode = async (req: Request, res: Response) => {
@@ -67,7 +66,7 @@ export const getMediumCode = async (req: Request, res: Response) => {
     });
   } catch (error) {
     // console.log(error);
-     return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -84,7 +83,7 @@ export const getMediumDetails = async (req: Request, res: Response) => {
       Result: mediumM,
     });
   } catch (error) {
-     return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -123,16 +122,18 @@ export const updateMedium = async (req: Request, res: Response) => {
       });
     }
     await mediumRepoistry.update({ mediumCode: payload.mediumCode }, payload);
-     
+
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName:null,
+      UserName: null,
       statusCode: 200,
       Message: `Medium Updated Successfully By - `,
     };
-      await InsertLog(logsPayload);
+    await InsertLog(logsPayload);
 
-    return res.status(200).json({ IsSuccess: "Medium Updated Successfully !!" });
+    return res
+      .status(200)
+      .json({ IsSuccess: "Medium Updated Successfully !!" });
   } catch (error) {
     // console.error("Update Error:", error);
     return res.status(500).json({
@@ -196,6 +197,14 @@ export const updateMediumStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ mediumCode: payload.mediumCode })
       .execute();
+  
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed Status for  ${existingMedium.medium} Medium to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Medium Status updated Successfully !" });

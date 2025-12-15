@@ -22,4 +22,6 @@ export interface ClassDto {
 export interface classStatus{
   classCode : number;
   status : boolean;
+    loginUserId: number;  
+  loginUserName:string;
 }

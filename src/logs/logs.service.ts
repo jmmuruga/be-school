@@ -7,10 +7,18 @@ import { ValidationException } from "../exceptions/ValidationException";
 export const InsertLog = async (payload: logsDto): Promise<void> => {
   const logsRepository = appSource.getRepository(logs);
   const userRepository = appSource.getRepository(User);
-  const userDetail = await userRepository.findBy({ UserID: payload.UserId });
-  const userName = userDetail[0]?.userName || "-";
-  payload.UserName = userName;
-  payload.Message = payload.Message + " " + userName;
+    if (!payload.UserName) {
+    const userDetail = await userRepository.findOneBy({
+      UserID: payload.UserId,
+    });
+    payload.UserName = userDetail?.userName || '-';
+  }
+
+  payload.Message = payload.Message + payload.UserName;
+  // const userDetail = await userRepository.findBy({ UserID: payload.UserId });
+  // const userName = userDetail[0]?.userName || "-";
+  // payload.UserName = userName;
+  //  payload.Message = payload.Message + payload.UserName;
   await logsRepository.save(payload);
 };
 export const sendLogs = async (req: Request, res: Response) => {

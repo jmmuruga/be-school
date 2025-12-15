@@ -205,6 +205,7 @@ export const updateStaffStatus = async (req: Request, res: Response) => {
     const staffRepository = appSource.getRepository(Staff);
     const existingStaff = await staffRepository.findOneBy({
       staffNo: payload.staffNo,
+      
     });
     if (!existingStaff) {
       return res.status(400).json({
@@ -217,6 +218,14 @@ export const updateStaffStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ staffNo: payload.staffNo })
       .execute();
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed Status for  ${existingStaff.staffName} to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res
       .status(200)
       .json({ IsSuccess: "Staff Status updated Successfully !" });

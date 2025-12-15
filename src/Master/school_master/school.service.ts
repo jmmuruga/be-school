@@ -188,6 +188,14 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ schoolCode: payload.schoolCode })
       .execute();
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed Status for  ${existingSchool.school} to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res.status(200).json({
       IsSuccess: "School Status Updated Successfully !!",
     });

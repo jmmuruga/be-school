@@ -20,4 +20,6 @@ export interface MarkDto {
 export interface markStatus{
   markCode : number;
   status : boolean;
+    loginUserId: number;  
+  loginUserName:string;
 }

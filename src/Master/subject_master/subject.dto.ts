@@ -25,4 +25,6 @@ export interface SubjectDto {
 export interface subjectStatus {
   subjectCode: number;
   status: boolean;
+  loginUserId: number;  
+  loginUserName:string;
 }

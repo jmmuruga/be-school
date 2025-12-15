@@ -25,25 +25,35 @@ export const signIn = async (req: Request, res: Response) => {
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
-        //  const logsPayload: logsDto = {
-        //    UserId: Number(payload.created_UserId),
-        //    UserName:null,
-        //    statusCode: 200,
-        //    Message: `Admin or User Successfully By - `,
-        //  };
-        //    await InsertLog(logsPayload);
+    const now = new Date().toLocaleTimeString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+
+    const logsPayload: logsDto = {
+      UserId: user.UserID,
+      UserName: null,
+      statusCode: 200,
+      Message: `Admin or User session Start at ${now} By - `,
+    };
+    await InsertLog(logsPayload);
 
     return res.status(200).send({
-      IsSuccess: "SignIn Successfully",
+      IsSuccess: "Sign-In Successfully",
       user: {
         id: user.UserID,
         name: user.userName,
         email: user.email,
         roleType: user.roleType,
-        phone:user.phone,
-        staffNo:user.staffNo,
-         password:user.password
-
+        phone: user.phone,
+        staffNo: user.staffNo,
+        password: user.password,
       },
     });
   } catch (error: any) {
@@ -74,27 +84,34 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
-    //     const logsPayload: logsDto = {
-    //   UserId: Number(payload.created_UserId),
-    //   UserName:null,
-    //   statusCode: 200,
-    //   Message: `Student sign in Successfully By - `,
-    // };
-    //   await InsertLog(logsPayload);
+    const now = new Date().toLocaleTimeString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+    const logsPayload: logsDto = {
+      UserId: student.id,
+      UserName: student.UserName,
+      statusCode: 200,
+      Message: `Student session start at ${now} By - `,
+    };
+    await InsertLog(logsPayload);
     // console.log('Student School from DB:', student.school);
     return res.status(200).send({
       IsSuccess: "Sign-in Successfully",
       user: {
         name: student.UserName,
         email: student.email,
-        studentid:student.id,
-        studentschool:student.school,
-        standard:student.standard
- 
+        studentid: student.id,
+        studentschool: student.school,
+        standard: student.standard,
       },
     });
-   
-    
   } catch (error: any) {
     return res.status(500).send({
       ErrorMessage: "Internal Server Error",
@@ -119,8 +136,8 @@ export const getStudentId = async (req: Request, res: Response) => {
     }
 
     const student = students[0];
-  //  console.log('Student data:', student);
-  
+    //  console.log('Student data:', student);
+
     return res.status(200).json({
       IsSuccess: true,
       Result: student,

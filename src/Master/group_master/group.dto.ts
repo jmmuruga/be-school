@@ -26,4 +26,6 @@ export interface GroupDto {
 export interface groupStatus{
   groupCode : number;
   status : boolean;
+    loginUserId: number;  
+  loginUserName:string;
 }

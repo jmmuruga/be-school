@@ -37,7 +37,7 @@ export const addGroup = async (req: Request, res: Response) => {
     const groupRepoistry = appSource.getRepository(GroupMaster);
     const existingClass = await groupRepoistry.findOneBy({
       groupName: payload.groupName,
-      groupoption : payload.groupoption
+      groupoption: payload.groupoption,
     });
 
     if (existingClass) {
@@ -46,13 +46,13 @@ export const addGroup = async (req: Request, res: Response) => {
       });
     }
     await groupRepoistry.save(payload);
-       const logsPayload: logsDto = {
-          UserId: Number(payload.created_UserId),
-          UserName:null,
-          statusCode: 200,
-          Message: `Group Added  Successfully By - `,
-        };
-          await InsertLog(logsPayload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Group Added  Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Group Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -120,13 +120,13 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     }
     await groupRepository.update({ groupCode: payload.groupCode }, payload);
 
-       const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName:null,
+      UserName: null,
       statusCode: 200,
       Message: `Group Updated Successfully By - `,
     };
-      await InsertLog(logsPayload);
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Group Updated successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -161,7 +161,7 @@ export const deleteGroup = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ groupCode: groupCode })
       .execute();
-      
+
     // await groupRepository.delete(groupCode);
     return res.status(200).json({
       IsSuccess: "Group Deleted Successfully !!",
@@ -191,7 +191,13 @@ export const updateGroupStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ groupCode: payload.groupCode })
       .execute();
-
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed Status for  ${existingClass.groupName} Group to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Group Status Updated Successfully" });

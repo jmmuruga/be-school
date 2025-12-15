@@ -20,4 +20,6 @@ export interface SchoolDto {
 export interface schoolStatus{
   schoolCode : number;
   status : boolean;
+    loginUserId: number;  
+  loginUserName:string;
 }

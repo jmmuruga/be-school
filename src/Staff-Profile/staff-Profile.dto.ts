@@ -32,4 +32,6 @@ export interface StaffDto {
 export interface StaffStatus{
   staffNo : number;
   status : boolean;
+    loginUserId: number;  
+  loginUserName:string;
 }

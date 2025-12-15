@@ -196,7 +196,13 @@ export const updateStatusClass = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ classCode: payload.classCode })
       .execute();
-
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed Status for  ${existingClass.className} to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Class  Status updated Successfully !! " });

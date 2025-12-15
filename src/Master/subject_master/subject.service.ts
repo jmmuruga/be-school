@@ -31,13 +31,13 @@ export const addSubject = async (req: Request, res: Response) => {
     }
     await subjectRepository.save(payload);
 
-       const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName:null,
+      UserName: null,
       statusCode: 200,
       Message: `Subject Added Successfully By - `,
     };
-      await InsertLog(logsPayload);
+    await InsertLog(logsPayload);
 
     return res.status(200).json({ IsSuccess: "Subject Added Successfully !!" });
   } catch (error) {
@@ -205,7 +205,13 @@ export const updateSubjectStatus = async (req: Request, res: Response) => {
       .where({ subjectCode: payload.subjectCode })
       .execute();
 
-
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed Status for  ${existingSubject.subjectName}Subject to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Subject Status updated Successfully" });

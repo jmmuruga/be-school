@@ -188,9 +188,17 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ markCode: payload.markCode })
       .execute();
+         const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed Status for  ${existingMark.mark} Mark to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({
       IsSuccess: "Mark status updated Successfully !",
     });
+
   } catch (error) {
     // console.error("update error",error);
     return res.status(500).json({
