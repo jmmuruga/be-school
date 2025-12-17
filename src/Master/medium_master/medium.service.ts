@@ -145,9 +145,11 @@ export const updateMedium = async (req: Request, res: Response) => {
 export const deleteMedium = async (req: Request, res: Response) => {
   try {
     const mediumCode = Number(req.params.mediumCode);
+    const { loginUserId, loginUserName } = req.body;
+
     if (isNaN(mediumCode)) {
       return res.status(400).json({
-        message: "Invalid class code",
+        ErrorMessage: "Invalid class code",
       });
     }
     const mediumRepoistry = appSource.getRepository(MediumMaster);
@@ -160,6 +162,7 @@ export const deleteMedium = async (req: Request, res: Response) => {
         ErrorMessage: "mediumCode  not found",
       });
     }
+
     //delete and active
     await mediumRepoistry
       .createQueryBuilder()
@@ -167,6 +170,23 @@ export const deleteMedium = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ mediumCode: mediumCode })
       .execute();
+
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 200,
+      Message: `Deleted Medium Master ${existingMedium.medium} By - `,
+    };
+    await InsertLog(logsPayload);
+
+    //delete and active
+    // await mediumRepoistry
+    //   .createQueryBuilder()
+    //   .update(MediumMaster)
+    //   .set({ isActive: false })
+    //   .where({ mediumCode: mediumCode })
+    //   .execute();
+
     // await mediumRepoistry.delete(mediumCode);
     return res.status(200).json({
       IsSuccess: "Medium Deleted successfully !!",
@@ -197,7 +217,7 @@ export const updateMediumStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ mediumCode: payload.mediumCode })
       .execute();
-  
+
     const logsPayload: logsDto = {
       UserId: payload.loginUserId,
       UserName: payload.loginUserName,

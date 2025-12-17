@@ -138,6 +138,7 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
 export const deleteGroup = async (req: Request, res: Response) => {
   try {
     const groupCode = Number(req.params.groupCode);
+    const { loginUserId, loginUserName } = req.body;
 
     if (isNaN(groupCode)) {
       return res.status(400).json({
@@ -161,6 +162,14 @@ export const deleteGroup = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ groupCode: groupCode })
       .execute();
+
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 200,
+      Message: `Deleted GroupMaster  ${existingGroup.groupName}  By - `,
+    };
+    await InsertLog(logsPayload);
 
     // await groupRepository.delete(groupCode);
     return res.status(200).json({

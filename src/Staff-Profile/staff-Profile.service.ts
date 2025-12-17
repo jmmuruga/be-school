@@ -30,32 +30,32 @@ export const addStaff = async (req: Request, res: Response) => {
     }
     // check data whether existing
     const emailExisting = await staffRepository.findBy({
-      email:payload.email,
-      staffNo:Not(payload.staffNo)
+      email: payload.email,
+      staffNo: Not(payload.staffNo),
     });
-    if(emailExisting.length> 0){
+    if (emailExisting.length > 0) {
       return res.status(400).json({
-        ErrorMessage : "Email Already Exists"
+        ErrorMessage: "Email Already Exists",
       });
     }
     const phoneExisting = await staffRepository.findBy({
-      contactNo:payload.contactNo,
-      staffNo:Not(payload.staffNo)
+      contactNo: payload.contactNo,
+      staffNo: Not(payload.staffNo),
     });
-    if(phoneExisting.length> 0){
+    if (phoneExisting.length > 0) {
       return res.status(400).json({
-        ErrorMessage : "Contact no Already Exists"
-      })
+        ErrorMessage: "Contact no Already Exists",
+      });
     }
 
     await staffRepository.save(payload);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName:null,
+      UserName: null,
       statusCode: 200,
       Message: `Staff Added Successfully By - `,
     };
-      await InsertLog(logsPayload);
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Staff Added Successfully !!" });
   } catch (error) {
     // console.error(error);
@@ -81,7 +81,6 @@ export const getStaffNo = async (req: Request, res: Response) => {
     });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
-
   }
 };
 export const getStaffDetails = async (req: Request, res: Response) => {
@@ -95,7 +94,6 @@ export const getStaffDetails = async (req: Request, res: Response) => {
   } catch (error) {
     // console.log(error);
     return res.status(500).json({ message: "Internal server error" });
-
   }
 };
 export const updateStaffDetls = async (req: Request, res: Response) => {
@@ -123,32 +121,32 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
       });
     }
     const emailExisting = await staffRepository.findBy({
-      email:payload.email,
-      staffNo :Not(payload.staffNo)
+      email: payload.email,
+      staffNo: Not(payload.staffNo),
     });
-     if(emailExisting.length>0){
+    if (emailExisting.length > 0) {
       return res.status(400).json({
-        ErrorMessage:"Email Already Existing"
-      })
-     }
-     const contactExisting = await staffRepository.findBy({
-      contactNo:payload.contactNo,
-      staffNo:Not(payload.staffNo)
-     });
-     if(contactExisting.length>0){
+        ErrorMessage: "Email Already Existing",
+      });
+    }
+    const contactExisting = await staffRepository.findBy({
+      contactNo: payload.contactNo,
+      staffNo: Not(payload.staffNo),
+    });
+    if (contactExisting.length > 0) {
       return res.status(400).json({
-        ErrorMessage:"Contact no Already Existing"
-      })
-     }
+        ErrorMessage: "Contact no Already Existing",
+      });
+    }
     await staffRepository.update({ staffNo: payload.staffNo }, payload);
 
-         const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName:null,
+      UserName: null,
       statusCode: 200,
       Message: `Staff Updated Successfully By - `,
     };
-      await InsertLog(logsPayload);
+    await InsertLog(logsPayload);
 
     return res.status(200).json({ IsSuccess: "Staff Updated Successfully !!" });
   } catch (error) {
@@ -162,6 +160,8 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
 export const deleteStaff = async (req: Request, res: Response) => {
   try {
     const staffNo = Number(req.params.staffNo);
+    const { loginUserId, loginUserName } = req.body;
+
     // console.log("deleting Staff:", staffNo);
     if (isNaN(staffNo)) {
       return res.status(400).json({ ErrorMessage: "Invalid Staff No" });
@@ -174,8 +174,7 @@ export const deleteStaff = async (req: Request, res: Response) => {
     if (!existingStaff) {
       return res.status(404).json({ ErrorMessage: "Staff not found" });
     }
-  
-    
+
     // delete and active
     await staffRepository
       .createQueryBuilder()
@@ -183,14 +182,14 @@ export const deleteStaff = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ staffNo: staffNo })
       .execute();
-    //      const logsPayload: logsDto = {
-    //   UserId: Number(payload.updated_UserId),
-    //   UserName:null,
-    //   statusCode: 200,
-    //   Message: `Staff delete Successfully By - `,
-    
-    // };
-    //   await InsertLog(logsPayload);
+
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 200,
+      Message: `Staff Detail delete  ${existingStaff.staffNo} & ${existingStaff.staffName} Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Staff Deleted SuccessFullyy !!" });
@@ -202,10 +201,10 @@ export const deleteStaff = async (req: Request, res: Response) => {
 export const updateStaffStatus = async (req: Request, res: Response) => {
   try {
     const payload: StaffStatus = req.body;
+
     const staffRepository = appSource.getRepository(Staff);
     const existingStaff = await staffRepository.findOneBy({
       staffNo: payload.staffNo,
-      
     });
     if (!existingStaff) {
       return res.status(400).json({

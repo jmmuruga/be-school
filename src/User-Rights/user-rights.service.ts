@@ -10,6 +10,7 @@ import { logsDto } from "../logs/logs.dto";
 export const addOrUpdateUserRight = async (req: Request, res: Response) => {
   try {
     const payload: UserRightDto = req.body;
+    const { loginUserId, loginUserName } = req.body;
 
     // Validate payload
     const validation = UserRightValidation.validate(payload);
@@ -33,13 +34,15 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
     const existing = await repo.find({
       where: { UserRightTypeId: payload.UserRightTypeId },
     });
-    // Delete old records for this userType (and company if relevant)
-    if (existing.length > 0) {
-      // Existing = Update mode (delete and reinsert)
+
+    const isUpdate = existing.length > 0;
+
+    if (isUpdate) {
       await repo.delete({ UserRightTypeId: payload.UserRightTypeId });
-    } else {
-      return;
     }
+    // if (existing.length > 0) {
+    //   await repo.delete({ UserRightTypeId: payload.UserRightTypeId });
+    // }
 
     let insertData: any[] = [];
 
@@ -79,14 +82,17 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
 
     // Insert new records
     await repo.save(insertData);
-    
+
     const logsPayload: logsDto = {
-      UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
       statusCode: 200,
-      Message: `User rights saved Successfully By - `,
+      Message: isUpdate
+        ? ` (${loginUserName}) UPDATED rights for UserRightTypeId - ${payload.UserRightTypeId} - `
+        : ` (${loginUserName}) ADDED rights for UserRightTypeId - ${payload.UserRightTypeId} - `,
     };
     await InsertLog(logsPayload);
+
     return res.status(200).json({
       IsSuccess: "User rights saved successfully",
     });

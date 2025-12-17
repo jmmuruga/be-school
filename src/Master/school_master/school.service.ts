@@ -1,5 +1,10 @@
 import { appSource } from "../../core/database/db";
-import { SchoolDto, schoolStatus, SchoolValidation } from "./school.dto";
+import {
+  DeleteSchoolDto,
+  SchoolDto,
+  schoolStatus,
+  SchoolValidation,
+} from "./school.dto";
 import { Request, Response } from "express";
 import { SchoolMaster } from "./school.model";
 import { Not } from "typeorm";
@@ -119,7 +124,7 @@ export const updateSchool = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `School Updated Successfully By - `,
+      Message: `School  Updated Successfully By - `,
     };
     await InsertLog(logsPayload);
 
@@ -136,40 +141,42 @@ export const updateSchool = async (req: Request, res: Response) => {
 export const deleteSchool = async (req: Request, res: Response) => {
   try {
     const schoolCode = Number(req.params.schoolCode);
+    const { loginUserId, loginUserName } = req.body;
 
     if (isNaN(schoolCode)) {
-      return res.status(400).json({
-        ErrorMessage: "Invalid school code",
-      });
+      return res.status(400).json({ ErrorMessage: "Invalid school code" });
     }
+
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
-    // Check whether schoolcode exists
-    const existingSchool = await schoolRepoistry.findOneBy({
-      schoolCode: schoolCode,
-    });
+
+    const existingSchool = await schoolRepoistry.findOneBy({ schoolCode });
     if (!existingSchool) {
-      return res.status(404).json({
-        ErrorMessage: "schoolCode  not found",
-      });
+      return res.status(404).json({ ErrorMessage: "School not found" });
     }
+    //delete and active
     await schoolRepoistry
       .createQueryBuilder()
-      .delete()
       .update(SchoolMaster)
       .set({ isActive: false })
       .where({ schoolCode: schoolCode })
       .execute();
-    // await schoolRepoistry.delete(schoolCode);
+
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 200,
+      Message: `Deleted SchoolMaster ${existingSchool.school} By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res.status(200).json({
-      IsSuccess: "School Deleted successfully",
+      IsSuccess: "School Deleted Successfully",
     });
   } catch (error) {
-    return res.status(500).json({
-      message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
-    });
+    return res.status(500).json({ ErrorMessage: "Internal server error" });
   }
 };
+
 export const updateSchoolStatus = async (req: Request, res: Response) => {
   try {
     const payload: schoolStatus = req.body;
@@ -188,6 +195,7 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ schoolCode: payload.schoolCode })
       .execute();
+
     const logsPayload: logsDto = {
       UserId: payload.loginUserId,
       UserName: payload.loginUserName,

@@ -142,6 +142,7 @@ export const updateSubject = async (req: Request, res: Response) => {
 export const deleteSubject = async (req: Request, res: Response) => {
   try {
     const subjectCode = Number(req.params.subjectCode);
+    const { loginUserId, loginUserName } = req.body;
 
     if (isNaN(subjectCode)) {
       return res.status(400).json({
@@ -167,13 +168,13 @@ export const deleteSubject = async (req: Request, res: Response) => {
       .where({ subjectCode: subjectCode })
       .execute();
 
-    //       const logsPayload: logsDto = {
-    //   UserId: Number(payload.created_UserId),
-    //   UserName:null,
-    //   statusCode: 200,
-    //   Message: `Staff Added Successfully By - `,
-    // };
-    //   await InsertLog(logsPayload);
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 200,
+      Message: `Deleted SubjectMaster ${existingSubject.subjectName} By - `,
+    };
+    await InsertLog(logsPayload);
 
     // await subjectRepoistry.delete(subjectCode);
     return res.status(200).json({

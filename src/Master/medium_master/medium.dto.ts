@@ -16,10 +16,14 @@ export interface MediumDto {
   created_UserId: string;
   updated_UserId: string;
 }
-
 export interface mediumStatus {
   mediumCode: number;
   status: boolean;
+  loginUserId: number;
+  loginUserName: string;
+}
+export interface DeleteSchoolDto {
+  mediumCode: number;
   loginUserId: number;
   loginUserName: string;
 }

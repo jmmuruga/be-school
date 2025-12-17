@@ -1,4 +1,4 @@
-import * as Joi from 'joi';
+import * as Joi from "joi";
 
 export const GroupValidation = Joi.object({
   groupCode: Joi.number().required(),
@@ -6,10 +6,9 @@ export const GroupValidation = Joi.object({
   groupName: Joi.string().required(),
   groupDescription: Joi.string().required(),
   isActive: Joi.boolean().optional(),
-  updateStatus:Joi.boolean().optional(),
+  updateStatus: Joi.boolean().optional(),
   created_UserId: Joi.string().required(),
-  updated_UserId: Joi.string().optional().allow(null , ""),
-
+  updated_UserId: Joi.string().optional().allow(null, ""),
 });
 
 export interface GroupDto {
@@ -18,14 +17,19 @@ export interface GroupDto {
   groupName: string;
   groupDescription: string;
   isActive: boolean;
-  updateStatus:boolean;
+  updateStatus: boolean;
   created_UserId: string;
   updated_UserId: string;
 }
 
-export interface groupStatus{
-  groupCode : number;
-  status : boolean;
-    loginUserId: number;  
-  loginUserName:string;
+export interface groupStatus {
+  groupCode: number;
+  status: boolean;
+  loginUserId: number;
+  loginUserName: string;
+}
+export interface DeleteGroupDto {
+  groupCode: number;
+  loginUserId: number;
+  loginUserName: string;
 }

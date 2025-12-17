@@ -136,6 +136,7 @@ export const deleteMarks = async (req: Request, res: Response) => {
   try {
     const markCode = Number(req.params.markCode);
     // console.log("Soft deleting mark:", markCode);
+    const { loginUserId, loginUserName } = req.body;
 
     if (isNaN(markCode)) {
       return res.status(400).json({
@@ -158,6 +159,20 @@ export const deleteMarks = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ markCode: markCode })
       .execute();
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 200,
+      Message: `Deleted MarkMaster ${existingMark.mark} By - `,
+    };
+    await InsertLog(logsPayload);
+    // await markRepository
+    //   .createQueryBuilder()
+    //   .delete()
+    //   .update(MarkMaster)
+    //   .set({ isActive: false })
+    //   .where({ markCode: markCode })
+    //   .execute();
     // await markRepository.delete(markCode);
     return res.status(200).json({
       IsSuccess: "Mark deleted successfully !!",
@@ -188,7 +203,7 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ markCode: payload.markCode })
       .execute();
-         const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: payload.loginUserId,
       UserName: payload.loginUserName,
       statusCode: 200,
@@ -198,7 +213,6 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
     return res.status(200).json({
       IsSuccess: "Mark status updated Successfully !",
     });
-
   } catch (error) {
     // console.error("update error",error);
     return res.status(500).json({

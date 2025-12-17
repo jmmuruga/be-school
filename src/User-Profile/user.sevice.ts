@@ -204,6 +204,8 @@ export const updateUserLogin = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const UserID = Number(req.params.UserID);
+    const { loginUserId, loginUserName } = req.body;
+
     // console.log(" deleting user:", UserID);
 
     if (isNaN(UserID)) {
@@ -228,10 +230,10 @@ export const deleteUser = async (req: Request, res: Response) => {
       .where({ UserID: UserID })
       .execute();
     const logsPayload: logsDto = {
-      UserId: UserID,
-      UserName: null,
+      UserId: loginUserId,
+      UserName: loginUserName,
       statusCode: 200,
-      Message: `User deleted Successfully By - `,
+      Message: ` Successfully  deleted  ${existingUser.userName} details By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Deleted Successfully !!" });

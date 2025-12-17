@@ -31,14 +31,13 @@ export const addClass = async (req: Request, res: Response) => {
     }
 
     await classRepository.save(payload);
-     const logsPayload: logsDto = {
-          UserId: Number(payload.created_UserId),
-          UserName:null,
-          statusCode: 200,
-          Message: `Class Added Successfully By - `,
-        
-        };
-          await InsertLog(logsPayload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Class Added Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Class Added Successfully !!" });
   } catch (error) {
     return res.status(500).json({
@@ -124,15 +123,14 @@ export const updateClassMaster = async (req: Request, res: Response) => {
       });
     }
     await classRepository.update({ classCode: payload.classCode }, payload); //update
-    
+
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName:null,
+      UserName: null,
       statusCode: 200,
       Message: `class Updated Successfully By - `,
-    
     };
-      await InsertLog(logsPayload);
+    await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Class Updated successfully  !!" });
@@ -147,6 +145,8 @@ export const updateClassMaster = async (req: Request, res: Response) => {
 export const deleteClass = async (req: Request, res: Response) => {
   try {
     const classCode = Number(req.params.classCode);
+    const { loginUserId, loginUserName } = req.body;
+
     if (isNaN(classCode)) {
       return res.status(400).json({ ErrorMessage: "Invalid class code" });
     }
@@ -167,9 +167,15 @@ export const deleteClass = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ classCode: classCode })
       .execute();
-    
 
-      
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 200,
+      Message: `Deleted ClassMaster  ${existingClass.className} By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res.status(200).json({ IsSuccess: "Class Deleted Successfully !!" });
   } catch (error) {
     return res.status(500).json({

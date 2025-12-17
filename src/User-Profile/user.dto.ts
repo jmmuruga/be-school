@@ -27,14 +27,9 @@ export interface UserDto {
   created_UserId: string;
   updated_UserId: string;
 }
-// export interface UserStatus {
-//   UserID: number;
-//   status: boolean;
-//   userName:string;
-// }
 export interface UserStatus {
-   UserID: number;       
+  UserID: number;
   status: boolean;
-  loginUserId: number;  
-  loginUserName:string;
+  loginUserId: number;
+  loginUserName: string;
 }
