@@ -39,6 +39,13 @@ export const addMark = async (req: Request, res: Response) => {
       mark: payload.mark,
     });
     if (existingMark) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while saving Mark - ${payload.mark} (Mark already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Mark already exists",
       });
@@ -111,6 +118,13 @@ export const updateMark = async (req: Request, res: Response) => {
       markCode: Not(payload.markCode),
     });
     if (markExist.length > 0) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while update mark - ${payload.mark} (mark  already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Mark Already Exist",
       });

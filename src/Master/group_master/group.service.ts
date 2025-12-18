@@ -41,6 +41,13 @@ export const addGroup = async (req: Request, res: Response) => {
     });
 
     if (existingClass) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while saving Group - ${payload.groupName} (Group Name already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Group Name already exists",
       });
@@ -102,6 +109,13 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
       groupCode: payload.groupCode,
     });
     if (!existingGroup) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while update group - ${payload.groupName} ( groupName already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Group Already exist",
       });

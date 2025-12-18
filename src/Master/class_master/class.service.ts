@@ -7,12 +7,14 @@ import { logsDto } from "../../logs/logs.dto";
 import { InsertLog } from "../../logs/logs.service";
 
 export const addClass = async (req: Request, res: Response) => {
+  const payload: ClassDto = req.body;
   try {
     // get the data
-    const payload: ClassDto = req.body;
+
     //check validation
     const validation = ClassValidation.validate(payload);
     if (validation.error) {
+      
       // console.log(validation.error, "Validation Error");
       return res.status(400).json({
         message: validation.error.details[0].message,
@@ -25,6 +27,13 @@ export const addClass = async (req: Request, res: Response) => {
     });
 
     if (existingClass) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while saving class - ${payload.className} (Class Name already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Class Name already exists",
       });
@@ -40,6 +49,13 @@ export const addClass = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Class Added Successfully !!" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while adding class - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

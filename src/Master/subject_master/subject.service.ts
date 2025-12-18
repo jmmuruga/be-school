@@ -25,6 +25,13 @@ export const addSubject = async (req: Request, res: Response) => {
     });
 
     if (existingSubject) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while saving subject - ${payload.subjectName} (Subject already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Subject  already exists",
       });
@@ -112,6 +119,13 @@ export const updateSubject = async (req: Request, res: Response) => {
       subjectCode: Not(payload.subjectCode),
     });
     if (subjectExist.length > 0) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while update Subject - ${payload.subjectName} (Subject Name already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Subject Already Exist",
       });

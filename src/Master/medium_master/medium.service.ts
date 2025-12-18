@@ -24,6 +24,13 @@ export const addMedium = async (req: Request, res: Response) => {
     });
 
     if (existingMedium) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while saving Medium - ${payload.medium} (Medium already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Medium already exists",
       });
@@ -117,6 +124,13 @@ export const updateMedium = async (req: Request, res: Response) => {
       mediumCode: Not(payload.mediumCode),
     });
     if (mediumExist.length > 0) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while update medium - ${payload.medium} (medium Name already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Medium Already Exist",
       });

@@ -26,6 +26,13 @@ export const addSchool = async (req: Request, res: Response) => {
     });
 
     if (existingSchool) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while saving school - ${payload.school} (School already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "School  already exists",
       });
@@ -113,6 +120,13 @@ export const updateSchool = async (req: Request, res: Response) => {
       schoolCode: Not(payload.schoolCode),
     });
     if (schoolExist.length > 0) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while update School - ${payload.school} (School Name already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "School Name Already Exist",
       });
