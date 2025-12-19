@@ -11,11 +11,16 @@ export const addClass = async (req: Request, res: Response) => {
   try {
     // get the data
 
-    //check validation
+    //check validationF
     const validation = ClassValidation.validate(payload);
     if (validation.error) {
-      
-      // console.log(validation.error, "Validation Error");
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -114,6 +119,13 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     const validation = ClassValidation.validate(payload);
     //validation
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -174,6 +186,7 @@ export const deleteClass = async (req: Request, res: Response) => {
     });
 
     if (!existingClass) {
+      
       return res.status(404).json({ ErrorMessage: "Class not found" });
     }
     // delete and active
@@ -210,6 +223,7 @@ export const updateStatusClass = async (req: Request, res: Response) => {
       classCode: payload.classCode,
     });
     if (!existingClass) {
+
       return res.status(404).json({ ErrorMessage: "Class not found" });
     }
     await classRepository

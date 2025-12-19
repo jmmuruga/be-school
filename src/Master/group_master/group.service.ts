@@ -29,10 +29,18 @@ export const addGroup = async (req: Request, res: Response) => {
     const payload: GroupDto = req.body;
     const validation = GroupValidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
     }
+
     // check data whether existing
     const groupRepoistry = appSource.getRepository(GroupMaster);
     const existingClass = await groupRepoistry.findOneBy({
@@ -99,6 +107,13 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     const payload: GroupDto = req.body;
     const validation = GroupValidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });

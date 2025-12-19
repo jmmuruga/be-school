@@ -13,6 +13,13 @@ export const addSubject = async (req: Request, res: Response) => {
 
     const validation = Subjectvalidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -99,6 +106,13 @@ export const updateSubject = async (req: Request, res: Response) => {
     const payload: SubjectDto = req.body;
     const validation = Subjectvalidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });

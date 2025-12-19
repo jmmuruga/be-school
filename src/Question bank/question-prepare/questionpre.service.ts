@@ -7,11 +7,16 @@ import { logsDto } from "../../logs/logs.dto";
 export const addQuestion = async (req: Request, res: Response) => {
   try {
     const payload: QuestionDto = req.body;
-    // console.log(" Incoming Question Payload:", payload);
     const validation = QuestionValidation.validate(payload);
-    // console.log(" Validation Result:", validation);
+
     if (validation.error) {
-      console.log(validation.error, "validatiom error");
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -29,6 +34,13 @@ export const addQuestion = async (req: Request, res: Response) => {
     });
 
     if (existing) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while add question - ${payload.question} (This question already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(409).json({
         ErrorMessage: "This question already exists!",
       });

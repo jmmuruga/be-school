@@ -11,21 +11,14 @@ export const AddStudentScoreResult = async (req: Request, res: Response) => {
     const payload: studentScoreResultDto = req.body;
     const Validation = studentScoreResultValidation.validate(payload);
     if (Validation.error) {
+      
       return res.status(400).json({
         message: Validation.error.details[0].message,
       });
     }
     const studentscoreRepository = appSource.getRepository(studentScoreResult);
-    console.log("payload", payload);
+    // console.log("payload", payload);
     await studentscoreRepository.save(payload);
-    //     const logsPayload: logsDto = {
-    //       UserId: Number(payload.created_UserId),
-    //       UserName:null,
-    //       statusCode: 200,
-    //       Message: `Save Successfully By - `,
-    //     };
-    //       await InsertLog(logsPayload);
-    // // console.log('Save successful');
     return res.status(200).json({ IsSuccess: "save successfully" });
   } catch (error) {
     //  console.error('Save error:', error);

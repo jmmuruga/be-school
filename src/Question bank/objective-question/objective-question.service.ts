@@ -13,6 +13,13 @@ export const addObjectiveques = async (req: Request, res: Response) => {
     });
     const validation = objectquesValidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -30,28 +37,24 @@ export const addObjectiveques = async (req: Request, res: Response) => {
     });
 
     if (existing) {
-      // console.log("Duplicate found, updating instead…", payload);
       return res.status(409).json({
         ErrorMessage: "This question already exists!",
       });
     }
 
     await questionRepoistry.save(payload);
-        const logsPayload: logsDto = {
-           UserId: Number(payload.created_UserId),
-           UserName:null,
-           statusCode: 200,
-           Message: `Question Added Successfully By - `,
-         };
-           await InsertLog(logsPayload);
-    // console.log("Received payload:", payload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Question Added Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Question added successfully" });
   } catch (error) {
-    console.log(error, "error");
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
   }
 };
-

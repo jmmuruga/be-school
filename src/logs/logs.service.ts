@@ -37,8 +37,8 @@ export const sendLogs = async (req: Request, res: Response) => {
 export const getLogs = async (req: Request, res: Response) => {
   try {
     const { fromDate, toDate } = req.params;
-    console.log("From Date:", fromDate);
-    console.log("To Date:", toDate);
+    // console.log("From Date:", fromDate);
+    // console.log("To Date:", toDate);
     const logsRepository = appSource.getRepository(logs);
     const logReports = await logsRepository.query(
       `select UserId,UserName,statusCode,Message,created_at from [${process.env.DB_NAME}].[dbo].[logs]

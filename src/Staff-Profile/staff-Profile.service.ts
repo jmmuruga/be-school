@@ -12,6 +12,13 @@ export const addStaff = async (req: Request, res: Response) => {
     const payload: StaffDto = req.body;
     const validation = StaffValidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -103,7 +110,13 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
     const validation = StaffValidation.validate(payload);
     //   validation
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });

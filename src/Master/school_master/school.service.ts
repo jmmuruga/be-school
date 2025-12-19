@@ -16,6 +16,13 @@ export const addSchool = async (req: Request, res: Response) => {
     const payload: SchoolDto = req.body;
     const validation = SchoolValidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -100,6 +107,13 @@ export const updateSchool = async (req: Request, res: Response) => {
     const payload: SchoolDto = req.body;
     const validation = SchoolValidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });

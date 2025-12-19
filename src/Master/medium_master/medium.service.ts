@@ -14,6 +14,13 @@ export const addMedium = async (req: Request, res: Response) => {
     //check validation
     const validation = MediumValidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -103,7 +110,13 @@ export const updateMedium = async (req: Request, res: Response) => {
     //check validation
     const validation = MediumValidation.validate(payload);
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -192,16 +205,6 @@ export const deleteMedium = async (req: Request, res: Response) => {
       Message: `Deleted Medium Master ${existingMedium.medium} By - `,
     };
     await InsertLog(logsPayload);
-
-    //delete and active
-    // await mediumRepoistry
-    //   .createQueryBuilder()
-    //   .update(MediumMaster)
-    //   .set({ isActive: false })
-    //   .where({ mediumCode: mediumCode })
-    //   .execute();
-
-    // await mediumRepoistry.delete(mediumCode);
     return res.status(200).json({
       IsSuccess: "Medium Deleted successfully !!",
     });
