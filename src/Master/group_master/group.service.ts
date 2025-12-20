@@ -23,10 +23,9 @@ export const getGroupMasterDetails = async (req: Request, res: Response) => {
     });
   }
 };
-
 export const addGroup = async (req: Request, res: Response) => {
+  const payload: GroupDto = req.body;
   try {
-    const payload: GroupDto = req.body;
     const validation = GroupValidation.validate(payload);
     if (validation.error) {
       const logsPayload: logsDto = {
@@ -65,18 +64,26 @@ export const addGroup = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Group Added  Successfully By - `,
+      Message: `Added Groupmaster - groupname (${payload.groupName})  Successfully By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Group Added Successfully !!" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while adding group - ${
+        error instanceof Error ? error.message : error
+      }`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
   }
 };
-
 export const getGroupCode = async (req: Request, res: Response) => {
   try {
     const groupRepositry = appSource.getRepository(GroupMaster);
@@ -153,11 +160,20 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Group Updated Successfully By - `,
+      Message: `Updated Group Master - GroupCode : ${existingGroup[0].groupCode} ,old GroupName :${existingGroup[0].groupName} to new GroupName :${payload.groupName} Successfully By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Group Updated successfully !!" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: Number(req.body.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while updating group - ${
+        error instanceof Error ? error.message : error
+      }`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -165,11 +181,17 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
   }
 };
 export const deleteGroup = async (req: Request, res: Response) => {
+  const groupCode = Number(req.params.groupCode);
+  const { loginUserId, loginUserName } = req.body;
   try {
-    const groupCode = Number(req.params.groupCode);
-    const { loginUserId, loginUserName } = req.body;
-
     if (isNaN(groupCode)) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 500,
+        Message: `Validation Failed - Invalid Class Code (${req.params.classCode})  by -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: "GroupCode not found",
       });
@@ -180,6 +202,13 @@ export const deleteGroup = async (req: Request, res: Response) => {
       groupCode: groupCode,
     });
     if (!existingGroup) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 500,
+        Message: `GroupMaster - groupCode: ${existingGroup.groupCode}, GroupName: ${existingGroup.groupName} not found by - `,
+      };
+      await InsertLog(logsPayload);
       return res.status(404).json({
         ErrorMessage: "GroupCode  not found",
       });
@@ -196,7 +225,7 @@ export const deleteGroup = async (req: Request, res: Response) => {
       UserId: loginUserId,
       UserName: loginUserName,
       statusCode: 200,
-      Message: `Deleted GroupMaster  ${existingGroup.groupName}  By - `,
+      Message: `Deleted GroupMaster groupcode:${groupCode} groupname: ${existingGroup.groupName} successfully By - `,
     };
     await InsertLog(logsPayload);
 
@@ -205,6 +234,13 @@ export const deleteGroup = async (req: Request, res: Response) => {
       IsSuccess: "Group Deleted Successfully !!",
     });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 500,
+      Message: `Error while deleting group - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -212,15 +248,21 @@ export const deleteGroup = async (req: Request, res: Response) => {
   }
 };
 export const updateGroupStatus = async (req: Request, res: Response) => {
+  const payload: groupStatus = req.body;
   try {
-    const payload: groupStatus = req.body;
-
     const classRepository = appSource.getRepository(GroupMaster);
     //  check whether exist code
     const existingClass = await classRepository.findOneBy({
       groupCode: payload.groupCode,
     });
     if (!existingClass) {
+      const logsPayload: logsDto = {
+        UserId: payload.loginUserId,
+        UserName: payload.loginUserName,
+        statusCode: 500,
+        Message: `Group not found for groupCode ${payload.groupCode} by - `,
+      };
+      await InsertLog(logsPayload);
       return res.status(404).json({ ErrorMessage: "Group Not Found" });
     }
     await classRepository
@@ -240,6 +282,13 @@ export const updateGroupStatus = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Group Status Updated Successfully" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 500,
+      Message: `Error while updating group status - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

@@ -6,8 +6,8 @@ import { objectiveques } from "../Question bank/objective-question/objective-que
 import { InsertLog } from "../logs/logs.service";
 import { logsDto } from "../logs/logs.dto";
 export const addOnlinetest = async (req: Request, res: Response) => {
-  try {
     const payload: onlinetestDto = req.body;
+  try {
     const validation = OnlineTestValidation.validate(payload);
     if (validation.error) {
       const logsPayload: logsDto = {
@@ -28,12 +28,18 @@ export const addOnlinetest = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Start  Successfully By - `,
+      Message: `Start  Successfully  id: ${payload.created_UserId}  By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Start successfully" });
   } catch (error) {
-    // console.log(error);
+       const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while start exam - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

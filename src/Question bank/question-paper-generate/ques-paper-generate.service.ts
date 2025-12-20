@@ -9,18 +9,18 @@ import { Question } from "../question-prepare/questionpre.model";
 import { logsDto } from "../../logs/logs.dto";
 import { InsertLog } from "../../logs/logs.service";
 export const addQuesgene = async (req: Request, res: Response) => {
+  const payload: QuesgenerateDto = req.body;
   try {
-    const payload: QuesgenerateDto = req.body;
     const validation = QuesgenerateValidation.validate(payload);
     if (validation.error) {
-  const logsPayload: logsDto = {
-    UserId: Number(payload.created_UserId),
-    UserName: null,
-    statusCode: 500,  
-    Message: `Validation error: ${validation.error.details[0].message}`, 
-  };
-  await InsertLog(logsPayload);
-      return res.status(400).json({       
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
+      return res.status(400).json({
         message: validation.error.details[0].message,
       });
     }
@@ -37,14 +37,22 @@ export const addQuesgene = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "QuesGenerate Print successfully" });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while quesgenerate print  - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
+  const { subject, standard, type, questionCount, oneMax } = req.params;
   try {
-    const { subject, standard, type, questionCount, oneMax } = req.params;
-    console.log(req.params);
-    // console.log("received oneMax ", oneMax);
     const objectiveRepo = appSource.getRepository(objectiveques);
 
     const questions = await objectiveRepo.query(
@@ -61,8 +69,10 @@ WHERE subject = '${subject}'
       Result: questions,
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const getQuestionAns = async (req: Request, res: Response) => {
@@ -107,8 +117,6 @@ export const getQuestionAns = async (req: Request, res: Response) => {
     const finalThreeMax = Math.min(threeDb, threeUserMax);
     const finalFiveMax = Math.min(fiveDb, fiveUserMax);
 
-    // console.log("Final max limits:", { finalTwoMax, finalThreeMax, finalFiveMax });
-
     const query = `
       SELECT TOP ${finalTwoMax} * FROM question
       WHERE subject = '${subject}'
@@ -139,7 +147,6 @@ export const getQuestionAns = async (req: Request, res: Response) => {
       Result: questions,
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

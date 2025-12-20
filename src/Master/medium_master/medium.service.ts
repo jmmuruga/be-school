@@ -8,9 +8,8 @@ import { InsertLog } from "../../logs/logs.service";
 import { logsDto } from "../../logs/logs.dto";
 
 export const addMedium = async (req: Request, res: Response) => {
+  const payload: MediumDto = req.body;
   try {
-    // get the data
-    const payload: MediumDto = req.body;
     //check validation
     const validation = MediumValidation.validate(payload);
     if (validation.error) {
@@ -48,13 +47,18 @@ export const addMedium = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Medium Added Successfully By - `,
+      Message: `Added MediumMaster - Medium (${payload.medium})  Successfully By - `,
     };
     await InsertLog(logsPayload);
-
     return res.status(200).json({ IsSuccess: "Medium Added Successfully !!" });
   } catch (error) {
-    // console.log(error);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while adding  Medium  - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -104,9 +108,8 @@ export const getMediumDetails = async (req: Request, res: Response) => {
   }
 };
 export const updateMedium = async (req: Request, res: Response) => {
+  const payload: MediumDto = req.body;
   try {
-    // get the data
-    const payload: MediumDto = req.body;
     //check validation
     const validation = MediumValidation.validate(payload);
     if (validation.error) {
@@ -122,11 +125,19 @@ export const updateMedium = async (req: Request, res: Response) => {
       });
     }
     // check whether medium exist code
+
     const mediumRepoistry = appSource.getRepository(MediumMaster);
     const existingMedium = await mediumRepoistry.findOneBy({
       mediumCode: payload.mediumCode,
     });
     if (!existingMedium) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 404,
+        Message: `Update Medium Failed - MediumCode ${payload.mediumCode} not found`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Medium Doesn't exist",
       });
@@ -154,7 +165,7 @@ export const updateMedium = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Medium Updated Successfully By - `,
+      Message: `Updated Medium Master - mediumCode : ${existingMedium.mediumCode}, old mediumname :${existingMedium.medium} to new medium :${payload.medium} Successfully By - `,
     };
     await InsertLog(logsPayload);
 
@@ -162,7 +173,13 @@ export const updateMedium = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Medium Updated Successfully !!" });
   } catch (error) {
-    // console.error("Update Error:", error);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while  update Medium  - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -170,11 +187,17 @@ export const updateMedium = async (req: Request, res: Response) => {
   }
 };
 export const deleteMedium = async (req: Request, res: Response) => {
+  const mediumCode = Number(req.params.mediumCode);
+  const { loginUserId, loginUserName } = req.body;
   try {
-    const mediumCode = Number(req.params.mediumCode);
-    const { loginUserId, loginUserName } = req.body;
-
     if (isNaN(mediumCode)) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 500,
+        Message: `Validation error: Invalid Medium Code (${req.params.mediumCode})`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Invalid class code",
       });
@@ -185,11 +208,18 @@ export const deleteMedium = async (req: Request, res: Response) => {
       mediumCode: mediumCode,
     });
     if (!existingMedium) {
-      return res.status(404).json({
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 404,
+        Message: ` Medium Failed - MediumCode ${mediumCode} not found`,
+      };
+      await InsertLog(logsPayload);
+
+      return res.status(400).json({
         ErrorMessage: "mediumCode  not found",
       });
     }
-
     //delete and active
     await mediumRepoistry
       .createQueryBuilder()
@@ -202,14 +232,20 @@ export const deleteMedium = async (req: Request, res: Response) => {
       UserId: loginUserId,
       UserName: loginUserName,
       statusCode: 200,
-      Message: `Deleted Medium Master ${existingMedium.medium} By - `,
+      Message: `Deleted Successfully in  Medium Master medium( ${existingMedium.medium}) By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({
       IsSuccess: "Medium Deleted successfully !!",
     });
   } catch (error) {
-    // console.error(error);
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 500,
+      Message: `Error while delete Medium  - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -217,13 +253,20 @@ export const deleteMedium = async (req: Request, res: Response) => {
   }
 };
 export const updateMediumStatus = async (req: Request, res: Response) => {
+  const payload: mediumStatus = req.body;
   try {
-    const payload: mediumStatus = req.body;
     const mediumRepoistry = appSource.getRepository(MediumMaster);
     const existingMedium = await mediumRepoistry.findOneBy({
       mediumCode: payload.mediumCode,
     });
     if (!existingMedium) {
+      const logsPayload: logsDto = {
+        UserId: payload.loginUserId,
+        UserName: payload.loginUserName,
+        statusCode: 500,
+        Message: `Validation Error: Invalid Medium Code (${payload.mediumCode})`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Medium not found",
       });
@@ -239,14 +282,20 @@ export const updateMediumStatus = async (req: Request, res: Response) => {
       UserId: payload.loginUserId,
       UserName: payload.loginUserName,
       statusCode: 200,
-      Message: `Changed Status for  ${existingMedium.medium} Medium to ${payload.status} By - `,
+      Message: `Changed  Medium Status for  ${existingMedium.medium} Medium to ${payload.status} By - `,
     };
     await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Medium Status updated Successfully !" });
   } catch (error) {
-    // console.error("Update Error:", error);
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 500,
+      Message: ` Error while updating Medium status: ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

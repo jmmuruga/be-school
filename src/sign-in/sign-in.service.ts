@@ -15,12 +15,26 @@ export const signIn = async (req: Request, res: Response) => {
     user = await userRepository.findOneBy({ phone: payload.emailOrPhone });
   }
   if (!user) {
+    const logsPayload: logsDto = {
+      UserId: user.UserID,
+      UserName: null,
+      statusCode: 500,
+      Message: `Login failed: User does not exist - ${payload.emailOrPhone} by-`,
+    };
+    await InsertLog(logsPayload);
     return res.status(401).send({
       ErrorMessage: "user Does Not Exist",
     });
   }
   try {
     if (user.password !== payload.password) {
+      const logsPayload: logsDto = {
+        UserId: user.UserID,
+        UserName: null,
+        statusCode: 500,
+        Message: `Login failed:F Wrong password for user ${user.email} by -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(401).send({
         ErrorMessage: "Invalid password. Please try again.",
       });
@@ -57,8 +71,16 @@ export const signIn = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    return res.status(500).send({
-      ErrorMessage: "Internal Server Error",
+    const logsPayload: logsDto = {
+      UserId: user.UserID,
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while session start - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -74,12 +96,26 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     });
   }
   if (!student) {
+    const logsPayload: logsDto = {
+      UserId: student.id,
+      UserName: student.UserName,
+      statusCode: 500,
+      Message: `Login failed: Student does not exist - ${payload.usernameOrAdmission}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(401).send({
       ErrorMessage: "Student Does Not Exist",
     });
   }
   try {
     if (student.password !== payload.Password) {
+      const logsPayload: logsDto = {
+        UserId: student.id,
+        UserName: student.UserName,
+        statusCode: 500,
+        Message: `Login failed: Wrong password for student by-`,
+      };
+      await InsertLog(logsPayload);
       return res.status(401).send({
         ErrorMessage: "Invalid password. Please try again.",
       });
@@ -113,8 +149,16 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    return res.status(500).send({
-      ErrorMessage: "Internal Server Error",
+    const logsPayload: logsDto = {
+      UserId: student.id,
+      UserName: student.UserName,
+      statusCode: 500,
+      Message: `Error while session start - ${error.message} by  student- `,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -143,7 +187,6 @@ export const getStudentId = async (req: Request, res: Response) => {
       Result: student,
     });
   } catch (error) {
-    // console.error(error);
     return res.status(500).json({
       IsSuccess: false,
       ErrorMessage: "Internal server error",

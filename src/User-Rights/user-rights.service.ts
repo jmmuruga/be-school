@@ -8,10 +8,10 @@ import { In, Not, Repository } from "typeorm";
 import { InsertLog } from "../logs/logs.service";
 import { logsDto } from "../logs/logs.dto";
 export const addOrUpdateUserRight = async (req: Request, res: Response) => {
-  try {
     const payload: UserRightDto = req.body;
     const { loginUserId, loginUserName } = req.body;
 
+  try {
     // Validate payload
     const validation = UserRightValidation.validate(payload);
     if (validation.error) {
@@ -82,7 +82,6 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
 
     // Insert new records
     await repo.save(insertData);
-
     const logsPayload: logsDto = {
       UserId: payload.loginUserId,
       UserName: payload.loginUserName,
@@ -97,6 +96,13 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
       IsSuccess: "User rights saved successfully",
     });
   } catch (error) {
+     const logsPayload: logsDto = {
+      UserId:payload. loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 500,
+      Message: `Error While user right  - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

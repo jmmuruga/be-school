@@ -5,10 +5,9 @@ import { Question } from "./questionpre.model";
 import { InsertLog } from "../../logs/logs.service";
 import { logsDto } from "../../logs/logs.dto";
 export const addQuestion = async (req: Request, res: Response) => {
-  try {
     const payload: QuestionDto = req.body;
+  try {
     const validation = QuestionValidation.validate(payload);
-
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
@@ -21,7 +20,6 @@ export const addQuestion = async (req: Request, res: Response) => {
         message: validation.error.details[0].message,
       });
     }
-
     const questionRepoistry = appSource.getRepository(Question);
     const existing = await questionRepoistry.findOne({
       where: {
@@ -50,7 +48,7 @@ export const addQuestion = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Question Added Successfully By - `,
+      Message: `Question  Added Successfully By - `,
     };
     await InsertLog(logsPayload);
 

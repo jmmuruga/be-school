@@ -2,15 +2,16 @@ import { appSource } from "../../core/database/db";
 import { SubjectDto, subjectStatus, Subjectvalidation } from "./subject.dto";
 import { Request, Response } from "express";
 import { SubjectMaster } from "./subject.model";
-import subjectRouter from "./subject.controller";
+// import subjectRouter from "./subject.controller";
 import { Not } from "typeorm";
 import { InsertLog } from "../../logs/logs.service";
 import { logsDto } from "../../logs/logs.dto";
+import { number } from "joi";
 
 export const addSubject = async (req: Request, res: Response) => {
-  try {
-    const payload: SubjectDto = req.body;
+  const payload: SubjectDto = req.body;
 
+  try {
     const validation = Subjectvalidation.validate(payload);
     if (validation.error) {
       const logsPayload: logsDto = {
@@ -36,7 +37,7 @@ export const addSubject = async (req: Request, res: Response) => {
         UserId: Number(payload.created_UserId),
         UserName: null,
         statusCode: 500,
-        Message: `Error while saving subject - ${payload.subjectName} (Subject already exists) -`,
+        Message: `Error while saving subject - ${payload.subjectName} (Subject already exists) - `,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
@@ -49,12 +50,19 @@ export const addSubject = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Subject Added Successfully By - `,
+      Message: `Added subjectMaster -Subject(${payload.subjectName}) Successfully By - `,
     };
     await InsertLog(logsPayload);
 
     return res.status(200).json({ IsSuccess: "Subject Added Successfully !!" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while adding subject - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -102,8 +110,8 @@ export const getSubjectDetails = async (req: Request, res: Response) => {
   }
 };
 export const updateSubject = async (req: Request, res: Response) => {
+  const payload: SubjectDto = req.body;
   try {
-    const payload: SubjectDto = req.body;
     const validation = Subjectvalidation.validate(payload);
     if (validation.error) {
       const logsPayload: logsDto = {
@@ -123,6 +131,13 @@ export const updateSubject = async (req: Request, res: Response) => {
       subjectCode: payload.subjectCode,
     });
     if (!existingSubject) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation Failed - subject Not Found (Code: ${payload.subjectCode})  by -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Subject Doesn't exist",
       });
@@ -153,7 +168,7 @@ export const updateSubject = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Subject Updated Successfully By - `,
+      Message: `Updated subject Master - SubjectCode : ${existingSubject.subjectCode}, old subjectName :${existingSubject.subjectCode} to new medium :${payload.subjectName} Successfully By - `,
     };
     await InsertLog(logsPayload);
 
@@ -161,6 +176,13 @@ export const updateSubject = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "Subject Updated Successfully !!" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while update subject -${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -168,11 +190,17 @@ export const updateSubject = async (req: Request, res: Response) => {
   }
 };
 export const deleteSubject = async (req: Request, res: Response) => {
+  const subjectCode = Number(req.params.subjectCode);
+  const { loginUserId, loginUserName } = req.body;
   try {
-    const subjectCode = Number(req.params.subjectCode);
-    const { loginUserId, loginUserName } = req.body;
-
     if (isNaN(subjectCode)) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 500,
+        Message: `Validation Failed - Invalid subject Code (${req.params.subjectCode})  by -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Invalid class code",
       });
@@ -183,6 +211,13 @@ export const deleteSubject = async (req: Request, res: Response) => {
       subjectCode: subjectCode,
     });
     if (!existingSubject) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 500,
+        Message: `Deleted failed  SubjectMaster -subjectCode: ${existingSubject.subjectCode}, subjectName: ${existingSubject.subjectName} not found by - `,
+      };
+      await InsertLog(logsPayload);
       return res.status(404).json({
         ErrorMessage: "subjectCode  not found",
       });
@@ -200,7 +235,8 @@ export const deleteSubject = async (req: Request, res: Response) => {
       UserId: loginUserId,
       UserName: loginUserName,
       statusCode: 200,
-      Message: `Deleted SubjectMaster ${existingSubject.subjectName} By - `,
+      Message: `Deleted SubjectMaster  subjectcode:${subjectCode} SubjectName:
+        ${existingSubject.subjectName} By - `,
     };
     await InsertLog(logsPayload);
 
@@ -209,6 +245,13 @@ export const deleteSubject = async (req: Request, res: Response) => {
       IsSuccess: "Subject Deleted Successfully !!",
     });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 500,
+      Message: `Error while deleting subject - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -216,8 +259,8 @@ export const deleteSubject = async (req: Request, res: Response) => {
   }
 };
 export const updateSubjectStatus = async (req: Request, res: Response) => {
+  const payload: subjectStatus = req.body;
   try {
-    const payload: subjectStatus = req.body;
     const subjectRepoistry = appSource.getRepository(SubjectMaster);
     const existingSubject = await subjectRepoistry.findOneBy({
       subjectCode: payload.subjectCode,
@@ -238,13 +281,20 @@ export const updateSubjectStatus = async (req: Request, res: Response) => {
       UserId: payload.loginUserId,
       UserName: payload.loginUserName,
       statusCode: 200,
-      Message: `Changed Status for  ${existingSubject.subjectName}Subject to ${payload.status} By - `,
+      Message: `Changed subjectMaster Status for  ${existingSubject.subjectName}Subject to ${payload.status} By - `,
     };
     await InsertLog(logsPayload);
     return res
       .status(200)
       .json({ IsSuccess: "Subject Status updated Successfully" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 500,
+      Message: `Error while updating subject  status - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

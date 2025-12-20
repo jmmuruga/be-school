@@ -6,8 +6,8 @@ import { objectiveques } from "./objective-question.model";
 import { InsertLog } from "../../logs/logs.service";
 import { logsDto } from "../../logs/logs.dto";
 export const addObjectiveques = async (req: Request, res: Response) => {
+  const payload: objectivequesDto = req.body;
   try {
-    const payload: objectivequesDto = req.body;
     Object.keys(payload).forEach((key) => {
       if (payload[key] === null) payload[key] = "";
     });
@@ -37,6 +37,13 @@ export const addObjectiveques = async (req: Request, res: Response) => {
     });
 
     if (existing) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while saving questions - ${payload.question} (Question already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(409).json({
         ErrorMessage: "This question already exists!",
       });
@@ -52,6 +59,13 @@ export const addObjectiveques = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Question added successfully" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while adding question - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

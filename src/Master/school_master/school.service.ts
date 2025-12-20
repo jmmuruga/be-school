@@ -12,8 +12,8 @@ import { logsDto } from "../../logs/logs.dto";
 import { InsertLog } from "../../logs/logs.service";
 
 export const addSchool = async (req: Request, res: Response) => {
+  const payload: SchoolDto = req.body;
   try {
-    const payload: SchoolDto = req.body;
     const validation = SchoolValidation.validate(payload);
     if (validation.error) {
       const logsPayload: logsDto = {
@@ -50,12 +50,18 @@ export const addSchool = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `School Added Successfully By - `,
+      Message: `Added SchoolMaster - schoolname (${payload.school})Successfully By - `,
     };
     await InsertLog(logsPayload);
-
     return res.status(200).json({ IsSuccess: "School Added Successfully !!" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Internal server error while adding School: ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -103,8 +109,8 @@ export const getSchoolDetails = async (req: Request, res: Response) => {
   }
 };
 export const updateSchool = async (req: Request, res: Response) => {
+  const payload: SchoolDto = req.body;
   try {
-    const payload: SchoolDto = req.body;
     const validation = SchoolValidation.validate(payload);
     if (validation.error) {
       const logsPayload: logsDto = {
@@ -124,6 +130,13 @@ export const updateSchool = async (req: Request, res: Response) => {
       schoolCode: payload.schoolCode,
     });
     if (!existingSchool) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error: School not found for Code ${payload.schoolCode}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "School Doesn't exist",
       });
@@ -152,7 +165,7 @@ export const updateSchool = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `School  Updated Successfully By - `,
+      Message: `Updated schoolMaster - schoolCode: ${existingSchool.schoolCode}, Old schoolName: ${existingSchool.school} to  New schoolName: ${payload.school} successfully by-`,
     };
     await InsertLog(logsPayload);
 
@@ -160,6 +173,13 @@ export const updateSchool = async (req: Request, res: Response) => {
       .status(200)
       .json({ IsSuccess: "School Updated Successfully !!" });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Internal server error while updating School: ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -167,18 +187,31 @@ export const updateSchool = async (req: Request, res: Response) => {
   }
 };
 export const deleteSchool = async (req: Request, res: Response) => {
+  const schoolCode = Number(req.params.schoolCode);
+  const { loginUserId, loginUserName } = req.body;
   try {
-    const schoolCode = Number(req.params.schoolCode);
-    const { loginUserId, loginUserName } = req.body;
-
     if (isNaN(schoolCode)) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 500,
+        Message: `Invalid School Code (${req.params.schoolCode})`,
+      };
+      await InsertLog(logsPayload);
+
       return res.status(400).json({ ErrorMessage: "Invalid school code" });
     }
-
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
 
     const existingSchool = await schoolRepoistry.findOneBy({ schoolCode });
     if (!existingSchool) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 500,
+        Message: `School not found for Code ${schoolCode}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(404).json({ ErrorMessage: "School not found" });
     }
     //delete and active
@@ -201,18 +234,35 @@ export const deleteSchool = async (req: Request, res: Response) => {
       IsSuccess: "School Deleted Successfully",
     });
   } catch (error) {
-    return res.status(500).json({ ErrorMessage: "Internal server error" });
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 500,
+      Message: `Internal server error while deleting School: ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 
 export const updateSchoolStatus = async (req: Request, res: Response) => {
+  const payload: schoolStatus = req.body;
   try {
-    const payload: schoolStatus = req.body;
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
     const existingSchool = await schoolRepoistry.findOneBy({
       schoolCode: payload.schoolCode,
     });
     if (!existingSchool) {
+      const logsPayload: logsDto = {
+        UserId: payload.loginUserId,
+        UserName: payload.loginUserName,
+        statusCode: 500,
+        Message: `School not found for schoolCode ${payload.schoolCode}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "School not found",
       });
@@ -228,7 +278,7 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
       UserId: payload.loginUserId,
       UserName: payload.loginUserName,
       statusCode: 200,
-      Message: `Changed Status for  ${existingSchool.school} to ${payload.status} By - `,
+      Message: `Changed  School Status for  ${existingSchool.school} to ${payload.status} By - `,
     };
     await InsertLog(logsPayload);
 
@@ -236,6 +286,15 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
       IsSuccess: "School Status Updated Successfully !!",
     });
   } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 500,
+      Message: `Internal server error while updating School status: ${
+        error instanceof Error ? error.message : error
+      }`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
