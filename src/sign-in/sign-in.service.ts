@@ -194,3 +194,53 @@ export const getStudentId = async (req: Request, res: Response) => {
     });
   }
 };
+export const logout = async (req: Request, res: Response) => {
+  const { userId, userName } = req.body;
+  try {
+    if (!userId) {
+      return res.status(400).json({
+        IsSuccess: false,
+        ErrorMessage: "UserId is required to logout",
+      });
+    }
+    const now = new Date().toLocaleTimeString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+
+    const logsPayload: logsDto = {
+      UserId: userId,
+      UserName: userName || null,
+      statusCode: 200,
+      Message: `User logged out at ${now} by - `,
+    };
+
+    await InsertLog(logsPayload);
+
+    return res.status(200).json({
+      IsSuccess: true,
+      Message: "Logout successful",
+    });
+  } catch (error: any) {
+    const logsPayload: logsDto = {
+      UserId: userId,
+      UserName: userName || null,
+      statusCode: 200,
+      Message: ` Error while User logged out - ${error.message}`,
+    };
+
+    await InsertLog(logsPayload);
+
+    return res.status(500).json({
+      IsSuccess: false,
+      ErrorMessage: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
