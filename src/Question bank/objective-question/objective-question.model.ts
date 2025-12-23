@@ -15,7 +15,7 @@ export class objectiveques {
   type: string;
   @Column({ type: "nvarchar", nullable: true, length: "MAX" })
   studentImage: string;
-  @Column({ nullable: true })
+  @Column({ nullable: true})
   question: string;
   @Column({ nullable: true })
   optionType: string;
