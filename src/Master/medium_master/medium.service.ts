@@ -38,7 +38,7 @@ export const addMedium = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Medium already exists",
+        ErrorMessage: "This Medium is already Existing !!",
       });
     }
     await mediumRepoistry.save(payload);
@@ -156,7 +156,7 @@ export const updateMedium = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Medium Already Exist",
+        ErrorMessage: "This Medium is  Already  Existing !!",
       });
     }
     await mediumRepoistry.update({ mediumCode: payload.mediumCode }, payload);

@@ -56,7 +56,7 @@ export const addGroup = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Group Name already exists",
+        ErrorMessage: "This Group Name is  already Existing !!",
       });
     }
     await groupRepoistry.save(payload);
@@ -139,7 +139,7 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Group Already exist",
+        ErrorMessage: "This Group Name is Already Existing",
       });
     }
     // check name  already exist
@@ -151,7 +151,7 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     });
     if (nameExist.length > 0) {
       return res.status(400).json({
-        ErrorMessage: "Group Name Already Exist",
+        ErrorMessage: "This Group Name is Already Existing !!",
       });
     }
     await groupRepository.update({ groupCode: payload.groupCode }, payload);

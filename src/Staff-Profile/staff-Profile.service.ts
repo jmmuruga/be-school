@@ -174,7 +174,7 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Staff Name Already Existing",
+        ErrorMessage: "This Staff Name is Already Existing !!",
       });
     }
     const emailExisting = await staffRepository.findBy({
@@ -190,7 +190,7 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Email Already Existing",
+        ErrorMessage: "This Email  is Already Existing !!",
       });
     }
     const contactExisting = await staffRepository.findBy({
@@ -206,7 +206,7 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Contact no Already Existing",
+        ErrorMessage: "This Contact no is Already Existing !!",
       });
     }
     await staffRepository.update({ staffNo: payload.staffNo }, payload);

@@ -153,7 +153,7 @@ export const updateMark = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Mark Already Exist",
+        ErrorMessage: "This Mark is Already Existing !!",
       });
     }
     await markRepository.update({ markCode: payload.markCode }, payload);

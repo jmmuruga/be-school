@@ -38,7 +38,7 @@ export const addClass = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Class Name already exists",
+        ErrorMessage: " This Class Name is  already Existing !!",
       });
     }
 
@@ -159,7 +159,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Class Name Already Exist",
+        ErrorMessage: "This Class Name is Already Existing !!",
       });
     }
     await classRepository.update({ classCode: payload.classCode }, payload);

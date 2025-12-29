@@ -5,7 +5,7 @@ import { Question } from "./questionpre.model";
 import { InsertLog } from "../../logs/logs.service";
 import { logsDto } from "../../logs/logs.dto";
 export const addQuestion = async (req: Request, res: Response) => {
-    const payload: QuestionDto = req.body;
+  const payload: QuestionDto = req.body;
   try {
     const validation = QuestionValidation.validate(payload);
     if (validation.error) {
@@ -40,7 +40,7 @@ export const addQuestion = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(409).json({
-        ErrorMessage: "This question already exists!",
+        ErrorMessage: "This questions already existing!",
       });
     }
     await questionRepoistry.save(payload);

@@ -7,10 +7,8 @@ import { Not } from "typeorm";
 import { InsertLog } from "../../logs/logs.service";
 import { logsDto } from "../../logs/logs.dto";
 import { number } from "joi";
-
 export const addSubject = async (req: Request, res: Response) => {
   const payload: SubjectDto = req.body;
-
   try {
     const validation = Subjectvalidation.validate(payload);
     if (validation.error) {
@@ -41,7 +39,7 @@ export const addSubject = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Subject  already exists",
+        ErrorMessage: "This Subject is already existing",
       });
     }
     await subjectRepository.save(payload);
@@ -156,7 +154,7 @@ export const updateSubject = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Subject Already Exist",
+        ErrorMessage: "This Subject is Already Existing",
       });
     }
 

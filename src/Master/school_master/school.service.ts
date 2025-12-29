@@ -41,7 +41,7 @@ export const addSchool = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "School  already exists",
+        ErrorMessage: "This School is already Existing !!",
       });
     }
     await schoolRepoistry.save(payload);
@@ -155,7 +155,7 @@ export const updateSchool = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "School Name Already Exist",
+        ErrorMessage: "This School Name Already Existing !!",
       });
     }
 

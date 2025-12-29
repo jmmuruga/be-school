@@ -92,7 +92,6 @@ export const getQuestionAns = async (req: Request, res: Response) => {
     // console.log("received twoMax ", twoMax);
     // console.log("received threeMax ", threeMax);
     // console.log("received fiveMax ", fiveMax);
-
     const quesAnsRepo = appSource.getRepository(Question);
     // Convert to number
     const twoUserMax = Number(twoMax);
@@ -122,8 +121,7 @@ export const getQuestionAns = async (req: Request, res: Response) => {
       WHERE subject = '${subject}'
         AND standard = '${standard}'
         AND type = '${type}'
-        AND mark = 2
-      
+        AND mark = 2   
       UNION ALL
 
       SELECT TOP ${finalThreeMax} * FROM question

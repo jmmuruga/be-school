@@ -45,7 +45,7 @@ export const addObjectiveques = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(409).json({
-        ErrorMessage: "This question already exists!",
+        ErrorMessage: "This question already existing!",
       });
     }
 
