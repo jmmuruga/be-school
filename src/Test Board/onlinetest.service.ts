@@ -49,7 +49,6 @@ export const addOnlinetest = async (req: Request, res: Response) => {
 export const getStudentId = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-
     const students = await appSource.query(
       `SELECT id, name,standard
        FROM [${process.env.DB_NAME}].[dbo].[signup]
@@ -64,13 +63,13 @@ export const getStudentId = async (req: Request, res: Response) => {
     }
 
     const student = students[0];
-    console.log("Student data:", student);
+    // console.log("Student data:", student);
     return res.status(200).json({
       IsSuccess: true,
       Result: student,
     });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({
       IsSuccess: false,
       ErrorMessage: "Internal server error",
@@ -81,7 +80,7 @@ export const getStudentId = async (req: Request, res: Response) => {
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
   try {
     const { subject, standard, type, question } = req.params;
-    console.log(req.params);
+    // console.log(req.params);
     // console.log("received oneMax ", oneMax);
     const objectiveRepo = appSource.getRepository(objectiveques);
 
@@ -99,6 +98,10 @@ WHERE subject = '${subject}'
     });
   } catch (error) {
     // console.error(error);
-    return res.status(500).json({ message: "Something went wrong" });
+      return res.status(500).json({
+      IsSuccess: false,
+      ErrorMessage: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
