@@ -3,6 +3,8 @@ import { MarkDto, markStatus, MarkValidation } from "./mark.dto";
 import { Request, Response } from "express";
 import { MarkMaster } from "./mark.model";
 import { Not } from "typeorm";
+import { InsertLog } from "../../logs/logs.service";
+import { logsDto } from "../../logs/logs.dto";
 
 export const getMarkMasterDetails = async (req: Request, res: Response) => {
   try {
@@ -10,24 +12,29 @@ export const getMarkMasterDetails = async (req: Request, res: Response) => {
     const MarkM = await markRepository.find({
       where: { isActive: true },
     });
-    // const MarkM = await markRepository.createQueryBuilder("").getMany();
     res.status(200).send({
       Result: MarkM,
     });
-    console.log(res, "mark");
+    // console.log(res, "mark");
   } catch (error) {
-  return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
   }
 };
-
 export const addMark = async (req: Request, res: Response) => {
+  const payload: MarkDto = req.body;
   try {
-    const payload: MarkDto = req.body;
     const validation = MarkValidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -38,14 +45,38 @@ export const addMark = async (req: Request, res: Response) => {
       mark: payload.mark,
     });
     if (existingMark) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while saving Mark - ${payload.mark} (Mark already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Mark already exists",
       });
     }
     await markRepository.save(payload);
+
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Added Markmaster- mark (${payload.mark})Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Mark Added Successfully !!" });
   } catch (error) {
-   return res.status(500).json({
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error in addMark - ${
+        error instanceof Error ? error.message : error
+      }`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -76,12 +107,17 @@ export const getMarkCode = async (req: Request, res: Response) => {
   }
 };
 export const updateMark = async (req: Request, res: Response) => {
+  const payload: MarkDto = req.body;
   try {
-    const payload: MarkDto = req.body;
-    // console.log("Update Payload:", payload);
     const validation = MarkValidation.validate(payload);
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -92,6 +128,13 @@ export const updateMark = async (req: Request, res: Response) => {
       markCode: payload.markCode,
     });
     if (!existingMark) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 404,
+        Message: `Update Mark Failed - MarkCode ${payload.markCode} not found`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Mark Doesn't exist",
       });
@@ -102,14 +145,36 @@ export const updateMark = async (req: Request, res: Response) => {
       markCode: Not(payload.markCode),
     });
     if (markExist.length > 0) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Error while update mark - ${payload.mark} (mark  already exists) -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Mark Already Exist",
+        ErrorMessage: "This Mark is Already Existing !!",
       });
     }
     await markRepository.update({ markCode: payload.markCode }, payload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `Updated Mark Master - MarkCode : ${existingMark.markCode} ,old Mark :${existingMark.mark} to new Mark :${payload.mark} Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Mark Updated successfully" });
   } catch (error) {
-    console.error("Update Error:", error);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error in updateMark - ${
+        error instanceof Error ? error.message : error
+      }`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -117,11 +182,17 @@ export const updateMark = async (req: Request, res: Response) => {
   }
 };
 export const deleteMarks = async (req: Request, res: Response) => {
+  const markCode = Number(req.params.markCode);
+  const { loginUserId, loginUserName } = req.body;
   try {
-    const markCode = Number(req.params.markCode);
-    // console.log("Soft deleting mark:", markCode);
-
     if (isNaN(markCode)) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 400,
+        Message: `Invalid MarkCode received for Delete: ${req.params.markCode}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: "Invalid Mark Code",
       });
@@ -131,6 +202,13 @@ export const deleteMarks = async (req: Request, res: Response) => {
     const existingMark = await markRepository.findOneBy({ markCode: markCode });
 
     if (!existingMark) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 404,
+        Message: `Delete Failed - MarkCode ${markCode} not found`,
+      };
+      await InsertLog(logsPayload);
       return res.status(404).json({
         ErrorMessage: "MarkCode not found",
       });
@@ -142,26 +220,48 @@ export const deleteMarks = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ markCode: markCode })
       .execute();
-    // await markRepository.delete(markCode);
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 200,
+      Message: `Deleted MarkMaster -${existingMark.mark} By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({
       IsSuccess: "Mark deleted successfully !!",
     });
   } catch (error) {
-   return res.status(500).json({
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 500,
+      Message: `Error in deleteMarks - ${
+        error instanceof Error ? error.message : error
+      }`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
   }
 };
 export const updateMarkStatus = async (req: Request, res: Response) => {
+  const payload: markStatus = req.body;
   try {
-    const payload: markStatus = req.body;
     const markRepository = appSource.getRepository(MarkMaster);
     // check whether markcode exists
-    const existingMark = await markRepository.findOneBy({ 
+    const existingMark = await markRepository.findOneBy({
       markCode: payload.markCode,
     });
     if (!existingMark) {
+      const logsPayload: logsDto = {
+        UserId: payload.loginUserId,
+        UserName: payload.loginUserName,
+        statusCode: 404,
+        Message: `Update Mark Status Failed - MarkCode ${payload.markCode} not found`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         ErrorMessage: "Mark not found",
       });
@@ -172,12 +272,25 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ markCode: payload.markCode })
       .execute();
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed  mark master Status for  ${existingMark.mark} Mark to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({
       IsSuccess: "Mark status updated Successfully !",
     });
   } catch (error) {
-    // console.error("update error",error);
-     return res.status(500).json({
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 500,
+      Message: `Error while updating mark status - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });

@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { addOnlinetest } from "./onlinetest.service";
+import { addOnlinetest, getObjectiveQuestions, getStudentId } from "./onlinetest.service";
 const onlinetestRouter =Router();
 onlinetestRouter.post('/addonlinetest',(req,res)=>addOnlinetest(req,res));
+onlinetestRouter.get('/getStudentId/:id', (req, res) => getStudentId(req, res));
+onlinetestRouter.get('/getObjectiveQuestions/:subject/:standard/:type/:question',(req,res)=>getObjectiveQuestions(req,res));
+
 export default onlinetestRouter;

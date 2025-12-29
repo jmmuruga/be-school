@@ -24,8 +24,8 @@ export const SignupValidation = Joi.object({
   school: Joi.string().required(),
   schoolAddress: Joi.string().required(),
   contact: Joi.string().required(),
-  created_UserId: Joi.string().optional(),
-  updated_UserId: Joi.string().optional(),
+  created_UserId: Joi.string().required(),
+  updated_UserId: Joi.string().optional().allow(null , ""),
 });
 
 export interface SignupDto {

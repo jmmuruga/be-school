@@ -7,8 +7,8 @@ export const SignInvalidation = Joi.object({
   usernameOrAdmission: Joi.string().optional(),
   Password: Joi.date().optional(),
   isActive: Joi.boolean().optional(),
-  created_UserId: Joi.string().optional(),
-  updated_UserId: Joi.string().optional(),
+  created_UserId: Joi.string().required(),
+  updated_UserId: Joi.string().optional().allow(null),
 });
 export interface SignInDto {
   role: string;

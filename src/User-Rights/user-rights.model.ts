@@ -3,31 +3,18 @@ import { PrimaryGeneratedColumn } from "typeorm";
 import { CreateDateColumn } from "typeorm";
 import { UpdateDateColumn } from "typeorm";
 import { Column } from "typeorm";
-
 @Entity()
-export class User {
+export class UserRight {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  UserID: number;
+  UserRightTypeId: string;
   @Column()
-  userName: string;
+  formCode: string;
   @Column()
-  password: string;
+  parentId: string;
   @Column()
-  confirmPassword: string;
-  @Column()
-  email: string;
-  @Column({ type: "nvarchar", length: 15 })
-  phone: string;
-  @Column()
-  roleType: string;
-  @Column()
-  staffNo: string;
-  @Column({ default: true })
-  isActive: boolean;
-  @Column({ default: true })
-  status: boolean;
+  formName: string;
   @Column({ nullable: true })
   created_UserId: string;
   @Column({ nullable: true })

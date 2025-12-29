@@ -11,8 +11,8 @@ export const StaffValidation = Joi.object({
   contactNo: Joi.string().required(),
   isActive: Joi.boolean().optional(),
       updateStatus:Joi.boolean().optional(),
-  created_UserId: Joi.string().optional(),
-  updated_UserId: Joi.string().optional(),
+  created_UserId: Joi.string().required(),
+  updated_UserId: Joi.string().optional().allow(null , ""),
 });
 export interface StaffDto {
   staffNo: number;
@@ -32,4 +32,6 @@ export interface StaffDto {
 export interface StaffStatus{
   staffNo : number;
   status : boolean;
+    loginUserId: number;  
+  loginUserName:string;
 }

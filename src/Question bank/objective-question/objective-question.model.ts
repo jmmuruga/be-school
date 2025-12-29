@@ -13,30 +13,35 @@ export class objectiveques {
   subject: string;
   @Column()
   type: string;
-  @Column()
+  @Column({ type: "nvarchar", nullable: true, length: "MAX" })
+  studentImage: string;
+  @Column({ nullable: true})
   question: string;
-  // @Column()
-  //  answerType:string;
-  @Column()
-  ImagePath: string;
-  @Column()
-  FilePath: string;
-  @Column()
+  @Column({ nullable: true })
+  optionType: string;
+
+  @Column({ nullable: true })
   option1: string;
-  @Column()
+
+  @Column({ nullable: true })
   option2: string;
-  @Column()
+
+  @Column({ nullable: true })
   option3: string;
-  @Column()
+
+  @Column({ nullable: true })
   option4: string;
-  @Column()
+
+  @Column({ nullable: true })
   correctanswer: string;
-  @Column({default:true})
+
+  @Column({ default: true })
   isActive: Boolean;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   created_UserId: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   updated_UserId: string;
+
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
   @UpdateDateColumn({ name: "updated_at" })

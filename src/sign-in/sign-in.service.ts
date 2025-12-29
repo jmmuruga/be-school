@@ -5,6 +5,8 @@ import { SignIn } from "./sign-in.model";
 import { User } from "../User-Profile/user.model";
 import { createTestAccount } from "nodemailer";
 import { Signup } from "../Signup/signup.model";
+import { logsDto } from "../logs/logs.dto";
+import { InsertLog } from "../logs/logs.service";
 export const signIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const userRepository = appSource.getRepository(User);
@@ -13,33 +15,72 @@ export const signIn = async (req: Request, res: Response) => {
     user = await userRepository.findOneBy({ phone: payload.emailOrPhone });
   }
   if (!user) {
+    const logsPayload: logsDto = {
+      UserId: user.UserID,
+      UserName: null,
+      statusCode: 500,
+      Message: `Login failed: User does not exist - ${payload.emailOrPhone} by-`,
+    };
+    await InsertLog(logsPayload);
     return res.status(401).send({
       ErrorMessage: "user Does Not Exist",
     });
   }
   try {
-    console.log("DB Password:", user.password);
-    console.log("Entered Password:", payload.password);
     if (user.password !== payload.password) {
-      console.log("Password mismatch ");
+      const logsPayload: logsDto = {
+        UserId: user.UserID,
+        UserName: null,
+        statusCode: 500,
+        Message: `Login failed:F Wrong password for user ${user.email} by -`,
+      };
+      await InsertLog(logsPayload);
       return res.status(401).send({
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
-    console.log("Password match ");
+    const now = new Date().toLocaleTimeString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+
+    const logsPayload: logsDto = {
+      UserId: user.UserID,
+      UserName: null,
+      statusCode: 200,
+      Message: `Admin or User session Start at ${now} By - `,
+    };
+    await InsertLog(logsPayload);
+
     return res.status(200).send({
-      IsSuccess: "SignIn Successfully",
+      IsSuccess: "Sign-In Successfully",
       user: {
         id: user.UserID,
         name: user.userName,
         email: user.email,
-        role: user.roleType,
+        roleType: user.roleType,
+        phone: user.phone,
+        staffNo: user.staffNo,
+        password: user.password,
       },
     });
   } catch (error: any) {
-    console.error("Sign-in error:", error);
-    return res.status(500).send({
-      ErrorMessage: "Internal Server Error",
+    const logsPayload: logsDto = {
+      UserId: user.UserID,
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while session start - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -55,32 +96,151 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     });
   }
   if (!student) {
+    const logsPayload: logsDto = {
+      UserId: student.id,
+      UserName: student.UserName,
+      statusCode: 500,
+      Message: `Login failed: Student does not exist - ${payload.usernameOrAdmission}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(401).send({
       ErrorMessage: "Student Does Not Exist",
     });
   }
   try {
-    // console.log("DB Password:", student.password);
-    // console.log("Entered Password:", payload.Password);
     if (student.password !== payload.Password) {
-      // console.log("Password mismatch ");
+      const logsPayload: logsDto = {
+        UserId: student.id,
+        UserName: student.UserName,
+        statusCode: 500,
+        Message: `Login failed: Wrong password for student by-`,
+      };
+      await InsertLog(logsPayload);
       return res.status(401).send({
         ErrorMessage: "Invalid password. Please try again.",
       });
     }
-    // console.log("Password match ");
+    const now = new Date().toLocaleTimeString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+    const logsPayload: logsDto = {
+      UserId: student.id,
+      UserName: student.UserName,
+      statusCode: 200,
+      Message: `Student session start at ${now} By - `,
+    };
+    await InsertLog(logsPayload);
+    // console.log('Student School from DB:', student.school);
     return res.status(200).send({
-      IsSuccess: "SignIn Successfully",
+      IsSuccess: "Sign-in Successfully",
       user: {
         name: student.UserName,
         email: student.email,
+        studentid: student.id,
+        studentschool: student.school,
+        standard: student.standard,
       },
     });
   } catch (error: any) {
-    // console.error("Sign-in error:", error);
-    return res.status(500).send({
-      ErrorMessage: "Internal Server Error",
+    const logsPayload: logsDto = {
+      UserId: student.id,
+      UserName: student.UserName,
+      statusCode: 500,
+      Message: `Error while session start - ${error.message} by  student- `,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
+export const getStudentId = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
 
+    const students = await appSource.query(
+      `SELECT id, name,standard
+       FROM [${process.env.DB_NAME}].[dbo].[signup]
+       WHERE id = '${id}'`
+    );
+
+    if (!students || students.length === 0) {
+      return res.status(404).json({
+        IsSuccess: false,
+        ErrorMessage: "Student not found",
+      });
+    }
+
+    const student = students[0];
+    //  console.log('Student data:', student);
+
+    return res.status(200).json({
+      IsSuccess: true,
+      Result: student,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      IsSuccess: false,
+      ErrorMessage: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+export const logout = async (req: Request, res: Response) => {
+  const { userId, userName } = req.body;
+  try {
+    if (!userId) {
+      return res.status(400).json({
+        IsSuccess: false,
+        ErrorMessage: "UserId is required to logout",
+      });
+    }
+    const now = new Date().toLocaleTimeString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+
+    const logsPayload: logsDto = {
+      UserId: userId,
+      UserName: userName || null,
+      statusCode: 200,
+      Message: `User logged out at ${now} by - `,
+    };
+
+    await InsertLog(logsPayload);
+
+    return res.status(200).json({
+      IsSuccess: true,
+      Message: "Logout successful",
+    });
+  } catch (error: any) {
+    const logsPayload: logsDto = {
+      UserId: userId,
+      UserName: userName || null,
+      statusCode: 200,
+      Message: ` Error while User logged out - ${error.message}`,
+    };
+
+    await InsertLog(logsPayload);
+
+    return res.status(500).json({
+      IsSuccess: false,
+      ErrorMessage: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};

@@ -4,27 +4,25 @@ export const objectquesValidation = Joi.object({
   standard: Joi.string().required(),
   subject: Joi.string().required(),
   type: Joi.string().required(),
-  question: Joi.string().required(),
-  ImageaPath: Joi.string().optional(),
-  FilePath: Joi.string().optional(),
-//  answerType: Joi.string().required(),
-  option1:Joi.string().optional(),
-  option2: Joi.string().optional(),
-  option3: Joi.string().optional(),
-  option4: Joi.string().optional(),
-  correctanswer: Joi.string().required(),
+  question: Joi.string().optional().allow(null, ""),
+  studentImage: Joi.string().optional().allow(null, ""),
+  optionType: Joi.string().optional().allow(null, ""),
+  option1: Joi.string().optional().allow(null, ""),
+  option2: Joi.string().optional().allow(null, ""),
+  option3: Joi.string().optional().allow(null, ""),
+  option4: Joi.string().optional().allow(null, ""),
+  correctanswer: Joi.string().optional().allow(null, ""),
   isActive: Joi.boolean().optional(),
-  created_UserId: Joi.string().optional(),
-  updated_UserId: Joi.string().optional(),
+  created_UserId: Joi.string().required(),
+  updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface objectivequesDto {
   standard: string;
   subject: string;
   type: string;
   question: string;
-  ImagePath: string;
-  FilePath: string;
-  // answerType: string;
+  studentImage: string;
+  optionType: string;
   option1: string;
   option2: string;
   option3: string;

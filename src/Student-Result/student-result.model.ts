@@ -5,33 +5,27 @@ import { UpdateDateColumn } from "typeorm";
 import { Column } from "typeorm";
 
 @Entity()
-export class User {
+export class studentScoreResult {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  UserID: number;
+  StudentId: string;
   @Column()
-  userName: string;
+  SubjectId: string;
   @Column()
-  password: string;
+  TestType: string;
   @Column()
-  confirmPassword: string;
+  NumOfQuestion: string;
   @Column()
-  email: string;
-  @Column({ type: "nvarchar", length: 15 })
-  phone: string;
+  NoOfAnswered: string;
   @Column()
-  roleType: string;
+  NoOfCorrectAnswered: string;
   @Column()
-  staffNo: string;
-  @Column({ default: true })
-  isActive: boolean;
-  @Column({ default: true })
-  status: boolean;
-  @Column({ nullable: true })
-  created_UserId: string;
-  @Column({ nullable: true })
-  updated_UserId: string;
+  NoOfWrongAnswered: string;
+  @Column()
+  Time: string;
+  @Column()
+  Time_Take: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
   @UpdateDateColumn({ name: "updated_at" })

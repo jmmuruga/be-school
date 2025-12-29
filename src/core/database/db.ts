@@ -15,9 +15,14 @@ import { Quesgenerate } from "../../Question bank/question-paper-generate/ques-p
 import { Staff } from "../../Staff-Profile/staff-Profile.model";
 import { objectiveques } from "../../Question bank/objective-question/objective-question.model";
 import { SignIn } from "../../sign-in/sign-in.model";
-
+import { Question } from "../../Question bank/question-prepare/questionpre.model";
+import { onlinetest } from "../../Test Board/onlinetest.model";
+import userRightRouter from "../../User-Rights/user-rights.controller";
+import { UserRight } from "../../User-Rights/user-rights.model";
+import { studentScoreResult } from "../../Student-Result/student-result.model";
+import { logs } from "../../logs/logs.model";
 const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,User,Staff,Signup,objectiveques,
-    Quesgenerate,SignIn
+    Quesgenerate,SignIn,Question,onlinetest,UserRight,studentScoreResult,logs
 ]
 
 export const appSource = new DataSource({

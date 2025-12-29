@@ -20,15 +20,13 @@ export class Question {
   mark: number;
   @Column()
   question: string;
-  @Column()
-  ImagePath: string;
-  @Column()
-  FilePath: string;
-  @Column({default:true})
+  @Column({ type: "text", nullable: true })
+  studentImage: string;
+  @Column({ default: true })
   isActive: Boolean;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   created_UserId: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

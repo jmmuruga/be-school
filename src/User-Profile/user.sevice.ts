@@ -3,13 +3,22 @@ import { Request, Response } from "express";
 import { User } from "./user.model";
 import { appSource } from "../core/database/db";
 import { In, Not } from "typeorm";
+import { logsDto } from "../logs/logs.dto";
+import { InsertLog } from "../logs/logs.service";
 // import { ValidationException } from "../exceptions/ValidationException";
 
 export const addUser = async (req: Request, res: Response) => {
+  const payload: UserDto = req.body;
   try {
-    const payload: UserDto = req.body;
     const validation = UserValidation.validate(payload);
     if (validation.error) {
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -59,10 +68,26 @@ export const addUser = async (req: Request, res: Response) => {
       });
     }
     await userRepoistry.save(payload);
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 200,
+      Message: `User Added Successfully By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Added Successfully !!" });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Internal server error" });
+    const logsPayload: logsDto = {
+      UserId: Number(payload.created_UserId),
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while adding User Details - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const getUserDetails = async (req: Request, res: Response) => {
@@ -75,7 +100,10 @@ export const getUserDetails = async (req: Request, res: Response) => {
       Result: userM,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const getUserId = async (req: Request, res: Response) => {
@@ -96,17 +124,26 @@ export const getUserId = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const updateUserLogin = async (req: Request, res: Response) => {
+  const payload: UserDto = req.body;
   try {
     // get the data
-    const payload: UserDto = req.body;
     const validation = UserValidation.validate(payload);
     // validation
     if (validation.error) {
-      console.log(validation.error, "Validation Error");
+      const logsPayload: logsDto = {
+        UserId: Number(payload.created_UserId),
+        UserName: null,
+        statusCode: 500,
+        Message: `Validation error: ${validation.error.details[0].message}`,
+      };
+      await InsertLog(logsPayload);
       return res.status(400).json({
         message: validation.error.details[0].message,
       });
@@ -169,9 +206,17 @@ export const updateUserLogin = async (req: Request, res: Response) => {
     }
 
     await userRepository.update({ UserID: payload.UserID }, payload);
+    const logsPayload: logsDto = {
+      UserId: payload.UserID,
+      UserName: null,
+      statusCode: 200,
+      Message: `Updated  User - userId : ${payload.UserID} Successfully By - `,
+   
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Updated Successfully !!!" });
   } catch (error) {
-    console.error("Update Error:", error);
+ 
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
@@ -179,14 +224,13 @@ export const updateUserLogin = async (req: Request, res: Response) => {
   }
 };
 export const deleteUser = async (req: Request, res: Response) => {
+  const UserID = Number(req.params.UserID);
+  const { loginUserId, loginUserName } = req.body;
   try {
-    const UserID = Number(req.params.UserID);
     // console.log(" deleting user:", UserID);
-
     if (isNaN(UserID)) {
       return res.status(400).json({ ErrorMessage: "Invalid User Id " });
     }
-
     const userRepository = appSource.getRepository(User);
 
     //  check whether exist code
@@ -204,20 +248,36 @@ export const deleteUser = async (req: Request, res: Response) => {
       .set({ isActive: false })
       .where({ UserID: UserID })
       .execute();
-
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 200,
+      Message: ` Successfully  deleted  ${existingUser.userName} details By - `,
+    };
+    await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Deleted Successfully !!" });
   } catch (error) {
-    console.error("delete error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    const logsPayload: logsDto = {
+      UserId: loginUserId,
+      UserName: loginUserName,
+      statusCode: 500,
+      Message: `Error while deleting User Details - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 export const updateUserStatus = async (req: Request, res: Response) => {
+  const payload: UserStatus = req.body;
   try {
-    const payload: UserStatus = req.body;
     const userRepository = appSource.getRepository(User);
     const existingUser = await userRepository.findOneBy({
       UserID: payload.UserID,
     });
+
     if (!existingUser) {
       return res.status(400).json({
         ErrorMessage: "User not found",
@@ -229,13 +289,28 @@ export const updateUserStatus = async (req: Request, res: Response) => {
       .set({ status: payload.status })
       .where({ UserID: payload.UserID })
       .execute();
-    return res
-      .status(200)
-      .json({ IsSuccess: "User Status updated Successfully !" });
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 200,
+      Message: `Changed User Status for  ${existingUser.userName} to ${payload.status} By - `,
+    };
+    await InsertLog(logsPayload);
+
+    return res.status(200).json({
+      IsSuccess: "User Status updated Successfully !",
+    });
   } catch (error) {
-    // console.error("Update Error:", error);
+    const logsPayload: logsDto = {
+      UserId: payload.loginUserId,
+      UserName: payload.loginUserName,
+      statusCode: 500,
+      Message: `Error while updating User status - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
