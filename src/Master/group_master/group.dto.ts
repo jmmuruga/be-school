@@ -1,8 +1,8 @@
 import * as Joi from "joi";
 
 export const GroupValidation = Joi.object({
-  groupCode: Joi.number().required(),
-  groupoption: Joi.string().required(),
+  Group_Id: Joi.number().required(),
+  className_Id: Joi.string().required(),
   groupName: Joi.string().required(),
   groupDescription: Joi.string().required(),
   isActive: Joi.boolean().optional(),
@@ -12,8 +12,8 @@ export const GroupValidation = Joi.object({
 });
 
 export interface GroupDto {
-  groupCode: number;
-  groupoption: string;
+  Group_Id: number;
+  className_Id: string;
   groupName: string;
   groupDescription: string;
   isActive: boolean;
@@ -23,13 +23,13 @@ export interface GroupDto {
 }
 
 export interface groupStatus {
-  groupCode: number;
+  Group_Id: number;
   status: boolean;
   loginUserId: number;
   loginUserName: string;
 }
 export interface DeleteGroupDto {
-  groupCode: number;
+  Group_Id: number;
   loginUserId: number;
   loginUserName: string;
 }

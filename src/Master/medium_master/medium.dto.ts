@@ -1,7 +1,7 @@
 import * as Joi from "joi";
 
 export const MediumValidation = Joi.object({
-  mediumCode: Joi.number().required(),
+  medium_Id: Joi.number().required(),
   medium: Joi.string().required(),
   isActive: Joi.boolean().optional(),
   updateStatus: Joi.boolean().optional(),
@@ -9,7 +9,7 @@ export const MediumValidation = Joi.object({
   updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface MediumDto {
-  mediumCode: number;
+  medium_Id: number;
   medium: string;
   isActive: boolean;
   updateStatus: boolean;
@@ -17,13 +17,13 @@ export interface MediumDto {
   updated_UserId: string;
 }
 export interface mediumStatus {
-  mediumCode: number;
+  medium_Id: number;
   status: boolean;
   loginUserId: number;
   loginUserName: string;
 }
 export interface DeleteSchoolDto {
-  mediumCode: number;
+  medium_Id: number;
   loginUserId: number;
   loginUserName: string;
 }

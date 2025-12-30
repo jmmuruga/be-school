@@ -11,9 +11,9 @@ export class Quesgenerate {
   @Column()
   type: string;
   @Column()
-  standard: string;
+  ClassName_Id: string;
   @Column()
-  subject: string;
+  subjectName_Id: string;
   @Column()
   total: number;
   @Column()

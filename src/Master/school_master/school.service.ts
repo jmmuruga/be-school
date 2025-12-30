@@ -68,18 +68,18 @@ export const addSchool = async (req: Request, res: Response) => {
     });
   }
 };
-export const getSchoolCode = async (req: Request, res: Response) => {
+export const getSchoolId = async (req: Request, res: Response) => {
   try {
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
-    let schoolCode = await schoolRepoistry.query(
-      `SELECT schoolCode
+    let school_Id = await schoolRepoistry.query(
+      `SELECT school_Id
             FROM [${process.env.DB_NAME}].[dbo].[school_master] 
-            Group by schoolCode
-            ORDER BY CAST(schoolCode AS INT) DESC;`
+            Group by school_Id
+            ORDER BY CAST(school_Id AS INT) DESC;`
     );
     let id = "0";
-    if (schoolCode?.length > 0) {
-      id = schoolCode[0].schoolCode;
+    if (school_Id?.length > 0) {
+      id = school_Id[0].school_Id;
     }
     const finalRes = Number(id) + 1;
     res.status(200).send({
@@ -127,14 +127,14 @@ export const updateSchool = async (req: Request, res: Response) => {
     // check whether school exist
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
     const existingSchool = await schoolRepoistry.findOneBy({
-      schoolCode: payload.schoolCode,
+      school_Id: payload.school_Id,
     });
     if (!existingSchool) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
         UserName: null,
         statusCode: 500,
-        Message: `Error: School not found for Code ${payload.schoolCode}`,
+        Message: `Error: School not found for Id ${payload.school_Id}`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
@@ -144,7 +144,7 @@ export const updateSchool = async (req: Request, res: Response) => {
     // check school already exist
     const schoolExist = await schoolRepoistry.findBy({
       school: payload.school,
-      schoolCode: Not(payload.schoolCode),
+      school_Id: Not(payload.school_Id),
     });
     if (schoolExist.length > 0) {
       const logsPayload: logsDto = {
@@ -159,13 +159,13 @@ export const updateSchool = async (req: Request, res: Response) => {
       });
     }
 
-    await schoolRepoistry.update({ schoolCode: payload.schoolCode }, payload);
+    await schoolRepoistry.update({ school_Id: payload.school_Id }, payload);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Updated schoolMaster - schoolCode: ${existingSchool.schoolCode}, Old schoolName: ${existingSchool.school} to  New schoolName: ${payload.school} successfully by-`,
+      Message: `Updated schoolMaster - school Id: ${existingSchool.school_Id}, Old schoolName: ${existingSchool.school} to  New schoolName: ${payload.school} successfully by-`,
     };
     await InsertLog(logsPayload);
 
@@ -187,15 +187,15 @@ export const updateSchool = async (req: Request, res: Response) => {
   }
 };
 export const deleteSchool = async (req: Request, res: Response) => {
-  const schoolCode = Number(req.params.schoolCode);
+  const school_Id = Number(req.params.school_Id);
   const { loginUserId, loginUserName } = req.body;
   try {
-    if (isNaN(schoolCode)) {
+    if (isNaN(school_Id)) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 500,
-        Message: `Invalid School Code (${req.params.schoolCode})`,
+        Message: `Invalid School Id (${req.params.school_Id})`,
       };
       await InsertLog(logsPayload);
 
@@ -203,13 +203,13 @@ export const deleteSchool = async (req: Request, res: Response) => {
     }
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
 
-    const existingSchool = await schoolRepoistry.findOneBy({ schoolCode });
+    const existingSchool = await schoolRepoistry.findOneBy({ school_Id });
     if (!existingSchool) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 500,
-        Message: `School not found for Code ${schoolCode}`,
+        Message: `School not found for Code ${school_Id}`,
       };
       await InsertLog(logsPayload);
       return res.status(404).json({ ErrorMessage: "School not found" });
@@ -219,7 +219,7 @@ export const deleteSchool = async (req: Request, res: Response) => {
       .createQueryBuilder()
       .update(SchoolMaster)
       .set({ isActive: false })
-      .where({ schoolCode: schoolCode })
+      .where({ school_Id: school_Id })
       .execute();
 
     const logsPayload: logsDto = {
@@ -253,14 +253,14 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
   try {
     const schoolRepoistry = appSource.getRepository(SchoolMaster);
     const existingSchool = await schoolRepoistry.findOneBy({
-      schoolCode: payload.schoolCode,
+      school_Id: payload.school_Id,
     });
     if (!existingSchool) {
       const logsPayload: logsDto = {
         UserId: payload.loginUserId,
         UserName: payload.loginUserName,
         statusCode: 500,
-        Message: `School not found for schoolCode ${payload.schoolCode}`,
+        Message: `School not found for school Id ${payload.school_Id}`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
@@ -271,7 +271,7 @@ export const updateSchoolStatus = async (req: Request, res: Response) => {
       .createQueryBuilder()
       .update(SchoolMaster)
       .set({ status: payload.status })
-      .where({ schoolCode: payload.schoolCode })
+      .where({ school_Id: payload.school_Id })
       .execute();
 
     const logsPayload: logsDto = {

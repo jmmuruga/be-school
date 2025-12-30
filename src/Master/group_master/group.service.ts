@@ -44,7 +44,7 @@ export const addGroup = async (req: Request, res: Response) => {
     const groupRepoistry = appSource.getRepository(GroupMaster);
     const existingClass = await groupRepoistry.findOneBy({
       groupName: payload.groupName,
-      groupoption: payload.groupoption,
+      className_Id: payload.className_Id,
     });
 
     if (existingClass) {
@@ -84,18 +84,18 @@ export const addGroup = async (req: Request, res: Response) => {
     });
   }
 };
-export const getGroupCode = async (req: Request, res: Response) => {
+export const getGroupId = async (req: Request, res: Response) => {
   try {
     const groupRepositry = appSource.getRepository(GroupMaster);
-    let groupCode = await groupRepositry.query(
-      `SELECT groupCode
+    let Group_Id = await groupRepositry.query(
+      `SELECT Group_Id
             FROM [${process.env.DB_NAME}].[dbo].[group_master] 
-            Group by groupCode
-            ORDER BY CAST(groupCode AS INT) DESC;`
+            Group by Group_Id
+            ORDER BY CAST(Group_Id AS INT) DESC;`
     );
     let id = "0";
-    if (groupCode?.length > 0) {
-      id = groupCode[0].groupCode;
+    if (Group_Id?.length > 0) {
+      id = Group_Id[0].Group_Id;
     }
     const finalRes = Number(id) + 1;
     res.status(200).send({
@@ -128,7 +128,7 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     // check whether class exist
     const groupRepository = appSource.getRepository(GroupMaster);
     const existingGroup = await groupRepository.findBy({
-      groupCode: payload.groupCode,
+      Group_Id: payload.Group_Id,
     });
     if (!existingGroup) {
       const logsPayload: logsDto = {
@@ -145,22 +145,22 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     // check name  already exist
     const nameExist = await groupRepository.findBy({
       groupName: payload.groupName,
-      groupoption: payload.groupoption,
+      className_Id: payload.className_Id,
       groupDescription: payload.groupDescription,
-      groupCode: Not(payload.groupCode),
+      Group_Id: Not(payload.Group_Id),
     });
     if (nameExist.length > 0) {
       return res.status(400).json({
         ErrorMessage: "This Group Name is Already Existing !!",
       });
     }
-    await groupRepository.update({ groupCode: payload.groupCode }, payload);
+    await groupRepository.update({ Group_Id: payload.Group_Id }, payload);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Updated Group Master - GroupCode : ${existingGroup[0].groupCode} ,old GroupName :${existingGroup[0].groupName} to new GroupName :${payload.groupName} Successfully By - `,
+      Message: `Updated Group Master - Group_Id : ${existingGroup[0].Group_Id} ,old GroupName :${existingGroup[0].groupName} to new GroupName :${payload.groupName} Successfully By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Group Updated successfully !!" });
@@ -181,36 +181,36 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
   }
 };
 export const deleteGroup = async (req: Request, res: Response) => {
-  const groupCode = Number(req.params.groupCode);
+  const Group_Id = Number(req.params.Group_Id);
   const { loginUserId, loginUserName } = req.body;
   try {
-    if (isNaN(groupCode)) {
+    if (isNaN(Group_Id)) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 500,
-        Message: `Validation Failed - Invalid Class Code (${req.params.classCode})  by -`,
+        Message: `Validation Failed - Invalid Group Id (${req.params.Group_Id})  by -`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
-        message: "GroupCode not found",
+        message: "Group_Id not found",
       });
     }
     const groupRepository = appSource.getRepository(GroupMaster);
-    // Check whether groupcode exists
+    // Check whether groupId exists
     const existingGroup = await groupRepository.findOneBy({
-      groupCode: groupCode,
+      Group_Id: Group_Id,
     });
     if (!existingGroup) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 500,
-        Message: `GroupMaster - groupCode: ${existingGroup.groupCode}, GroupName: ${existingGroup.groupName} not found by - `,
+        Message: `GroupMaster - Group_Id: ${existingGroup.Group_Id}, GroupName: ${existingGroup.groupName} not found by - `,
       };
       await InsertLog(logsPayload);
       return res.status(404).json({
-        ErrorMessage: "GroupCode  not found",
+        ErrorMessage: "Group_Id  not found",
       });
     }
     await groupRepository
@@ -218,18 +218,18 @@ export const deleteGroup = async (req: Request, res: Response) => {
       .delete()
       .update(GroupMaster)
       .set({ isActive: false })
-      .where({ groupCode: groupCode })
+      .where({ Group_Id: Group_Id })
       .execute();
 
     const logsPayload: logsDto = {
       UserId: loginUserId,
       UserName: loginUserName,
       statusCode: 200,
-      Message: `Deleted GroupMaster groupcode:${groupCode} groupname: ${existingGroup.groupName} successfully By - `,
+      Message: `Deleted GroupMaster Group_Id:${Group_Id} groupname: ${existingGroup.groupName} successfully By - `,
     };
     await InsertLog(logsPayload);
 
-    // await groupRepository.delete(groupCode);
+    // await groupRepository.delete(groupid);
     return res.status(200).json({
       IsSuccess: "Group Deleted Successfully !!",
     });
@@ -253,14 +253,14 @@ export const updateGroupStatus = async (req: Request, res: Response) => {
     const classRepository = appSource.getRepository(GroupMaster);
     //  check whether exist code
     const existingClass = await classRepository.findOneBy({
-      groupCode: payload.groupCode,
+      Group_Id: payload.Group_Id,
     });
     if (!existingClass) {
       const logsPayload: logsDto = {
         UserId: payload.loginUserId,
         UserName: payload.loginUserName,
         statusCode: 500,
-        Message: `Group not found for groupCode ${payload.groupCode} by - `,
+        Message: `Group not found for Group_Id ${payload.Group_Id} by - `,
       };
       await InsertLog(logsPayload);
       return res.status(404).json({ ErrorMessage: "Group Not Found" });
@@ -269,7 +269,7 @@ export const updateGroupStatus = async (req: Request, res: Response) => {
       .createQueryBuilder()
       .update(GroupMaster)
       .set({ status: payload.status })
-      .where({ groupCode: payload.groupCode })
+      .where({ Group_Id: payload.Group_Id })
       .execute();
     const logsPayload: logsDto = {
       UserId: payload.loginUserId,

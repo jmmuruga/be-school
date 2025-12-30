@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   addGroup,
   deleteGroup,
-  getGroupCode,
+  getGroupId,
   getGroupMasterDetails,
   updateGroupMaster,
   updateGroupStatus,
@@ -10,14 +10,14 @@ import {
 
 const groupRouter = Router();
 groupRouter.post("/addGroup", (req, res) => addGroup(req, res));
-groupRouter.get("/getGroupCode", (req, res) => getGroupCode(req, res));
+groupRouter.get("/getGroupId", (req, res) => getGroupId(req, res));
 groupRouter.get("/getGroupMasterDetails", (req, res) =>
   getGroupMasterDetails(req, res)
 );
 groupRouter.post("/updateGroupMaster", (req, res) =>
   updateGroupMaster(req, res)
 );
-groupRouter.delete("/deleteGroup/:groupCode",(req,res) => deleteGroup(req,res));
+groupRouter.delete("/deleteGroup/:Group_Id",(req,res) => deleteGroup(req,res));
 export default groupRouter;
 groupRouter.post("/updateGroupStatus",(req,res) => updateGroupStatus(req,res));
 

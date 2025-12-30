@@ -28,11 +28,11 @@ export class Signup {
   @Column()
   address: string;
   @Column()
-  standard: string;
+  Class_Id: string;
   @Column({ type: "nvarchar", nullable: true })
-  medium: string | null;
+  medium_Id: string | null;
   @Column({ type: "nvarchar", nullable: true })
-  otherMedium: string | null;
+  otherScheme: string | null;
   @Column()
   board: string;
   @Column()

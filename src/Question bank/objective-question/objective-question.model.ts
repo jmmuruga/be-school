@@ -8,13 +8,13 @@ export class objectiveques {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  standard: string;
+  ClassName_Id: string;
   @Column()
-  subject: string;
+  subjectName_Id: string;
   @Column()
   type: string;
   @Column({ type: "nvarchar", nullable: true, length: "MAX" })
-  studentImage: string;
+  Imagequestion: string;
   @Column({ nullable: true})
   question: string;
   @Column({ nullable: true })

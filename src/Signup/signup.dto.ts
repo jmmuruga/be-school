@@ -11,12 +11,12 @@ export const SignupValidation = Joi.object({
   dateOfBirth:Joi.string().required(),
   gender: Joi.string().required(),
   address: Joi.string().required(),
-  standard: Joi.string().required(),
-  medium: Joi.string().allow("", null),
-  otherMedium: Joi.when("medium", {
+  Class_Id: Joi.string().required(),
+  medium_Id: Joi.string().allow("", null),
+  otherScheme: Joi.when("medium_Id", {
     is: "Other",
     then: Joi.string().required().messages({
-      "string.empty": "Please specify the other medium",
+      "string.empty": "Please specify the other scheme",
     }),
     otherwise: Joi.string().allow("", null),
   }),
@@ -39,9 +39,9 @@ export interface SignupDto {
   gender: string;
   dateOfBirth:string;
   address: string;
-  standard: string;
-  medium?: string;
-  otherMedium?: string;
+  Class_Id: string;
+  medium_Id?: string;
+  otherScheme?: string;
   board: string;
   school: string;
   schoolAddress: string;

@@ -28,11 +28,11 @@ export const addObjectiveques = async (req: Request, res: Response) => {
 
     const existing = await questionRepoistry.findOne({
       where: {
-        standard: payload.standard,
-        subject: payload.subject,
+        ClassName_Id: payload.ClassName_Id,
+        subjectName_Id: payload.subjectName_Id,
         type: payload.type,
         question: payload.question,
-        studentImage: payload.studentImage,
+        Imagequestion: payload.Imagequestion,
       },
     });
 

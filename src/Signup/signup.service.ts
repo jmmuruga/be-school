@@ -28,7 +28,7 @@ export const addSignup = async (req: Request, res: Response) => {
     });
     if (nameExist) {
       return res.status(400).json({
-        ErrorMessage: "UserName Already Exist",
+        ErrorMessage: "UserName Already Existing",
       });
     }
     const emailExist = await signupRepository.findOneBy({
@@ -36,7 +36,7 @@ export const addSignup = async (req: Request, res: Response) => {
     });
     if (emailExist) {
       return res.status(400).json({
-        ErrorMessage: "Email Already Exist",
+        ErrorMessage: "Email Already Existing",
       });
     }
     const aatharExist = await signupRepository.findOneBy({
@@ -66,7 +66,6 @@ export const addSignup = async (req: Request, res: Response) => {
 
     return res.status(200).json({ IsSuccess: "Student Register Successfully" });
   } catch (error) {
-    // console.log(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

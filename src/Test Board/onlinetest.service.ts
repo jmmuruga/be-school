@@ -14,7 +14,7 @@ export const addOnlinetest = async (req: Request, res: Response) => {
         UserId: Number(payload.created_UserId),
         UserName: payload.studentName,
         statusCode: 500,
-        Message: `Validation error: ${validation.error.details[0].message}`,
+        Message: `Validation error: ${validation.error.details[0].message} -`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
@@ -37,7 +37,7 @@ export const addOnlinetest = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: payload.studentName,
       statusCode: 500,
-      Message: `Error while start exam - ${error.message}`,
+      Message: `Error while start exam - ${error.message} -`,
     };
     await InsertLog(logsPayload);
     return res.status(500).json({
@@ -50,7 +50,7 @@ export const getStudentId = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const students = await appSource.query(
-      `SELECT id, name,standard
+      `SELECT id, name,ClassName_Id
        FROM [${process.env.DB_NAME}].[dbo].[signup]
        WHERE id = '${id}'`
     );
@@ -79,7 +79,7 @@ export const getStudentId = async (req: Request, res: Response) => {
 };
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
   try {
-    const { subject, standard, type, question } = req.params;
+    const { subjectName_Id, ClassName_Id, type, question } = req.params;
     // console.log(req.params);
     // console.log("received oneMax ", oneMax);
     const objectiveRepo = appSource.getRepository(objectiveques);
@@ -87,8 +87,8 @@ export const getObjectiveQuestions = async (req: Request, res: Response) => {
     const questions = await objectiveRepo.query(
       `SELECT TOP ${question} *
         FROM objectiveques
-WHERE subject = '${subject}'
-  AND standard = '${standard}'
+WHERE subjectName_Id = '${subjectName_Id}'
+  AND ClassName_Id = '${ClassName_Id}'
   AND type = '${type}'
   ;`
     );
@@ -97,7 +97,6 @@ WHERE subject = '${subject}'
       Result: questions,
     });
   } catch (error) {
-    // console.error(error);
       return res.status(500).json({
       IsSuccess: false,
       ErrorMessage: "Internal server error",

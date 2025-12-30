@@ -145,7 +145,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         email: student.email,
         studentid: student.id,
         studentschool: student.school,
-        standard: student.standard,
+        standard: student.Class_Id,
       },
     });
   } catch (error: any) {

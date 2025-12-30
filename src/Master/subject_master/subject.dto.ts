@@ -2,7 +2,7 @@ import e from "express";
 import * as Joi from "joi";
 
 export const Subjectvalidation = Joi.object({
-  subjectCode: Joi.number().required(),
+  subject_Id: Joi.number().required(),
   subjectName: Joi.string().required(),
   subjectType: Joi.string().required(),
   selectedClasses: Joi.string().required(),
@@ -12,7 +12,7 @@ export const Subjectvalidation = Joi.object({
   updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface SubjectDto {
-  subjectCode: number;
+  subject_Id: number;
   subjectName: string;
   subjectType: string;
   selectedClasses: string;
@@ -23,7 +23,7 @@ export interface SubjectDto {
 }
 
 export interface subjectStatus {
-  subjectCode: number;
+  subject_Id: number;
   status: boolean;
   loginUserId: number;  
   loginUserName:string;

@@ -82,18 +82,18 @@ export const addMark = async (req: Request, res: Response) => {
     });
   }
 };
-export const getMarkCode = async (req: Request, res: Response) => {
+export const getMarkId = async (req: Request, res: Response) => {
   try {
     const markRepositry = appSource.getRepository(MarkMaster);
-    let markCode = await markRepositry.query(
-      `SELECT markCode
+    let mark_Id = await markRepositry.query(
+      `SELECT mark_Id
             FROM [${process.env.DB_NAME}].[dbo].[mark_master] 
-            Group by markCode
-            ORDER BY CAST(markCode AS INT) DESC;`
+            Group by mark_Id
+            ORDER BY CAST(mark_Id AS INT) DESC;`
     );
     let id = "0";
-    if (markCode?.length > 0) {
-      id = markCode[0].markCode;
+    if (mark_Id?.length > 0) {
+      id = mark_Id[0].mark_Id;
     }
     const finalRes = Number(id) + 1;
     res.status(200).send({
@@ -125,14 +125,14 @@ export const updateMark = async (req: Request, res: Response) => {
     //check  whether mark exist
     const markRepository = appSource.getRepository(MarkMaster);
     const existingMark = await markRepository.findOneBy({
-      markCode: payload.markCode,
+      mark_Id: payload.mark_Id,
     });
     if (!existingMark) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
         UserName: null,
         statusCode: 404,
-        Message: `Update Mark Failed - MarkCode ${payload.markCode} not found`,
+        Message: `Update Mark Failed - mark_Id ${payload.mark_Id} not found`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
@@ -142,7 +142,7 @@ export const updateMark = async (req: Request, res: Response) => {
     // check mark already exist
     const markExist = await markRepository.findBy({
       mark: payload.mark,
-      markCode: Not(payload.markCode),
+      mark_Id: Not(payload.mark_Id),
     });
     if (markExist.length > 0) {
       const logsPayload: logsDto = {
@@ -156,12 +156,12 @@ export const updateMark = async (req: Request, res: Response) => {
         ErrorMessage: "This Mark is Already Existing !!",
       });
     }
-    await markRepository.update({ markCode: payload.markCode }, payload);
+    await markRepository.update({ mark_Id: payload.mark_Id }, payload);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Updated Mark Master - MarkCode : ${existingMark.markCode} ,old Mark :${existingMark.mark} to new Mark :${payload.mark} Successfully By - `,
+      Message: `Updated Mark Master - Mark Id : ${existingMark.mark_Id} ,old Mark :${existingMark.mark} to new Mark :${payload.mark} Successfully By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Mark Updated successfully" });
@@ -182,15 +182,15 @@ export const updateMark = async (req: Request, res: Response) => {
   }
 };
 export const deleteMarks = async (req: Request, res: Response) => {
-  const markCode = Number(req.params.markCode);
+  const mark_Id = Number(req.params.mark_Id);
   const { loginUserId, loginUserName } = req.body;
   try {
-    if (isNaN(markCode)) {
+    if (isNaN(mark_Id)) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 400,
-        Message: `Invalid MarkCode received for Delete: ${req.params.markCode}`,
+        Message: `Invalid Mark Id received for Delete: ${req.params.mark_Id}`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
@@ -198,19 +198,19 @@ export const deleteMarks = async (req: Request, res: Response) => {
       });
     }
     const markRepository = appSource.getRepository(MarkMaster);
-    // check whether markcode exists
-    const existingMark = await markRepository.findOneBy({ markCode: markCode });
+    // check whether markid exists
+    const existingMark = await markRepository.findOneBy({ mark_Id: mark_Id });
 
     if (!existingMark) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 404,
-        Message: `Delete Failed - MarkCode ${markCode} not found`,
+        Message: `Delete Failed - MarkId ${mark_Id} not found`,
       };
       await InsertLog(logsPayload);
       return res.status(404).json({
-        ErrorMessage: "MarkCode not found",
+        ErrorMessage: "Mark Id not found",
       });
     }
     await markRepository
@@ -218,7 +218,7 @@ export const deleteMarks = async (req: Request, res: Response) => {
       .delete()
       .update(MarkMaster)
       .set({ isActive: false })
-      .where({ markCode: markCode })
+      .where({ mark_Id: mark_Id })
       .execute();
     const logsPayload: logsDto = {
       UserId: loginUserId,
@@ -250,16 +250,16 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
   const payload: markStatus = req.body;
   try {
     const markRepository = appSource.getRepository(MarkMaster);
-    // check whether markcode exists
+    // check whether markid exists
     const existingMark = await markRepository.findOneBy({
-      markCode: payload.markCode,
+      mark_Id: payload.mark_Id,
     });
     if (!existingMark) {
       const logsPayload: logsDto = {
         UserId: payload.loginUserId,
         UserName: payload.loginUserName,
         statusCode: 404,
-        Message: `Update Mark Status Failed - MarkCode ${payload.markCode} not found`,
+        Message: `Update Mark Status Failed - Mark Id ${payload.mark_Id} not found`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
@@ -270,7 +270,7 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
       .createQueryBuilder()
       .update(MarkMaster)
       .set({ status: payload.status })
-      .where({ markCode: payload.markCode })
+      .where({ mark_Id: payload.mark_Id })
       .execute();
     const logsPayload: logsDto = {
       UserId: payload.loginUserId,

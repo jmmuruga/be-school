@@ -7,9 +7,9 @@ export class GroupMaster {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  groupCode: number;
+  Group_Id: number;
   @Column({ default: "" })
-  groupoption: string;
+  className_Id: string;
   @Column()
   groupName: string;
   @Column()

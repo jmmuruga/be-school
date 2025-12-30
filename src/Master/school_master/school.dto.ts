@@ -1,7 +1,7 @@
 import * as Joi from "joi";
 
 export const SchoolValidation = Joi.object({
-  schoolCode: Joi.number().required(),
+  school_Id: Joi.number().required(),
   school: Joi.string().required(),
   isActive: Joi.boolean().optional(),
   updateStatus: Joi.boolean().optional(),
@@ -9,7 +9,7 @@ export const SchoolValidation = Joi.object({
   updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface SchoolDto {
-  schoolCode: number;
+  school_Id: number;
   school: string;
   isActive: boolean;
   updateStatus: boolean;
@@ -17,12 +17,12 @@ export interface SchoolDto {
   updated_UserId: string;
 }
 export interface DeleteSchoolDto {
-  schoolCode: number;
+  school_Id: number;
   loginUserId: number;
   loginUserName: string;
 }
 export interface schoolStatus {
-  schoolCode: number;
+  school_Id: number;
   status: boolean;
   loginUserId: number;
   loginUserName: string;

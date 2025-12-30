@@ -9,7 +9,7 @@ export class SubjectMaster {
   @PrimaryGeneratedColumn() 
     id: number;
     @Column()
-    subjectCode: number
+    subject_Id: number
     @Column()
     subjectName: string
     @Column()

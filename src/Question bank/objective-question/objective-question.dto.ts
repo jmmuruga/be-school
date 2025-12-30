@@ -1,11 +1,11 @@
 import * as Joi from "joi";
 
 export const objectquesValidation = Joi.object({
-  standard: Joi.string().required(),
-  subject: Joi.string().required(),
+  ClassName_Id: Joi.string().required(),
+  subjectName_Id: Joi.string().required(),
   type: Joi.string().required(),
   question: Joi.string().optional().allow(null, ""),
-  studentImage: Joi.string().optional().allow(null, ""),
+  Imagequestion: Joi.string().optional().allow(null, ""),
   optionType: Joi.string().optional().allow(null, ""),
   option1: Joi.string().optional().allow(null, ""),
   option2: Joi.string().optional().allow(null, ""),
@@ -17,11 +17,11 @@ export const objectquesValidation = Joi.object({
   updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface objectivequesDto {
-  standard: string;
-  subject: string;
+  ClassName_Id: string;
+  subjectName_Id: string;
   type: string;
   question: string;
-  studentImage: string;
+  Imagequestion: string;
   optionType: string;
   option1: string;
   option2: string;
