@@ -51,15 +51,15 @@ export const addQuesgene = async (req: Request, res: Response) => {
   }
 };
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
-  const { subject, standard, type, questionCount, oneMax } = req.params;
+  const { subject_Id, Class_Id, type, questionCount, oneMax } = req.params;
   try {
     const objectiveRepo = appSource.getRepository(objectiveques);
 
     const questions = await objectiveRepo.query(
       `SELECT TOP ${oneMax} *
         FROM [${process.env.DB_NAME}].[dbo].[objectiveques]
-WHERE subject = '${subject}'
-  AND standard = '${standard}'
+WHERE subjectName_Id = '${subject_Id}'
+  AND ClassName_Id = '${Class_Id}'
   AND type = '${type}'
   
   ;`
@@ -78,8 +78,8 @@ WHERE subject = '${subject}'
 export const getQuestionAns = async (req: Request, res: Response) => {
   try {
     const {
-      subject,
-      standard,
+      subjectName_Id,
+      ClassName_Id,
       type,
       twomark,
       threemark,
@@ -100,15 +100,15 @@ export const getQuestionAns = async (req: Request, res: Response) => {
 
     // 1️ Count DB totals for each mark
     const twoDb = await quesAnsRepo.count({
-      where: { subject, standard, type, mark: 2 },
+      where: { subjectName_Id, ClassName_Id, type, mark: 2 },
     });
 
     const threeDb = await quesAnsRepo.count({
-      where: { subject, standard, type, mark: 3 },
+      where: { subjectName_Id, ClassName_Id, type, mark: 3 },
     });
 
     const fiveDb = await quesAnsRepo.count({
-      where: { subject, standard, type, mark: 5 },
+      where: { subjectName_Id, ClassName_Id, type, mark: 5 },
     });
 
     // 2️ Calculate final MAX based on DB + User Max
@@ -118,22 +118,22 @@ export const getQuestionAns = async (req: Request, res: Response) => {
 
     const query = `
       SELECT TOP ${finalTwoMax} * FROM question
-      WHERE subject = '${subject}'
-        AND standard = '${standard}'
+      WHERE subjectName_Id = '${subjectName_Id}'
+        AND ClassName_Id = '${ClassName_Id}'
         AND type = '${type}'
         AND mark = 2   
       UNION ALL
 
       SELECT TOP ${finalThreeMax} * FROM question
-      WHERE subject = '${subject}'
-        AND standard = '${standard}'
+      WHERE subjectName_Id = '${subjectName_Id}'
+        AND ClassName_Id = '${ClassName_Id}'
         AND type = '${type}'
         AND mark = 3
       UNION ALL
 
       SELECT TOP ${finalFiveMax} * FROM question
-      WHERE subject = '${subject}'
-        AND standard = '${standard}'
+      WHERE subjectName_Id = '${subjectName_Id}'
+        AND ClassName_Id = '${ClassName_Id}'
         AND type = '${type}'
         AND mark = 5 
     `;

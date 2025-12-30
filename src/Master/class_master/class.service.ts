@@ -65,19 +65,19 @@ export const addClass = async (req: Request, res: Response) => {
     });
   }
 };
-// get the classcode
-export const getClassCode = async (req: Request, res: Response) => {
+// get the classId
+export const getClassId = async (req: Request, res: Response) => {
   try {
     const classRepositry = appSource.getRepository(classMaster);
-    let classCode = await classRepositry.query(
-      `SELECT classCode
+    let Class_Id = await classRepositry.query(
+      `SELECT Class_Id
             FROM [${process.env.DB_NAME}].[dbo].[class_master] 
-            Group by classCode
-            ORDER BY CAST(classCode AS INT) DESC;`
+            Group by Class_Id
+            ORDER BY CAST(Class_Id AS INT) DESC;`
     );
     let id = "0";
-    if (classCode?.length > 0) {
-      id = classCode[0].classCode;
+    if (Class_Id?.length > 0) {
+      id = Class_Id[0].Class_Id;
     }
     const finalRes = Number(id) + 1;
     res.status(200).send({
@@ -131,14 +131,14 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     // check whether class exist
     const classRepository = appSource.getRepository(classMaster);
     const existingClass = await classRepository.findOneBy({
-      classCode: payload.classCode,
+      Class_Id: payload.Class_Id,
     });
     if (!existingClass) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
         UserName: null,
         statusCode: 500,
-        Message: `Validation Failed - Class Not Found (Code: ${payload.classCode})`,
+        Message: `Validation Failed - Class Not Found (Code: ${payload.Class_Id})`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
@@ -148,7 +148,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     // check name already exist
     const nameExist = await classRepository.findBy({
       className: payload.className,
-      classCode: Not(payload.classCode),
+      Class_Id: Not(payload.Class_Id),
     });
     if (nameExist.length > 0) {
       const logsPayload: logsDto = {
@@ -162,13 +162,13 @@ export const updateClassMaster = async (req: Request, res: Response) => {
         ErrorMessage: "This Class Name is Already Existing !!",
       });
     }
-    await classRepository.update({ classCode: payload.classCode }, payload);
+    await classRepository.update({ Class_Id: payload.Class_Id }, payload);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Updated ClassMaster - classCode: ${existingClass.classCode}, Old className: ${existingClass.className} to  New className: ${payload.className} -`,
+      Message: `Updated ClassMaster - Class_Id: ${existingClass.Class_Id}, Old className: ${existingClass.className} to  New className: ${payload.className} -`,
     };
     await InsertLog(logsPayload);
     return res
@@ -190,15 +190,15 @@ export const updateClassMaster = async (req: Request, res: Response) => {
 };
 
 export const deleteClass = async (req: Request, res: Response) => {
-    const classCode = Number(req.params.classCode);
+    const Class_Id = Number(req.params.Class_Id);
     const { loginUserId, loginUserName } = req.body;
   try {
-    if (isNaN(classCode)) {
+    if (isNaN(Class_Id)) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 500,
-        Message: `Validation Failed - Invalid Class Code (${classCode})  by -`,
+        Message: `Validation Failed - Invalid Class Code (${Class_Id})  by -`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({ ErrorMessage: "Invalid class code" });
@@ -207,7 +207,7 @@ export const deleteClass = async (req: Request, res: Response) => {
     const classRepository = appSource.getRepository(classMaster);
     //  check whether exist code
     const existingClass = await classRepository.findOneBy({
-      classCode: classCode,
+      Class_Id: Class_Id,
     });
 
     if (!existingClass) {
@@ -215,7 +215,7 @@ export const deleteClass = async (req: Request, res: Response) => {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 500,
-        Message: `ClassMaster - classCode: ${existingClass.classCode}, className: ${existingClass.className} not found by - `,
+        Message: `ClassMaster - Class_Id: ${existingClass.Class_Id}, className: ${existingClass.className} not found by - `,
       };
       await InsertLog(logsPayload);
       return res.status(404).json({ ErrorMessage: "Class not found" });
@@ -225,14 +225,14 @@ export const deleteClass = async (req: Request, res: Response) => {
       .createQueryBuilder()
       .update(classMaster)
       .set({ isActive: false })
-      .where({ classCode: classCode })
+      .where({ Class_Id: Class_Id })
       .execute();
 
     const logsPayload: logsDto = {
       UserId: loginUserId,
       UserName: loginUserName,
       statusCode: 200,
-      Message: `Deleted ClassMaster classcode:${classCode} classname:  ${existingClass.className} By - `,
+      Message: `Deleted ClassMaster Class_Id:${Class_Id} classname:  ${existingClass.className} By - `,
     };
     await InsertLog(logsPayload);
 
@@ -258,14 +258,14 @@ export const updateStatusClass = async (req: Request, res: Response) => {
     const classRepository = appSource.getRepository(classMaster);
     //  check whether exist code
     const existingClass = await classRepository.findOneBy({
-      classCode: payload.classCode,
+      Class_Id: payload.Class_Id,
     });
     if (!existingClass) {
      const logsPayload: logsDto = {
         UserId: payload.loginUserId,
         UserName: payload.loginUserName,
         statusCode: 500,
-        Message: `class not found for classCode ${payload.classCode} by - `,
+        Message: `class not found for Class_Id ${payload.Class_Id} by - `,
       };
       await InsertLog(logsPayload);
       return res.status(404).json({ ErrorMessage: "Class not found" });
@@ -274,7 +274,7 @@ export const updateStatusClass = async (req: Request, res: Response) => {
       .createQueryBuilder()
       .update(classMaster)
       .set({ status: payload.status })
-      .where({ classCode: payload.classCode })
+      .where({ Class_Id: payload.Class_Id })
       .execute();
     const logsPayload: logsDto = {
       UserId: payload.loginUserId,

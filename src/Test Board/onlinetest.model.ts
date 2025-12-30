@@ -8,13 +8,15 @@ export class onlinetest {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  Subject: string;
+  subjectName_Id: string;
   @Column()
   TestType: string;
   @Column()
   Numofquestion: number;
   @Column({default:true})
   isActive: Boolean;
+  @Column()
+  StudentLoginId:string;
   @Column({nullable:true})
   created_UserId: string;
   @Column({nullable:true})

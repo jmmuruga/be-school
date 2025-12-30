@@ -1,8 +1,8 @@
 import * as Joi from "joi";
 export const QuesgenerateValidation = Joi.object({
   type: Joi.string().required(),
-  standard: Joi.string().required(),
-  subject: Joi.string().required(),
+  ClassName_Id: Joi.string().required(),
+  subjectName_Id: Joi.string().required(),
   total: Joi.number().required(),
   onemark: Joi.number().optional().allow(null),
 
@@ -16,8 +16,8 @@ export const QuesgenerateValidation = Joi.object({
 });
 export interface QuesgenerateDto {
   type: string;
-  standard: string;
-  subject: string;
+  ClassName_Id: string;
+  subjectName_Id: string;
   total: number;
   onemark: number;
   optionType: string;

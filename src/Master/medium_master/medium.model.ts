@@ -6,7 +6,7 @@ export class MediumMaster {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  mediumCode: number;
+  medium_Id: number;
   @Column()
   medium: string;
   @Column({default:true})

@@ -6,7 +6,7 @@ export class MarkMaster {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  markCode: number;
+  mark_Id: number;
   @Column()
   mark: number;
   @Column({default:true})

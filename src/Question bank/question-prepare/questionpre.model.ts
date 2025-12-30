@@ -11,9 +11,9 @@ export class Question {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  standard: string;
+  ClassName_Id: string;
   @Column()
-  subject: string;
+  subjectName_Id: string;
   @Column()
   type: string;
   @Column()
@@ -21,7 +21,7 @@ export class Question {
   @Column()
   question: string;
   @Column({ type: "text", nullable: true })
-  studentImage: string;
+  Imagequestion: string;
   @Column({ default: true })
   isActive: Boolean;
   @Column({ nullable: true })

@@ -23,8 +23,8 @@ export const addQuestion = async (req: Request, res: Response) => {
     const questionRepoistry = appSource.getRepository(Question);
     const existing = await questionRepoistry.findOne({
       where: {
-        standard: payload.standard,
-        subject: payload.subject,
+        ClassName_Id: payload.ClassName_Id,
+        subjectName_Id: payload.subjectName_Id,
         type: payload.type,
         mark: payload.mark,
         question: payload.question,
@@ -54,7 +54,6 @@ export const addQuestion = async (req: Request, res: Response) => {
 
     return res.status(200).json({ IsSuccess: "Question added successfully" });
   } catch (error) {
-    // console.log(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

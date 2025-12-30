@@ -1,7 +1,7 @@
 import * as Joi from "joi";
 
 export const MarkValidation = Joi.object({
-  markCode: Joi.number().required(),
+  mark_Id: Joi.number().required(),
   mark: Joi.number().required(),
   isActive: Joi.boolean().optional(),
   updateStatus: Joi.boolean().optional(),
@@ -9,7 +9,7 @@ export const MarkValidation = Joi.object({
   updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface MarkDto {
-  markCode: number;
+  mark_Id: number;
   mark: number;
   isActive: boolean;
   updateStatus: boolean;
@@ -17,12 +17,12 @@ export interface MarkDto {
   updated_UserId: string;
 }
 export interface DeleteMarkDto {
-  markCode: number;
+  mark_Id: number;
   loginUserId: number;
   loginUserName: string;
 }
 export interface markStatus {
-  markCode: number;
+  mark_Id: number;
   status: boolean;
   loginUserId: number;
   loginUserName: string;

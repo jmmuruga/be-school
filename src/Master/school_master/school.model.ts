@@ -7,7 +7,7 @@ export class SchoolMaster {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  schoolCode: number;
+  school_Id: number;
   @Column()
   school: string;
   @Column({ default: true })
