@@ -10,7 +10,7 @@ export const addSignup = async (req: Request, res: Response) => {
     const validation = SignupValidation.validate(payload);
     if (validation.error) {
       const logsPayload: logsDto = {
-        UserId: Number(payload.created_UserId),
+        UserId: 1,
         UserName: null,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
@@ -57,7 +57,7 @@ export const addSignup = async (req: Request, res: Response) => {
     }
     await signupRepository.save(payload);
     const logsPayload: logsDto = {
-      UserId: Number(payload.created_UserId),
+      UserId: 1,
       UserName: null,
       statusCode: 200,
       Message: `Student Register Successfully By - `,

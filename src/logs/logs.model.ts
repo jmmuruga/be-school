@@ -10,7 +10,7 @@ export class logs {
   logId: number;
   @Column()
   UserId: number;
-  @Column()
+  @Column({nullable:true})
   UserName: string;
   @Column()
   statusCode: number;

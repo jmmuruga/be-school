@@ -10,9 +10,13 @@ import { InsertLog } from "../logs/logs.service";
 export const signIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const userRepository = appSource.getRepository(User);
-  let user = await userRepository.findOneBy({ email: payload.emailOrPhone });
+  let user =
+    (await userRepository.findOneBy({ email: payload.emailOrPhone })) ||
+    (await userRepository.findOneBy({ phone: payload.emailOrPhone }));
   if (!user) {
-    user = await userRepository.findOneBy({ phone: payload.emailOrPhone });
+    return res.status(401).send({
+      ErrorMessage: "User does not exist. Please check your username.",
+    });
   }
   if (!user) {
     const logsPayload: logsDto = {
@@ -87,15 +91,27 @@ export const signIn = async (req: Request, res: Response) => {
 export const StudentSignIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const studentRespository = appSource.getRepository(Signup);
-  let student = await studentRespository.findOneBy({
-    UserName: payload.usernameOrAdmission,
-  });
-  if (!student) {
-    student = await studentRespository.findOneBy({
+  // let student = await studentRespository.findOneBy({
+  //   UserName: payload.usernameOrAdmission,
+  // });
+  // if (!student) {
+  //   student = await studentRespository.findOneBy({
+  //     password: payload.usernameOrAdmission,
+  //   });
+  // }
+  let student =
+    (await studentRespository.findOneBy({
+      UserName: payload.usernameOrAdmission,
+    })) ||
+    (await studentRespository.findOneBy({
       password: payload.usernameOrAdmission,
+    }));
+  if (!student) {
+    return res.status(401).send({
+      ErrorMessage: "Student does not exist. Please check your username.",
     });
   }
-  if (!student) {
+  if (student.UserName !== payload.usernameOrAdmission) {
     const logsPayload: logsDto = {
       UserId: student.id,
       UserName: student.UserName,
@@ -104,7 +120,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     };
     await InsertLog(logsPayload);
     return res.status(401).send({
-      ErrorMessage: "Student Does Not Exist",
+      ErrorMessage: "Student Does Not Exist ..Please Check your name ",
     });
   }
   try {
@@ -113,7 +129,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         UserId: student.id,
         UserName: student.UserName,
         statusCode: 500,
-        Message: `Login failed: Wrong password for student by-`,
+        Message: `Login failed: Wrong password for student by- `,
       };
       await InsertLog(logsPayload);
       return res.status(401).send({
@@ -141,7 +157,8 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     return res.status(200).send({
       IsSuccess: "Sign-in Successfully",
       user: {
-        name: student.UserName,
+        name: student.name,
+        username: student.UserName,
         email: student.email,
         studentid: student.id,
         studentschool: student.school,
@@ -167,7 +184,7 @@ export const getStudentId = async (req: Request, res: Response) => {
     const id = req.params.id;
 
     const students = await appSource.query(
-      `SELECT id, name,standard
+      `SELECT id, name,Class_Id
        FROM [${process.env.DB_NAME}].[dbo].[signup]
        WHERE id = '${id}'`
     );
@@ -218,21 +235,21 @@ export const logout = async (req: Request, res: Response) => {
       UserId: userId,
       UserName: userName || null,
       statusCode: 200,
-      Message: `User logged out at ${now} by - `,
+      Message: ` logged out at ${now} by -  `,
     };
 
     await InsertLog(logsPayload);
 
     return res.status(200).json({
       IsSuccess: true,
-      Message: "Logout successful",
+      Message: "Logout successfully",
     });
   } catch (error: any) {
     const logsPayload: logsDto = {
       UserId: userId,
       UserName: userName || null,
       statusCode: 200,
-      Message: ` Error while User logged out - ${error.message}`,
+      Message: ` Error while User logged out - ${error.message}-`,
     };
 
     await InsertLog(logsPayload);

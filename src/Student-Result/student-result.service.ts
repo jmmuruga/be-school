@@ -21,9 +21,9 @@ export const AddStudentScoreResult = async (req: Request, res: Response) => {
     await studentscoreRepository.save(payload);
     const logsPayload: logsDto = {
       UserId: Number(payload.StudentId),
-      UserName: payload.studentName,
+      UserName: payload.studentusername,
       statusCode: 200,
-      Message: `Exam Submitted  Successfully, student id: ${payload.StudentId}, student name : ${payload.studentName} , student class: ${payload.standard} , By - `,
+      Message: `Exam Submitted  Successfully, student id: ${payload.StudentId}, student name : ${payload.studentName} , student class: ${payload.ClassName_Id} , By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "submitted successfully" });
@@ -43,13 +43,13 @@ export const AddStudentScoreResult = async (req: Request, res: Response) => {
   }
 };
 export const AddTryAgainLog = async (req: Request, res: Response) => {
-  const { StudentId, studentName, standard } = req.body;
+  const { StudentId, studentName, ClassName_Id,studentusername } = req.body;
   try {
     const logsPayload: logsDto = {
       UserId: Number(StudentId),
-      UserName: studentName,
+      UserName: studentusername,
       statusCode: 200,
-      Message: `Try again exam clicked   → StudentId: ${StudentId}, Name: ${studentName}, Standard: ${standard} by -`,
+      Message: `Try again exam clicked   → StudentId: ${StudentId},Student Name: ${studentName}, Standard: ${ClassName_Id} by -`,
     };
     await InsertLog(logsPayload);
 
@@ -68,3 +68,4 @@ export const AddTryAgainLog = async (req: Request, res: Response) => {
     });
   }
 };
+
