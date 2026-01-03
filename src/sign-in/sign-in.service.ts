@@ -10,9 +10,13 @@ import { InsertLog } from "../logs/logs.service";
 export const signIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const userRepository = appSource.getRepository(User);
-  let user = await userRepository.findOneBy({ email: payload.emailOrPhone });
+  let user =
+    (await userRepository.findOneBy({ email: payload.emailOrPhone })) ||
+    (await userRepository.findOneBy({ phone: payload.emailOrPhone }));
   if (!user) {
-    user = await userRepository.findOneBy({ phone: payload.emailOrPhone });
+    return res.status(401).send({
+      ErrorMessage: "User does not exist. Please check your username.",
+    });
   }
   if (!user) {
     const logsPayload: logsDto = {
@@ -87,15 +91,27 @@ export const signIn = async (req: Request, res: Response) => {
 export const StudentSignIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const studentRespository = appSource.getRepository(Signup);
-  let student = await studentRespository.findOneBy({
-    UserName: payload.usernameOrAdmission,
-  });
-  if (!student) {
-    student = await studentRespository.findOneBy({
+  // let student = await studentRespository.findOneBy({
+  //   UserName: payload.usernameOrAdmission,
+  // });
+  // if (!student) {
+  //   student = await studentRespository.findOneBy({
+  //     password: payload.usernameOrAdmission,
+  //   });
+  // }
+  let student =
+    (await studentRespository.findOneBy({
+      UserName: payload.usernameOrAdmission,
+    })) ||
+    (await studentRespository.findOneBy({
       password: payload.usernameOrAdmission,
+    }));
+  if (!student) {
+    return res.status(401).send({
+      ErrorMessage: "Student does not exist. Please check your username.",
     });
   }
-  if (!student) {
+  if (student.UserName !== payload.usernameOrAdmission) {
     const logsPayload: logsDto = {
       UserId: student.id,
       UserName: student.UserName,
@@ -104,7 +120,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     };
     await InsertLog(logsPayload);
     return res.status(401).send({
-      ErrorMessage: "Student Does Not Exist",
+      ErrorMessage: "Student Does Not Exist ..Please Check your name ",
     });
   }
   try {
@@ -142,7 +158,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       IsSuccess: "Sign-in Successfully",
       user: {
         name: student.name,
-        username:student.UserName,
+        username: student.UserName,
         email: student.email,
         studentid: student.id,
         studentschool: student.school,
@@ -219,7 +235,7 @@ export const logout = async (req: Request, res: Response) => {
       UserId: userId,
       UserName: userName || null,
       statusCode: 200,
-      Message: `User logged out at ${now} by -  `,
+      Message: ` logged out at ${now} by -  `,
     };
 
     await InsertLog(logsPayload);

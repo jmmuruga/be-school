@@ -17,6 +17,7 @@ export interface studentScoreResultDto {
   StudentId: string;
   subjectName_Id: string;
   TestType: string;
+  studentusername?:string;
   NumOfQuestion: string;
   NoOfAnswered: string;
   NoOfCorrectAnswered: string;
