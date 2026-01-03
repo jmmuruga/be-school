@@ -1,3 +1,4 @@
+
 import "reflect-metadata";
 import express from "express";
 import dotenv from "dotenv";
@@ -7,7 +8,7 @@ import "./core/database/db"
 import classRouter from "./Master/class_master/class.controller";
 import groupRouter from "./Master/group_master/group.controller";
 import markRouter from "./Master/mark_master/mark.controller";
-import mediumRouter from "./Master/medium_master/medium.controller";
+import StreamRouter from "./Master/medium_master/medium.controller";
 import schoolRouter from "./Master/school_master/school.controller";
 import subjectRouter from "./Master/subject_master/subject.controller";
 import signupRouter from "./Signup/signup.controller";
@@ -41,7 +42,7 @@ let corsOptions = {
 app.use('/classRouter' , cors(corsOptions) , classRouter);
 app.use('/groupRouter',cors(corsOptions),groupRouter);
 app.use('/markRouter',cors(corsOptions),markRouter);
-app.use('/mediumRouter',cors(corsOptions),mediumRouter);
+app.use('/StreamRouter',cors(corsOptions),StreamRouter);
 app.use('/schoolRouter',cors(corsOptions),schoolRouter);
 app.use('/subjectRouter',cors(corsOptions),subjectRouter);
 app.use("/signupRouter", cors(corsOptions), signupRouter); 

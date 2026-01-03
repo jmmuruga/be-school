@@ -12,7 +12,7 @@ export const addOnlinetest = async (req: Request, res: Response) => {
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: payload.studentName,
+        UserName: payload.studentusername,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message} -`,
       };
@@ -26,7 +26,7 @@ export const addOnlinetest = async (req: Request, res: Response) => {
     await onlinetestRepoistry.save(payload);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: payload.studentName,
+      UserName: payload.studentusername,
       statusCode: 200,
       Message: `Exam Started Successfully, student id: ${payload.created_UserId}, student name : ${payload.studentName} , student class: ${payload.studentStandard} , By - `,
     };
@@ -35,7 +35,7 @@ export const addOnlinetest = async (req: Request, res: Response) => {
   } catch (error) {
        const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: payload.studentName,
+      UserName: payload.studentusername,
       statusCode: 500,
       Message: `Error while start exam - ${error.message} -`,
     };

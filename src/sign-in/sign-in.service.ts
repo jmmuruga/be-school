@@ -113,7 +113,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         UserId: student.id,
         UserName: student.UserName,
         statusCode: 500,
-        Message: `Login failed: Wrong password for student by-`,
+        Message: `Login failed: Wrong password for student by- `,
       };
       await InsertLog(logsPayload);
       return res.status(401).send({
@@ -141,7 +141,8 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     return res.status(200).send({
       IsSuccess: "Sign-in Successfully",
       user: {
-        name: student.UserName,
+        name: student.name,
+        username:student.UserName,
         email: student.email,
         studentid: student.id,
         studentschool: student.school,
@@ -167,7 +168,7 @@ export const getStudentId = async (req: Request, res: Response) => {
     const id = req.params.id;
 
     const students = await appSource.query(
-      `SELECT id, name,standard
+      `SELECT id, name,Class_Id
        FROM [${process.env.DB_NAME}].[dbo].[signup]
        WHERE id = '${id}'`
     );
@@ -218,21 +219,21 @@ export const logout = async (req: Request, res: Response) => {
       UserId: userId,
       UserName: userName || null,
       statusCode: 200,
-      Message: `User logged out at ${now} by - `,
+      Message: `User logged out at ${now} by -  `,
     };
 
     await InsertLog(logsPayload);
 
     return res.status(200).json({
       IsSuccess: true,
-      Message: "Logout successful",
+      Message: "Logout successfully",
     });
   } catch (error: any) {
     const logsPayload: logsDto = {
       UserId: userId,
       UserName: userName || null,
       statusCode: 200,
-      Message: ` Error while User logged out - ${error.message}`,
+      Message: ` Error while User logged out - ${error.message}-`,
     };
 
     await InsertLog(logsPayload);

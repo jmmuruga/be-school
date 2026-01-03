@@ -30,9 +30,9 @@ export class Signup {
   @Column()
   Class_Id: string;
   @Column({ type: "nvarchar", nullable: true })
-  medium_Id: string | null;
+  Stream_Id: string | null;
   @Column({ type: "nvarchar", nullable: true })
-  otherScheme: string | null;
+  otherStream: string | null;
   @Column()
   board: string;
   @Column()
@@ -41,8 +41,8 @@ export class Signup {
   schoolAddress: string;
   @Column({ type: "nvarchar", length: 15 })
   contact: string;
-  @Column({ nullable: true })
-  created_UserId: string;
+  // @Column({ nullable: true })
+  // created_UserId: string;
   @Column({ nullable: true })
   updated_UserId: string;
   @CreateDateColumn({ name: "created_at" })

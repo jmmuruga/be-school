@@ -11,7 +11,7 @@ export class studentScoreResult {
   @Column()
   StudentId: string;
   @Column()
-  SubjectId: string;
+  subjectName_Id: string;
   @Column()
   TestType: string;
   @Column()

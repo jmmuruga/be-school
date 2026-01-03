@@ -5,7 +5,7 @@ import { GroupMaster } from "../../Master/group_master/group.model";
 import { classMaster } from "../../Master/class_master/class.model";
 import { SchoolMaster } from "../../Master/school_master/school.model";
 import { MarkMaster } from "../../Master/mark_master/mark.model";
-import { MediumMaster } from "../../Master/medium_master/medium.model";
+import { StreamMaster } from "../../Master/medium_master/medium.model";
 import { SubjectMaster } from "../../Master/subject_master/subject.model";
 // import { Signup } from "../../Signup/signup.model";
 import { Signup } from "../../Signup/signup.model";
@@ -21,7 +21,7 @@ import userRightRouter from "../../User-Rights/user-rights.controller";
 import { UserRight } from "../../User-Rights/user-rights.model";
 import { studentScoreResult } from "../../Student-Result/student-result.model";
 import { logs } from "../../logs/logs.model";
-const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,MediumMaster,SubjectMaster,User,Staff,Signup,objectiveques,
+const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,StreamMaster,SubjectMaster,User,Staff,Signup,objectiveques,
     Quesgenerate,SignIn,Question,onlinetest,UserRight,studentScoreResult,logs
 ]
 

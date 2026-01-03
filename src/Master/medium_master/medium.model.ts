@@ -2,13 +2,13 @@ import { CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
 import { PrimaryGeneratedColumn } from "typeorm";
 import { Column } from "typeorm";
 @Entity()
-export class MediumMaster {
+export class StreamMaster {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
-  medium_Id: number;
+  Stream_Id: number;
   @Column()
-  medium: string;
+ Stream: string;
   @Column({default:true})
   isActive: boolean;
   @Column({default:true})
