@@ -3,10 +3,11 @@ import { SignInDto, SignInvalidation } from "./sign-in.dto";
 import { Request, Response } from "express";
 import { SignIn } from "./sign-in.model";
 import { User } from "../User-Profile/user.model";
-import { createTestAccount } from "nodemailer";
+import nodemailer from "nodemailer";
 import { Signup } from "../Signup/signup.model";
 import { logsDto } from "../logs/logs.dto";
 import { InsertLog } from "../logs/logs.service";
+import { saveOtpForStudent } from "../Generate_Otp/generate_otp.service";
 export const signIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const userRepository = appSource.getRepository(User);
@@ -197,8 +198,6 @@ export const getStudentId = async (req: Request, res: Response) => {
     }
 
     const student = students[0];
-    //  console.log('Student data:', student);
-
     return res.status(200).json({
       IsSuccess: true,
       Result: student,
@@ -259,5 +258,89 @@ export const logout = async (req: Request, res: Response) => {
       ErrorMessage: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
+  }
+};
+export const forgotPassword = async (req: Request, res: Response) => {
+  const payload = req.body;
+  try {
+    const studentRepository = appSource.getRepository(Signup);
+
+    let student = await studentRepository.findOneBy({
+      UserName: payload.usernameOrAdmission,
+    });
+
+    const studentname = student.UserName;
+    const studentmail = student.email;
+    console.log("student-mail", studentmail);
+    console.log("student Username", studentname);
+
+    if (!studentmail) {
+      return res.status(401).send({
+        ErrorMessage: "Student mail doesnt exist.",
+      });
+    }
+    if (!studentname) {
+      return res.status(401).send({
+        ErrorMessage: "Student Username doesnt exist.",
+      });
+    }
+    const GeneratedOtp = generateOpt();
+    console.log("Generated OTP:", GeneratedOtp);
+
+    await saveOtpForStudent(student.id, Number(GeneratedOtp));
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "savedatain@gmail.com",
+        pass: "unpk bcsy ibhp wzrm",
+      },
+    });
+    const response = await transporter.sendMail({
+      from: "savedatain@gmail.com",
+      to: studentmail,
+      subject: `OTP to Reset Password`,
+      text: `
+Hello ${studentname},
+
+Your OTP for password reset is: ${GeneratedOtp}
+
+Please use this OTP to reset your password.
+
+Thank you.
+      `,
+    });
+
+    // Log success
+    const logsPayload: logsDto = {
+      UserId: student.id,
+      UserName: student.UserName,
+      statusCode: 200,
+      Message: `Student OTP sent successfully`,
+    };
+    await InsertLog(logsPayload);
+
+    return res.status(200).send({
+      IsSuccess: true,
+      Message: "OTP sent successfully to your email",
+      otp: GeneratedOtp,
+      user: {
+        id: student.id,
+        name: student.name,
+        email: student.email,
+        username: student.UserName,
+        school: student.school,
+        standard: student.Class_Id,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      ErrorMessage: "Internal server error",
+      error: error.message,
+    });
+  }
+  function generateOpt(): string {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    return otp;
   }
 };
