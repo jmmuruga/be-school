@@ -216,7 +216,7 @@ export const logout = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(400).json({
         IsSuccess: false,
-        ErrorMessage: "UserId is required to logout",
+        ErrorMessage: "UserId is required to sign out",
       });
     }
     const now = new Date().toLocaleTimeString("en-US", {
@@ -234,21 +234,21 @@ export const logout = async (req: Request, res: Response) => {
       UserId: userId,
       UserName: userName || null,
       statusCode: 200,
-      Message: ` logged out at ${now} by -  `,
+      Message: ` sign-out at ${now} by -  `,
     };
 
     await InsertLog(logsPayload);
 
     return res.status(200).json({
       IsSuccess: true,
-      Message: "Logout successfully",
+      Message: "Sign out successfully",
     });
   } catch (error: any) {
     const logsPayload: logsDto = {
       UserId: userId,
       UserName: userName || null,
       statusCode: 200,
-      Message: ` Error while User logged out - ${error.message}-`,
+      Message: ` Error while User sign out - ${error.message}-`,
     };
 
     await InsertLog(logsPayload);
@@ -271,9 +271,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const studentname = student.UserName;
     const studentmail = student.email;
-    console.log("student-mail", studentmail);
-    console.log("student Username", studentname);
-
     if (!studentmail) {
       return res.status(401).send({
         ErrorMessage: "Student mail doesnt exist.",
@@ -285,8 +282,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
       });
     }
     const GeneratedOtp = generateOpt();
-    console.log("Generated OTP:", GeneratedOtp);
-
     await saveOtpForStudent(student.id, Number(GeneratedOtp));
 
     const transporter = nodemailer.createTransport({
@@ -316,14 +311,13 @@ Thank you.
       UserId: student.id,
       UserName: student.UserName,
       statusCode: 200,
-      Message: `Student OTP sent successfully`,
+      Message: `Student OTP sent successfully -`,
     };
     await InsertLog(logsPayload);
 
     return res.status(200).send({
       IsSuccess: true,
       Message: "OTP sent successfully to your email",
-      otp: GeneratedOtp,
       user: {
         id: student.id,
         name: student.name,
@@ -342,5 +336,111 @@ Thank you.
   function generateOpt(): string {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     return otp;
+  }
+};
+export const verifyStudentOtp = async (req: Request, res: Response) => {
+  const { studentId, otp } = req.body;
+  try {
+    if (!studentId || !otp) {
+      return res.status(400).send({
+        IsSuccess: false,
+        ErrorMessage: "StudentId and OTP are required",
+      });
+    }
+
+    const result = await appSource.query(`
+      SELECT TOP 1 Generate_Otp
+      FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
+      WHERE studentId = ${studentId}
+      ORDER BY id DESC
+    `);
+
+    if (result.length === 0) {
+      await InsertLog({
+        UserId: studentId,
+        UserName: null,
+        statusCode: 404,
+        Message: "OTP not found for student",
+      });
+
+      return res.status(404).send({
+        IsSuccess: false,
+        ErrorMessage: "OTP not found. Please request again.",
+      });
+    }
+
+    const savedOtp = String(result[0].Generate_Otp);
+    if (savedOtp !== String(otp)) {
+      const logsPayload: logsDto = {
+        UserId: studentId,
+        UserName: null,
+        statusCode: 401,
+        Message: `Invalid OTP attempt for Student - student
+        ID : ${studentId} -`,
+      };
+      await InsertLog(logsPayload);
+      return res.status(401).send({
+        IsSuccess: false,
+        ErrorMessage: "Invalid OTP. Please try again",
+      });
+    }
+    const logsPayload: logsDto = {
+      UserId: studentId,
+      UserName: null,
+      statusCode: 200,
+      Message: `OTP verified successfully for Student - studentID :${studentId} -`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(200).send({
+      IsSuccess: true,
+      Message: "OTP verified successfully",
+    });
+  } catch (error: any) {
+    return res.status(500).send({
+      IsSuccess: false,
+      ErrorMessage: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export const resetStudentPassword = async (req: Request, res: Response) => {
+  const { studentId, newPassword, confirmNewPassword } = req.body;
+  try {
+    if (!studentId || !newPassword) {
+      return res.status(400).send({
+        IsSuccess: false,
+        ErrorMessage: "StudentId and New Password required",
+      });
+    }
+    await appSource.query(`
+       UPDATE [${process.env.DB_NAME}].[dbo].[signup]
+  SET password = '${newPassword}', confirmPassword = '${confirmNewPassword}'
+  WHERE id = ${studentId}
+    `);
+    const logsPayload: logsDto = {
+      UserId: studentId,
+      UserName: null,
+      statusCode: 200,
+      Message: `Password reset successfully for Student - studentID: ${studentId} -`,
+    };
+    await InsertLog(logsPayload);
+
+    return res.status(200).send({
+      IsSuccess: true,
+      Message: "Password reset successfully",
+    });
+  } catch (error: any) {
+    const logsPayload: logsDto = {
+      UserId: studentId,
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while student set a new password - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
