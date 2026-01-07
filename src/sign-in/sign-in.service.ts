@@ -89,6 +89,7 @@ export const signIn = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const StudentSignIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const studentRespository = appSource.getRepository(Signup);
@@ -100,6 +101,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
   //     password: payload.usernameOrAdmission,
   //   });
   // }
+  
   let student =
     (await studentRespository.findOneBy({
       UserName: payload.usernameOrAdmission,
@@ -180,6 +182,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const getStudentId = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -260,6 +263,7 @@ export const logout = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const forgotPassword = async (req: Request, res: Response) => {
   const payload = req.body;
   try {
@@ -338,6 +342,7 @@ Thank you.
     return otp;
   }
 };
+
 export const verifyStudentOtp = async (req: Request, res: Response) => {
   const { studentId, otp } = req.body;
   try {
