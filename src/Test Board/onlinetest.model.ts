@@ -15,6 +15,8 @@ export class onlinetest {
   Numofquestion: number;
   @Column({default:true})
   isActive: Boolean;
+   @Column()
+  Stream_Id: string;
   @Column()
   StudentLoginId:string;
   @Column({nullable:true})

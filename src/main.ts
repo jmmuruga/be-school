@@ -1,10 +1,9 @@
-
 import "reflect-metadata";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
-import "./core/database/db"
+import "./core/database/db";
 import classRouter from "./Master/class_master/class.controller";
 import groupRouter from "./Master/group_master/group.controller";
 import markRouter from "./Master/mark_master/mark.controller";
@@ -21,8 +20,9 @@ import QuesGenerateRouter from "./Question bank/question-paper-generate/ques-pap
 import questionRouter from "./Question bank/question-prepare/questionpre.controller";
 import signInRouter from "./sign-in/sign-in.controller";
 import userRightRouter from "./User-Rights/user-rights.controller";
- import studentscoreRouter from "./Student-Result/student-result.controller";
- import logsRouter from "./logs/logs.controller";
+import studentscoreRouter from "./Student-Result/student-result.controller";
+import logsRouter from "./logs/logs.controller";
+import otpRouter from "./Generate_Otp/generate_otp.controller";
 const app = express();
 
 dotenv.config();
@@ -38,29 +38,25 @@ let corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-
-app.use('/classRouter' , cors(corsOptions) , classRouter);
-app.use('/groupRouter',cors(corsOptions),groupRouter);
-app.use('/markRouter',cors(corsOptions),markRouter);
-app.use('/StreamRouter',cors(corsOptions),StreamRouter);
-app.use('/schoolRouter',cors(corsOptions),schoolRouter);
-app.use('/subjectRouter',cors(corsOptions),subjectRouter);
-app.use("/signupRouter", cors(corsOptions), signupRouter); 
-app.use('/userRouter',cors(corsOptions),userRouter);
-app.use('/signInRouter',cors(corsOptions),signInRouter);
-app.use('/objectquesRouter',cors(corsOptions),objectquesRouter);
-app.use('/questionRouter', cors(corsOptions), questionRouter);
-app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter);
-app.use('/onlinetestRouter',cors(corsOptions),onlinetestRouter);
-app.use('/StaffRouter',cors(corsOptions),StaffRouter);
-app.use('/userRightRouter',cors(corsOptions),userRightRouter);
-app.use('/studentscoreRouter',cors(corsOptions),studentscoreRouter);
-app.use('/logsRouter',cors(corsOptions),logsRouter);
-app.use(express.json({ limit: '10mb' }));
+app.use("/classRouter", cors(corsOptions), classRouter);
+app.use("/groupRouter", cors(corsOptions), groupRouter);
+app.use("/markRouter", cors(corsOptions), markRouter);
+app.use("/StreamRouter", cors(corsOptions), StreamRouter);
+app.use("/schoolRouter", cors(corsOptions), schoolRouter);
+app.use("/subjectRouter", cors(corsOptions), subjectRouter);
+app.use("/signupRouter", cors(corsOptions), signupRouter);
+app.use("/userRouter", cors(corsOptions), userRouter);
+app.use("/signInRouter", cors(corsOptions), signInRouter);
+app.use("/objectquesRouter", cors(corsOptions), objectquesRouter);
+app.use("/questionRouter", cors(corsOptions), questionRouter);
+app.use("/QuesGenerateRouter", cors(corsOptions), QuesGenerateRouter);
+app.use("/onlinetestRouter", cors(corsOptions), onlinetestRouter);
+app.use("/StaffRouter", cors(corsOptions), StaffRouter);
+app.use("/userRightRouter", cors(corsOptions), userRightRouter);
+app.use("/studentscoreRouter", cors(corsOptions), studentscoreRouter);
+app.use("/logsRouter", cors(corsOptions), logsRouter);
+app.use("/otpRouter", cors(corsOptions), otpRouter);
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 // app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter)
 app.listen(PORT, () => console.log(`server upon port ${PORT}`));
-
-
-
-

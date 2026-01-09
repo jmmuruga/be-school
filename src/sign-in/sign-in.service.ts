@@ -3,10 +3,11 @@ import { SignInDto, SignInvalidation } from "./sign-in.dto";
 import { Request, Response } from "express";
 import { SignIn } from "./sign-in.model";
 import { User } from "../User-Profile/user.model";
-import { createTestAccount } from "nodemailer";
+import nodemailer from "nodemailer";
 import { Signup } from "../Signup/signup.model";
 import { logsDto } from "../logs/logs.dto";
 import { InsertLog } from "../logs/logs.service";
+import { saveOtpForStudent } from "../Generate_Otp/generate_otp.service";
 export const signIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const userRepository = appSource.getRepository(User);
@@ -88,6 +89,7 @@ export const signIn = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const StudentSignIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const studentRespository = appSource.getRepository(Signup);
@@ -99,6 +101,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
   //     password: payload.usernameOrAdmission,
   //   });
   // }
+
   let student =
     (await studentRespository.findOneBy({
       UserName: payload.usernameOrAdmission,
@@ -116,7 +119,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       UserId: student.id,
       UserName: student.UserName,
       statusCode: 500,
-      Message: `Login failed: Student does not exist - ${payload.usernameOrAdmission}`,
+      Message: `Signin failed: Student does not exist - ${payload.usernameOrAdmission}`,
     };
     await InsertLog(logsPayload);
     return res.status(401).send({
@@ -153,7 +156,6 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       Message: `Student session start at ${now} By - `,
     };
     await InsertLog(logsPayload);
-    // console.log('Student School from DB:', student.school);
     return res.status(200).send({
       IsSuccess: "Sign-in Successfully",
       user: {
@@ -163,6 +165,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         studentid: student.id,
         studentschool: student.school,
         standard: student.Class_Id,
+        studentStream_Id: student.Stream_Id,
       },
     });
   } catch (error: any) {
@@ -179,6 +182,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const getStudentId = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -197,8 +201,6 @@ export const getStudentId = async (req: Request, res: Response) => {
     }
 
     const student = students[0];
-    //  console.log('Student data:', student);
-
     return res.status(200).json({
       IsSuccess: true,
       Result: student,
@@ -217,7 +219,7 @@ export const logout = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(400).json({
         IsSuccess: false,
-        ErrorMessage: "UserId is required to logout",
+        ErrorMessage: "UserId is required to sign out",
       });
     }
     const now = new Date().toLocaleTimeString("en-US", {
@@ -233,23 +235,23 @@ export const logout = async (req: Request, res: Response) => {
 
     const logsPayload: logsDto = {
       UserId: userId,
-      UserName: userName || null,
+      UserName: null,
       statusCode: 200,
-      Message: ` logged out at ${now} by -  `,
+      Message: ` sign-out at ${now} by -  `,
     };
 
     await InsertLog(logsPayload);
 
     return res.status(200).json({
       IsSuccess: true,
-      Message: "Logout successfully",
+      Message: "Sign out successfully",
     });
   } catch (error: any) {
     const logsPayload: logsDto = {
       UserId: userId,
       UserName: userName || null,
       statusCode: 200,
-      Message: ` Error while User logged out - ${error.message}-`,
+      Message: ` Error while User sign out - ${error.message}-`,
     };
 
     await InsertLog(logsPayload);
@@ -257,6 +259,192 @@ export const logout = async (req: Request, res: Response) => {
     return res.status(500).json({
       IsSuccess: false,
       ErrorMessage: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  const payload = req.body;
+  try {
+    const studentRepository = appSource.getRepository(Signup);
+
+    let student = await studentRepository.findOneBy({
+      UserName: payload.usernameOrAdmission,
+    });
+
+    const studentname = student.UserName;
+    const studentmail = student.email;
+    if (!studentmail) {
+      return res.status(401).send({
+        ErrorMessage: "Student mail doesnt exist.",
+      });
+    }
+    if (!studentname) {
+      return res.status(401).send({
+        ErrorMessage: "Student Username doesnt exist.",
+      });
+    }
+    const GeneratedOtp = generateOpt();
+    await saveOtpForStudent(student.id, Number(GeneratedOtp));
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "savedatain@gmail.com",
+        pass: "unpk bcsy ibhp wzrm",
+      },
+    });
+    const response = await transporter.sendMail({
+      from: "savedatain@gmail.com",
+      to: studentmail,
+      subject: `OTP to Reset Password`,
+      text: `
+Hello ${studentname},
+
+Your OTP for password reset is: ${GeneratedOtp}
+
+Please use this OTP to reset your password.
+
+Thank you.
+      `,
+    });
+
+    // Log success
+    const logsPayload: logsDto = {
+      UserId: student.id,
+      UserName: student.UserName,
+      statusCode: 200,
+      Message: `Student OTP sent successfully -`,
+    };
+    await InsertLog(logsPayload);
+
+    return res.status(200).send({
+      IsSuccess: true,
+      Message: "OTP sent successfully to your email",
+      user: {
+        id: student.id,
+        name: student.name,
+        email: student.email,
+        username: student.UserName,
+        school: student.school,
+        standard: student.Class_Id,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      ErrorMessage: "Internal server error",
+      error: error.message,
+    });
+  }
+  function generateOpt(): string {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    return otp;
+  }
+};
+
+export const verifyStudentOtp = async (req: Request, res: Response) => {
+  const { studentId, otp } = req.body;
+  try {
+    if (!studentId || !otp) {
+      return res.status(400).send({
+        IsSuccess: false,
+        ErrorMessage: "StudentId and OTP are required",
+      });
+    }
+
+    const result = await appSource.query(`
+      SELECT TOP 1 Generate_Otp
+      FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
+      WHERE studentId = ${studentId}
+      ORDER BY id DESC
+    `);
+
+    if (result.length === 0) {
+      await InsertLog({
+        UserId: studentId,
+        UserName: null,
+        statusCode: 404,
+        Message: "OTP not found for student",
+      });
+
+      return res.status(404).send({
+        IsSuccess: false,
+        ErrorMessage: "OTP not found. Please request again.",
+      });
+    }
+
+    const savedOtp = String(result[0].Generate_Otp);
+    if (savedOtp !== String(otp)) {
+      const logsPayload: logsDto = {
+        UserId: studentId,
+        UserName: null,
+        statusCode: 401,
+        Message: `Invalid OTP attempt for Student - student
+        ID : ${studentId} -`,
+      };
+      await InsertLog(logsPayload);
+      return res.status(401).send({
+        IsSuccess: false,
+        ErrorMessage: "Invalid OTP. Please try again",
+      });
+    }
+    const logsPayload: logsDto = {
+      UserId: studentId,
+      UserName: null,
+      statusCode: 200,
+      Message: `OTP verified successfully for Student - studentID :${studentId} -`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(200).send({
+      IsSuccess: true,
+      Message: "OTP verified successfully",
+    });
+  } catch (error: any) {
+    return res.status(500).send({
+      IsSuccess: false,
+      ErrorMessage: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export const resetStudentPassword = async (req: Request, res: Response) => {
+  const { studentId, newPassword, confirmNewPassword } = req.body;
+  try {
+    if (!studentId || !newPassword) {
+      return res.status(400).send({
+        IsSuccess: false,
+        ErrorMessage: "StudentId and New Password required",
+      });
+    }
+    await appSource.query(`
+       UPDATE [${process.env.DB_NAME}].[dbo].[signup]
+  SET password = '${newPassword}', confirmPassword = '${confirmNewPassword}'
+  WHERE id = ${studentId}
+    `);
+    const logsPayload: logsDto = {
+      UserId: studentId,
+      UserName: null,
+      statusCode: 200,
+      Message: `Password reset successfully for Student - studentID: ${studentId} -`,
+    };
+    await InsertLog(logsPayload);
+
+    return res.status(200).send({
+      IsSuccess: true,
+      Message: "Password reset successfully",
+    });
+  } catch (error: any) {
+    const logsPayload: logsDto = {
+      UserId: studentId,
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while student set a new password - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
   }

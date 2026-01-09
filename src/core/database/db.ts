@@ -21,8 +21,9 @@ import userRightRouter from "../../User-Rights/user-rights.controller";
 import { UserRight } from "../../User-Rights/user-rights.model";
 import { studentScoreResult } from "../../Student-Result/student-result.model";
 import { logs } from "../../logs/logs.model";
+import { Generate_Otp } from "../../Generate_Otp/generate_otp.model";
 const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,StreamMaster,SubjectMaster,User,Staff,Signup,objectiveques,
-    Quesgenerate,SignIn,Question,onlinetest,UserRight,studentScoreResult,logs
+    Quesgenerate,SignIn,Question,onlinetest,UserRight,studentScoreResult,logs,Generate_Otp
 ]
 
 export const appSource = new DataSource({

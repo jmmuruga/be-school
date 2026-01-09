@@ -51,19 +51,20 @@ export const addQuesgene = async (req: Request, res: Response) => {
   }
 };
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
-  const { subject_Id, Class_Id, type, questionCount, oneMax } = req.params;
+  const { subjectName_Id, ClassName_Id, type, questionCount, oneMax } = req.params;
   try {
     const objectiveRepo = appSource.getRepository(objectiveques);
 
     const questions = await objectiveRepo.query(
       `SELECT TOP ${oneMax} *
         FROM [${process.env.DB_NAME}].[dbo].[objectiveques]
-WHERE subjectName_Id = '${subject_Id}'
-  AND ClassName_Id = '${Class_Id}'
+WHERE subjectName_Id = '${subjectName_Id}'
+  AND ClassName_Id = '${ClassName_Id}'
   AND type = '${type}'
   
   ;`
     );
+    
     return res.status(200).json({
       IsSuccess: "successfully",
       Result: questions,
