@@ -101,7 +101,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
   //     password: payload.usernameOrAdmission,
   //   });
   // }
-  
+
   let student =
     (await studentRespository.findOneBy({
       UserName: payload.usernameOrAdmission,
@@ -119,7 +119,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       UserId: student.id,
       UserName: student.UserName,
       statusCode: 500,
-      Message: `Login failed: Student does not exist - ${payload.usernameOrAdmission}`,
+      Message: `Signin failed: Student does not exist - ${payload.usernameOrAdmission}`,
     };
     await InsertLog(logsPayload);
     return res.status(401).send({
@@ -156,7 +156,6 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       Message: `Student session start at ${now} By - `,
     };
     await InsertLog(logsPayload);
-    // console.log('Student School from DB:', student.school);
     return res.status(200).send({
       IsSuccess: "Sign-in Successfully",
       user: {
@@ -166,6 +165,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         studentid: student.id,
         studentschool: student.school,
         standard: student.Class_Id,
+        studentStream_Id: student.Stream_Id,
       },
     });
   } catch (error: any) {
@@ -235,7 +235,7 @@ export const logout = async (req: Request, res: Response) => {
 
     const logsPayload: logsDto = {
       UserId: userId,
-      UserName: userName || null,
+      UserName: null,
       statusCode: 200,
       Message: ` sign-out at ${now} by -  `,
     };

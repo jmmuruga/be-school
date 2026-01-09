@@ -13,6 +13,8 @@ export class objectiveques {
   subjectName_Id: string;
   @Column()
   type: string;
+  @Column()
+  Stream_Id:string;
   @Column({ type: "nvarchar", nullable: true, length: "MAX" })
   Imagequestion: string;
   @Column({ nullable: true})

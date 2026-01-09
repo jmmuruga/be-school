@@ -30,7 +30,7 @@ export class Signup {
   @Column()
   Class_Id: string;
   @Column({ type: "nvarchar", nullable: true })
-  Stream_Id: string | null;
+  Stream_Id: string;
   @Column({ type: "nvarchar", nullable: true })
   otherStream: string | null;
   @Column()

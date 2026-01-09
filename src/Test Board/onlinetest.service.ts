@@ -6,7 +6,7 @@ import { objectiveques } from "../Question bank/objective-question/objective-que
 import { InsertLog } from "../logs/logs.service";
 import { logsDto } from "../logs/logs.dto";
 export const addOnlinetest = async (req: Request, res: Response) => {
-    const payload: onlinetestDto = req.body;
+  const payload: onlinetestDto = req.body;
   try {
     const validation = OnlineTestValidation.validate(payload);
     if (validation.error) {
@@ -33,7 +33,7 @@ export const addOnlinetest = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Start successfully" });
   } catch (error) {
-       const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
       UserName: payload.studentusername,
       statusCode: 500,
@@ -79,7 +79,8 @@ export const getStudentId = async (req: Request, res: Response) => {
 };
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
   try {
-    const { subjectName_Id, ClassName_Id, type, question } = req.params;
+    const { subjectName_Id, ClassName_Id, type, question, Stream_Id } =
+      req.params;
     // console.log(req.params);
     // console.log("received oneMax ", oneMax);
     const objectiveRepo = appSource.getRepository(objectiveques);
@@ -87,9 +88,10 @@ export const getObjectiveQuestions = async (req: Request, res: Response) => {
     const questions = await objectiveRepo.query(
       `SELECT TOP ${question} *
         FROM objectiveques
-WHERE subjectName_Id = '${subjectName_Id}'
-  AND ClassName_Id = '${ClassName_Id}'
+          WHERE subjectName_Id = '${subjectName_Id}'
+          AND ClassName_Id = '${ClassName_Id}'
   AND type = '${type}'
+  AND Stream_Id = '${Stream_Id}'
   ;`
     );
     return res.status(200).json({
@@ -97,7 +99,7 @@ WHERE subjectName_Id = '${subjectName_Id}'
       Result: questions,
     });
   } catch (error) {
-      return res.status(500).json({
+    return res.status(500).json({
       IsSuccess: false,
       ErrorMessage: "Internal server error",
       error: error instanceof Error ? error.message : error,

@@ -31,6 +31,7 @@ export const addObjectiveques = async (req: Request, res: Response) => {
         ClassName_Id: payload.ClassName_Id,
         subjectName_Id: payload.subjectName_Id,
         type: payload.type,
+        Stream_Id:payload.Stream_Id,
         question: payload.question,
         Imagequestion: payload.Imagequestion,
       },
