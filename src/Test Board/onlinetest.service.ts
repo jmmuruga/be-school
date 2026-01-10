@@ -87,7 +87,7 @@ export const getObjectiveQuestions = async (req: Request, res: Response) => {
 
     const questions = await objectiveRepo.query(
       `SELECT TOP ${question} *
-        FROM objectiveques
+        FROM [${process.env.DB_NAME}].[dbo].[objectiveques] 
           WHERE subjectName_Id = '${subjectName_Id}'
           AND ClassName_Id = '${ClassName_Id}'
   AND type = '${type}'
