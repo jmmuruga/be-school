@@ -13,6 +13,8 @@ export class studentScoreResult {
   @Column()
   subjectName_Id: string;
   @Column()
+  ClassName_Id:string;
+  @Column()
   TestType: string;
   @Column()
   NumOfQuestion: string;
