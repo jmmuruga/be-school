@@ -84,7 +84,6 @@ export const getClassId = async (req: Request, res: Response) => {
       Result: finalRes,
     });
   } catch (error) {
-    // console.log(error);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

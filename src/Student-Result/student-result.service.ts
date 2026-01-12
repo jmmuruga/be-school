@@ -23,7 +23,7 @@ export const AddStudentScoreResult = async (req: Request, res: Response) => {
       UserId: Number(payload.StudentId),
       UserName: payload.studentusername,
       statusCode: 200,
-      Message: `Exam Submitted  Successfully, student id: ${payload.StudentId}, student name : ${payload.studentName} , student class: ${payload.ClassName_Id} , By - `,
+      Message: `Exam Submitted  Successfully, student id: ${payload.StudentId}, student name : ${payload.studentName} , student class Id: ${payload.ClassName_Id} , By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "submitted successfully" });
@@ -49,7 +49,7 @@ export const AddTryAgainLog = async (req: Request, res: Response) => {
       UserId: Number(StudentId),
       UserName: studentusername,
       statusCode: 200,
-      Message: `Try again exam clicked   → StudentId: ${StudentId},Student Name: ${studentName}, Standard: ${ClassName_Id} by -`,
+      Message: `Try again exam clicked   → StudentId: ${StudentId},Student Name: ${studentName}, Class Id: ${ClassName_Id} by -`,
     };
     await InsertLog(logsPayload);
 
