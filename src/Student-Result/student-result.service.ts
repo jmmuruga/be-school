@@ -70,9 +70,55 @@ export const AddTryAgainLog = async (req: Request, res: Response) => {
 };
 export const getStudentScoreResult = async (req: Request, res: Response) => {
   try {
-    const { StudentId, fromDate, toDate } = req.query;
+    const { StudentId, reportType, subjectId, fromDate, toDate } = req.query;
 
-    const repo = appSource.getRepository(studentScoreResult);
+    let query = "";
+    if (reportType === "last_test") {
+      query = `
+    SELECT TOP 1
+      created_at,
+      subjectName_Id,
+      NumOfQuestion,
+      NoOfCorrectAnswered,
+      NoOfWrongAnswered
+    FROM [${process.env.DB_NAME}].[dbo].[student_score_result]
+    WHERE StudentId = '${StudentId}'
+    ORDER BY created_at DESC
+  `;
+    } else if (reportType === "subject_wise") {
+      query = `
+    SELECT
+      created_at,
+      subjectName_Id,
+      NumOfQuestion,
+      NoOfCorrectAnswered,
+      NoOfWrongAnswered
+    FROM [${process.env.DB_NAME}].[dbo].[student_score_result]
+    WHERE StudentId = '${StudentId}'
+      AND subjectName_Id = '${subjectId}'
+    ORDER BY created_at DESC
+  `;
+    } else if (reportType === "date_wise") {
+      query = `
+    SELECT
+      created_at,
+      subjectName_Id,
+      NumOfQuestion,
+      NoOfCorrectAnswered,
+      NoOfWrongAnswered
+    FROM [${process.env.DB_NAME}].[dbo].[student_score_result]
+    WHERE StudentId = '${StudentId}'
+      AND CONVERT(DATE, created_at) >= '${fromDate}'
+      AND CONVERT(DATE, created_at) <= '${toDate}'
+    ORDER BY created_at DESC
+  `;
+    } else {
+      return res.status(400).json({
+        ErrorMessage: "Invalid report type",
+      });
+    }
+
+    const result = await appSource.query(query);
 
     // const result = await appSource.query(
     //   `
@@ -81,36 +127,10 @@ export const getStudentScoreResult = async (req: Request, res: Response) => {
     //   WHERE StudentId = '${StudentId}'
     //     AND CONVERT(DATE, created_at) >= '${fromDate}'
     //     AND CONVERT(DATE, created_at) <= '${toDate}'
+    //     AND subjectName_Id ='${subjectId}'
     //   ORDER BY created_at DESC
     //   `
     // );
-    const result = await appSource.query(
-      `
-SELECT 
-  r.StudentId,
-  r.TestType,
-  r.NumOfQuestion,
-  r.NoOfCorrectAnswered,
-  r.NoOfWrongAnswered,
-  r.Time,
-  r.Time_Take,
-  r.created_at,
-  c.className AS className,
-  s.subjectName AS subjectName
-
-FROM [${process.env.DB_NAME}].[dbo].[student_score_result] r
-
-LEFT JOIN [${process.env.DB_NAME}].[dbo].[class_master] c
-  ON r.ClassName_Id = c.Class_Id
-
-LEFT JOIN [${process.env.DB_NAME}].[dbo].[subject_master] s
-  ON r.subjectName_Id = s.subject_Id
-
-WHERE r.StudentId = '${StudentId}'
-ORDER BY r.created_at DESC
-`,
-      [StudentId]
-    );
 
     return res.status(200).json({
       IsSuccess: true,
