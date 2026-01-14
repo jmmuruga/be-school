@@ -37,7 +37,7 @@ export const signIn = async (req: Request, res: Response) => {
         UserId: user.UserID,
         UserName: null,
         statusCode: 500,
-        Message: `Login failed:F Wrong password for user ${user.email} by -`,
+        Message: `Login failed: Wrong password for user ${user.email} by -`,
       };
       await InsertLog(logsPayload);
       return res.status(401).send({
@@ -235,7 +235,7 @@ export const logout = async (req: Request, res: Response) => {
 
     const logsPayload: logsDto = {
       UserId: userId,
-      UserName: null,
+      UserName: userName,
       statusCode: 200,
       Message: ` sign-out at ${now} by -  `,
     };

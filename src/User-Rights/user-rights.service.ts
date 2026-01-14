@@ -12,7 +12,6 @@ export const addOrUpdateUserRight = async (req: Request, res: Response) => {
     const { loginUserId, loginUserName } = req.body;
 
   try {
-    // Validate payload
     const validation = UserRightValidation.validate(payload);
     if (validation.error) {
       return res.status(400).json({

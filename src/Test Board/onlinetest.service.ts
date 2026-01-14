@@ -22,7 +22,6 @@ export const addOnlinetest = async (req: Request, res: Response) => {
       });
     }
     const onlinetestRepoistry = appSource.getRepository(onlinetest);
-    // console.log('payload',payload);
     await onlinetestRepoistry.save(payload);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -63,13 +62,11 @@ export const getStudentId = async (req: Request, res: Response) => {
     }
 
     const student = students[0];
-    // console.log("Student data:", student);
     return res.status(200).json({
       IsSuccess: true,
       Result: student,
     });
   } catch (error) {
-    // console.error(error);
     return res.status(500).json({
       IsSuccess: false,
       ErrorMessage: "Internal server error",
@@ -81,8 +78,6 @@ export const getObjectiveQuestions = async (req: Request, res: Response) => {
   try {
     const { subjectName_Id, ClassName_Id, type, question, Stream_Id } =
       req.params;
-    // console.log(req.params);
-    // console.log("received oneMax ", oneMax);
     const objectiveRepo = appSource.getRepository(objectiveques);
 
     const questions = await objectiveRepo.query(

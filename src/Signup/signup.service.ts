@@ -85,6 +85,6 @@ export const getDetails = async (req: Request, res: Response) => {
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
-    // console.log(error);
+
   }
 };
