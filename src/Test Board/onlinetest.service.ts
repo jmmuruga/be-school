@@ -51,7 +51,7 @@ export const getStudentId = async (req: Request, res: Response) => {
     const students = await appSource.query(
       `SELECT id, name,ClassName_Id
        FROM [${process.env.DB_NAME}].[dbo].[signup]
-       WHERE id = '${id}'`
+       WHERE id = '${id}'`,
     );
 
     if (!students || students.length === 0) {
@@ -87,7 +87,7 @@ export const getObjectiveQuestions = async (req: Request, res: Response) => {
           AND ClassName_Id = '${ClassName_Id}'
   AND type = '${type}'
   AND Stream_Id = '${Stream_Id}'
-  ;`
+  ;`,
     );
     return res.status(200).json({
       IsSuccess: "successfully",
