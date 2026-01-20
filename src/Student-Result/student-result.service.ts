@@ -143,3 +143,33 @@ export const getStudentScoreResult = async (req: Request, res: Response) => {
     });
   }
 };
+export const getstudentResultCount = async (req:Request,res:Response) => {
+  try {
+    const { StudentId } = req.query;
+
+    if (!StudentId) {
+      return res.status(400).json({
+        ErrorMessage: "StudentId is required",
+      });
+    }
+
+    const query = `
+      SELECT COUNT(*) AS AttemptCount
+      FROM [${process.env.DB_NAME}].[dbo].[student_score_result]
+      WHERE StudentId = '${StudentId}'
+    `;
+
+    const result = await appSource.query(query);
+
+    return res.status(200).json({
+      IsSuccess: true,
+      StudentId,
+      AttemptCount: result[0]?.AttemptCount || 0,
+    });
+  }catch(error){
+    return res.status(500).json({
+      ErrorMessage: "Error fetching student result count",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
