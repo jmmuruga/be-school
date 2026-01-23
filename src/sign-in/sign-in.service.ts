@@ -161,6 +161,12 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       Message: `Student session start at ${now} By - `,
     };
     await InsertLog(logsPayload);
+   const token = jwt.sign(
+  { id: student.id, username: student.UserName },
+  process.env.JWT_SECRET_KEY as string,
+  { expiresIn: '1d' }
+);
+
     return res.status(200).send({
       IsSuccess: "Sign-in Successfully",
       user: {
@@ -170,6 +176,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         studentid: student.id,
         studentschool: student.school,
         standard: student.Class_Id,
+        token,
         studentStream_Id: student.Stream_Id,
       },
     });
@@ -454,3 +461,4 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
     });
   }
 };
+
