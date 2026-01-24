@@ -170,6 +170,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         studentid: student.id,
         studentschool: student.school,
         standard: student.Class_Id,
+        
         studentStream_Id: student.Stream_Id,
       },
     });
@@ -454,3 +455,4 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
     });
   }
 };
+
