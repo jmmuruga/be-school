@@ -85,6 +85,97 @@ export const getDetails = async (req: Request, res: Response) => {
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
-
   }
 };
+export const getStudentCount = async (req: Request, res: Response) => {
+  try {
+    const result = await appSource.query(`
+      SELECT COUNT(*) AS total
+      FROM [${process.env.DB_NAME}].[dbo].[signup]
+    `);
+
+    return res.status(200).json({
+      Result: {
+        total: Number(result[0].total),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ErrorMessage: "Internal server error",
+    });
+  }
+};
+
+// export const getTenthCount = async (req: Request, res: Response) => {
+//   try {
+//     const result = await appSource.query(`
+//       SELECT COUNT(*) AS tenthCount
+//       FROM  [${process.env.DB_NAME}].[dbo].[signup]
+//       WHERE Class_Id = 12
+//     `);
+
+//     return res.status(200).json({
+//       count: Number(result[0].tenthCount),
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Internal server error",
+//       error: error instanceof Error ? error.message : error,
+//     });
+//   }
+// };
+// export const gettwelvethCount = async (req: Request, res: Response) => {
+//   try {
+//     const signupRepository = appSource.getRepository(Signup);
+
+//     const twelvethCount = await signupRepository.countBy({
+//       Class_Id: "14",
+//     });
+
+//     return res.status(200).json({
+//       count: twelvethCount,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Internal server error",
+//       error: error instanceof Error ? error.message : error,
+//     });
+//   }
+// }
+// export const getStreamCount = async (req: Request, res: Response) => {
+//   try {
+//     const signupRepository = appSource.getRepository(Signup);
+//     const streamCount = await signupRepository.countBy({
+//       Stream_Id: "",
+
+//     });
+//     return res.status(200).json({
+//       count: streamCount,
+//     });
+//     }
+//     catch (error) {
+//       return res.status(500).json({
+//         message: "Internal server error",
+//         error: error instanceof Error ? error.message : error,
+//       });
+//     }
+//   };
+
+// export const getotherStreamCount = async (req: Request, res: Response) => {
+//   try {
+//     const signupRepository = appSource.getRepository(Signup);
+
+//     const otherStreamCount = await signupRepository.countBy({
+//       otherStream: "Yes",
+//     });
+
+//     return res.status(200).json({
+//       count: otherStreamCount,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Internal server error",
+//       error: error instanceof Error ? error.message : error,
+//     });
+//   }
+// }
