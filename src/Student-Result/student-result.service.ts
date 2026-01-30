@@ -119,19 +119,6 @@ export const getStudentScoreResult = async (req: Request, res: Response) => {
     }
 
     const result = await appSource.query(query);
-
-    // const result = await appSource.query(
-    //   `
-    //   SELECT *
-    //   FROM [${process.env.DB_NAME}].[dbo].[student_score_result]
-    //   WHERE StudentId = '${StudentId}'
-    //     AND CONVERT(DATE, created_at) >= '${fromDate}'
-    //     AND CONVERT(DATE, created_at) <= '${toDate}'
-    //     AND subjectName_Id ='${subjectId}'
-    //   ORDER BY created_at DESC
-    //   `
-    // );
-
     return res.status(200).json({
       IsSuccess: true,
       Result: result,
@@ -143,7 +130,7 @@ export const getStudentScoreResult = async (req: Request, res: Response) => {
     });
   }
 };
-export const getstudentResultCount = async (req:Request,res:Response) => {
+export const getstudentResultCount = async (req: Request, res: Response) => {
   try {
     const { StudentId } = req.query;
 
@@ -166,9 +153,35 @@ export const getstudentResultCount = async (req:Request,res:Response) => {
       StudentId,
       AttemptCount: result[0]?.AttemptCount || 0,
     });
-  }catch(error){
+  } catch (error) {
     return res.status(500).json({
       ErrorMessage: "Error fetching student result count",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+export const getSubjectNameCount = async (req: Request, res: Response) => {
+  try {
+    const query = `
+      SELECT
+        sm.subjectName AS Subject,
+        COUNT(ssr.subjectName_Id) AS SubjectCount
+      FROM [${process.env.DB_NAME}].[dbo].[student_score_result] ssr
+      INNER JOIN [${process.env.DB_NAME}].[dbo].[subject_master] sm
+        ON sm.subject_Id = ssr.subjectName_Id
+      GROUP BY sm.subjectName
+      ORDER BY SubjectCount DESC
+    `;
+
+    const result = await appSource.query(query);
+
+    return res.status(200).json({
+      IsSuccess: true,
+      Result: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ErrorMessage: "Error fetching subject count",
       error: error instanceof Error ? error.message : error,
     });
   }

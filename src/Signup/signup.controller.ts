@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { addSignup, getDetails, getStudentCount, } from "./signup.service";
+import { addSignup, getDetails, getStreamCount, getStudentCount, getXandXIIClassCount, } from "./signup.service";
 const signupRouter = Router();
 signupRouter.post('/addSignup' , (req,res) => addSignup(req,res));
 signupRouter.get("/getDetails",(req,res) => getDetails(req,res));
 signupRouter.get("/getStudentCount",(req,res) => getStudentCount(req,res));
 // signupRouter.get("/getTenthCount",(req,res) => getTenthCount(req,res));
-// signupRouter.get("/gettwelvethCount",(req,res) => gettwelvethCount(req,res));
-// signupRouter.get("/getstreamCount",(req,res) => getStreamCount(req,res));
+signupRouter.get("/getXandXIIClassCount",(req,res) => getXandXIIClassCount(req,res));
+signupRouter.get("/getstreamCount",(req,res) => getStreamCount(req,res));
 export default signupRouter;
