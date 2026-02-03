@@ -18,6 +18,7 @@ export const objectquesValidation = Joi.object({
   updated_UserId: Joi.string().optional().allow(null, ""),
 });
 export interface objectivequesDto {
+  Question_Id:string;
   ClassName_Id: string;
   subjectName_Id: string;
   type: string;
