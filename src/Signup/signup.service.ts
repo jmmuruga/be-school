@@ -85,6 +85,90 @@ export const getDetails = async (req: Request, res: Response) => {
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
+  }
+};
+export const getStudentCount = async (req: Request, res: Response) => {
+  try {
+    const result = await appSource.query(`
+      SELECT COUNT(*) AS total
+      FROM [${process.env.DB_NAME}].[dbo].[signup]
+    `);
 
+    return res.status(200).json({
+      Result: {
+        total: Number(result[0].total),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ErrorMessage: "Internal server error",
+    });
+  }
+};
+export const getXandXIIClassCount = async (req: Request, res: Response) => {
+  try {
+    const result = await appSource.query(`
+      SELECT 
+        cm.className AS Class,
+        COUNT(s.Id) AS studCount
+      FROM [${process.env.DB_NAME}].[dbo].[signup] s
+      INNER JOIN [${process.env.DB_NAME}].[dbo].[class_master] cm
+        ON cm.Class_Id = s.Class_Id
+      WHERE cm.className IN ('X', 'XII')
+      GROUP BY cm.className
+      ORDER BY 
+        CASE cm.className
+          WHEN 'X' THEN 1
+          WHEN 'XII' THEN 2
+        END
+    `);
+
+    return res.status(200).json({
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+export const getStreamCount = async (req: Request, res: Response) => {
+  try {
+    const data = await appSource.query(`
+      SELECT 
+        result.Stream,
+        COUNT(*) AS studCount
+      FROM (
+        SELECT 
+          sm.Stream AS Stream
+        FROM [${process.env.DB_NAME}].[dbo].[signup] s
+        INNER JOIN [${process.env.DB_NAME}].[dbo].[stream_master] sm
+          ON sm.Stream_Id = CAST(s.Stream_Id AS INT)
+        WHERE ISNUMERIC(s.Stream_Id) = 1
+
+        UNION ALL
+        SELECT 
+          'Others' AS Stream
+        FROM [${process.env.DB_NAME}].[dbo].[signup]
+        WHERE Stream_Id = 'Other'
+      ) AS result
+      GROUP BY result.Stream
+      ORDER BY 
+        CASE result.Stream
+          WHEN 'Tamil' THEN 1
+          WHEN 'English' THEN 2
+          WHEN 'Others' THEN 3
+          ELSE 4
+        END
+    `);
+
+    return res.status(200).json({ data });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };

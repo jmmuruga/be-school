@@ -7,6 +7,8 @@ import { Column } from "typeorm";
 export class objectiveques {
   @PrimaryGeneratedColumn()
   id: number;
+ @Column()
+Question_Id: string;
   @Column()
   ClassName_Id: string;
   @Column()
