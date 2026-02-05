@@ -10,6 +10,8 @@ export const Subjectvalidation = Joi.object({
   updateStatus: Joi.boolean().optional(),
   created_UserId: Joi.string().required(),
   updated_UserId: Joi.string().optional().allow(null, ""),
+  loginUserName: Joi.string().optional().allow(null, ""),
+
 });
 export interface SubjectDto {
   subject_Id: number;
@@ -20,6 +22,8 @@ export interface SubjectDto {
   updateStatus: boolean;
   created_UserId: string;
   updated_UserId: string;
+  loginUserName:string;
+
 }
 
 export interface subjectStatus {

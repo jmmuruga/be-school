@@ -42,11 +42,12 @@ export const addSubject = async (req: Request, res: Response) => {
         ErrorMessage: "This Subject is already existing",
       });
     }
-    await subjectRepository.save(payload);
+    const { loginUserName, ...data } = payload;
+    await subjectRepository.save(data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName:loginUserName ,
       statusCode: 200,
       Message: `Added subjectMaster -Subject(${payload.subjectName}) Successfully By - `,
     };
@@ -157,14 +158,14 @@ export const updateSubject = async (req: Request, res: Response) => {
         ErrorMessage: "This Subject is Already Existing",
       });
     }
-
+    const { loginUserName, ...data } = payload;
     await subjectRepoistry.update(
       { subject_Id: payload.subject_Id },
-      payload
+      data
     );
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Updated subject Master - Subject Id : ${existingSubject.subject_Id}, old subjectName :${existingSubject.subject_Id} to new subject Name :${payload.subjectName} Successfully By - `,
     };
@@ -176,7 +177,7 @@ export const updateSubject = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Error while update subject -${error.message}`,
     };

@@ -14,7 +14,7 @@ export const addUser = async (req: Request, res: Response) => {
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
       };
@@ -67,10 +67,11 @@ export const addUser = async (req: Request, res: Response) => {
         ErrorMessage: "Phone Number Already Exists ",
       });
     }
-    await userRepoistry.save(payload);
+    const { loginUserName, ...data } = payload;
+    await userRepoistry.save(data);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `User Added Successfully By - `,
     };
@@ -79,7 +80,7 @@ export const addUser = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Error while adding User Details - ${error.message}`,
     };
@@ -113,7 +114,7 @@ export const getUserId = async (req: Request, res: Response) => {
       `SELECT UserID
         FROM [${process.env.DB_NAME}].[dbo].[user] 
         Group by UserID
-        ORDER BY CAST(UserID AS INT) DESC;`
+        ORDER BY CAST(UserID AS INT) DESC;`,
     );
     let id = "0";
     if (UserID?.length > 0) {
@@ -139,7 +140,7 @@ export const updateUserLogin = async (req: Request, res: Response) => {
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
       };
@@ -204,19 +205,24 @@ export const updateUserLogin = async (req: Request, res: Response) => {
         ErrorMessage: "Email Id Already Exist",
       });
     }
-
-    await userRepository.update({ UserID: payload.UserID }, payload);
+    const { loginUserName, ...data } = payload;
+    await userRepository.update({ UserID: payload.UserID }, data);
     const logsPayload: logsDto = {
-      UserId: payload.UserID,
-      UserName: null,
+      UserId: Number(payload.updated_UserId),
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Updated  User - userId : ${payload.UserID} Successfully By - `,
-   
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "User Updated Successfully !!!" });
   } catch (error) {
- 
+    const logsPayload: logsDto = {
+      UserId: Number(payload.updated_UserId),
+      UserName: payload.loginUserName,
+      statusCode: 500,
+      Message: `Error while updating the User Details - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,

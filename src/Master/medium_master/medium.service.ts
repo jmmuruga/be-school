@@ -41,7 +41,8 @@ export const addStream = async (req: Request, res: Response) => {
         ErrorMessage: "This Stream is already Existing !!",
       });
     }
-    await StreamRepoistry.save(payload);
+    const { loginUserName, ...data } = payload;
+    await StreamRepoistry.save(data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -72,7 +73,7 @@ export const getStreamId = async (req: Request, res: Response) => {
       `SELECT Stream_Id
             FROM [${process.env.DB_NAME}].[dbo].[Stream_master] 
             Group by Stream_Id
-            ORDER BY CAST(Stream_Id AS INT) DESC;`
+            ORDER BY CAST(Stream_Id AS INT) DESC;`,
     );
     let id = "0";
     if (Stream_Id?.length > 0) {
@@ -159,11 +160,12 @@ export const updateStream = async (req: Request, res: Response) => {
         ErrorMessage: "This Stream is  Already  Existing !!",
       });
     }
-    await StreamRepoistry.update({ Stream_Id: payload.Stream_Id }, payload);
+    const { loginUserName, ...data } = payload;
+    await StreamRepoistry.update({ Stream_Id: payload.Stream_Id }, data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Updated Stream Master - Stream_Id : ${existingStream.Stream_Id}, old Stream name :${existingStream.Stream} to new Stream :${payload.Stream} Successfully By - `,
     };
@@ -175,7 +177,7 @@ export const updateStream = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Error while  update Stream  - ${error.message}`,
     };
@@ -205,7 +207,7 @@ export const deleteStream = async (req: Request, res: Response) => {
     const StreamRepoistry = appSource.getRepository(StreamMaster);
     // Check whether StreamId exists
     const existingStream = await StreamRepoistry.findOneBy({
-      Stream_Id:Stream_Id,
+      Stream_Id: Stream_Id,
     });
     if (!existingStream) {
       const logsPayload: logsDto = {
@@ -221,8 +223,7 @@ export const deleteStream = async (req: Request, res: Response) => {
       });
     }
     //delete and active
-    await StreamRepoistry
-      .createQueryBuilder()
+    await StreamRepoistry.createQueryBuilder()
       .update(StreamMaster)
       .set({ isActive: false })
       .where({ Stream_Id: Stream_Id })
@@ -271,8 +272,7 @@ export const updateStreamStatus = async (req: Request, res: Response) => {
         ErrorMessage: "Stream not found",
       });
     }
-    await StreamRepoistry
-      .createQueryBuilder()
+    await StreamRepoistry.createQueryBuilder()
       .update(StreamMaster)
       .set({ status: payload.status })
       .where({ Stream_Id: payload.Stream_Id })

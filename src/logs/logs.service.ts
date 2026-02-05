@@ -43,7 +43,7 @@ export const getLogs = async (req: Request, res: Response) => {
       `select UserId,UserName,statusCode,Message,created_at from [${process.env.DB_NAME}].[dbo].[logs]
      where CONVERT(DATE, created_at) >= '${fromDate}'
    AND  CONVERT(DATE, created_at) <= '${toDate}'
-   order by logId desc`
+   order by logId DESC`
     );
     res.status(200).send({
       Result: logReports,

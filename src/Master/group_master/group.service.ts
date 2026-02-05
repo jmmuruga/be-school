@@ -2,8 +2,8 @@ import { appSource } from "../../core/database/db";
 import { GroupDto, groupStatus, GroupValidation } from "./group.dto";
 import { Request, Response } from "express";
 import { GroupMaster } from "./group.model";
-import { Not } from "typeorm";
-import { logsDto } from "../../logs/logs.dto";
+import { Not, PrimaryColumn } from "typeorm";
+import { logsDto, logsValidation } from "../../logs/logs.dto";
 import { InsertLog } from "../../logs/logs.service";
 
 export const getGroupMasterDetails = async (req: Request, res: Response) => {
@@ -30,7 +30,7 @@ export const addGroup = async (req: Request, res: Response) => {
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
       };
@@ -50,7 +50,7 @@ export const addGroup = async (req: Request, res: Response) => {
     if (existingClass) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Error while saving Group - ${payload.groupName} (Group Name already exists) -`,
       };
@@ -59,10 +59,11 @@ export const addGroup = async (req: Request, res: Response) => {
         ErrorMessage: "This Group Name is  already Existing !!",
       });
     }
-    await groupRepoistry.save(payload);
+    const {loginUserName,...data} = payload;
+    await groupRepoistry.save(data);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Added Groupmaster - groupname (${payload.groupName})  Successfully By - `,
     };
@@ -71,7 +72,7 @@ export const addGroup = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Error while adding group - ${
         error instanceof Error ? error.message : error
@@ -110,13 +111,14 @@ export const getGroupId = async (req: Request, res: Response) => {
   }
 };
 export const updateGroupMaster = async (req: Request, res: Response) => {
-  try {
     const payload: GroupDto = req.body;
+ 
+  try {
     const validation = GroupValidation.validate(payload);
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
       };
@@ -133,7 +135,7 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
     if (!existingGroup) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Error while update group - ${payload.groupName} ( groupName already exists) -`,
       };
@@ -154,11 +156,12 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
         ErrorMessage: "This Group Name is Already Existing !!",
       });
     }
-    await groupRepository.update({ Group_Id: payload.Group_Id }, payload);
+    const {loginUserName,...data} = payload;
+    await groupRepository.update({ Group_Id: payload.Group_Id }, data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Updated Group Master - Group_Id : ${existingGroup[0].Group_Id} ,old GroupName :${existingGroup[0].groupName} to new GroupName :${payload.groupName} Successfully By - `,
     };
@@ -167,7 +170,7 @@ export const updateGroupMaster = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(req.body.created_UserId),
-      UserName: null,
+      UserName:payload.loginUserName,
       statusCode: 500,
       Message: `Error while updating group - ${
         error instanceof Error ? error.message : error

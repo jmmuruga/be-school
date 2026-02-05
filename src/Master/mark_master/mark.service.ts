@@ -30,7 +30,7 @@ export const addMark = async (req: Request, res: Response) => {
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
       };
@@ -47,7 +47,7 @@ export const addMark = async (req: Request, res: Response) => {
     if (existingMark) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Error while saving Mark - ${payload.mark} (Mark already exists) -`,
       };
@@ -56,11 +56,12 @@ export const addMark = async (req: Request, res: Response) => {
         ErrorMessage: "Mark already exists",
       });
     }
-    await markRepository.save(payload);
+    const { loginUserName, ...data } = payload;
+    await markRepository.save(data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Added Markmaster- mark (${payload.mark})Successfully By - `,
     };
@@ -69,7 +70,7 @@ export const addMark = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Error in addMark - ${
         error instanceof Error ? error.message : error
@@ -113,7 +114,7 @@ export const updateMark = async (req: Request, res: Response) => {
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
       };
@@ -130,7 +131,7 @@ export const updateMark = async (req: Request, res: Response) => {
     if (!existingMark) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 404,
         Message: `Update Mark Failed - mark_Id ${payload.mark_Id} not found`,
       };
@@ -147,7 +148,7 @@ export const updateMark = async (req: Request, res: Response) => {
     if (markExist.length > 0) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Error while update mark - ${payload.mark} (mark  already exists) -`,
       };
@@ -156,10 +157,11 @@ export const updateMark = async (req: Request, res: Response) => {
         ErrorMessage: "This Mark is Already Existing !!",
       });
     }
-    await markRepository.update({ mark_Id: payload.mark_Id }, payload);
+    const {loginUserName, ...data} = payload
+    await markRepository.update({ mark_Id: payload.mark_Id }, data);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Updated Mark Master - Mark Id : ${existingMark.mark_Id} ,old Mark :${existingMark.mark} to new Mark :${payload.mark} Successfully By - `,
     };
@@ -168,7 +170,7 @@ export const updateMark = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Error in updateMark - ${
         error instanceof Error ? error.message : error

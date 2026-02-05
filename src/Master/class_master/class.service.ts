@@ -42,15 +42,18 @@ export const addClass = async (req: Request, res: Response) => {
       });
     }
 
-    await classRepository.save(payload);
+const { loginUserName, ...data } = payload;
+await classRepository.save(data);
+
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 200,
       Message: `Added classmaster - classname (${payload.className})  Successfully By - `,
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Class Added Successfully !!" });
+
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -73,7 +76,7 @@ export const getClassId = async (req: Request, res: Response) => {
       `SELECT Class_Id
             FROM [${process.env.DB_NAME}].[dbo].[class_master] 
             Group by Class_Id
-            ORDER BY CAST(Class_Id AS INT) DESC;`
+            ORDER BY CAST(Class_Id AS INT) DESC;`,
     );
     let id = "0";
     if (Class_Id?.length > 0) {
@@ -129,6 +132,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     }
     // check whether class exist
     const classRepository = appSource.getRepository(classMaster);
+
     const existingClass = await classRepository.findOneBy({
       Class_Id: payload.Class_Id,
     });
@@ -161,11 +165,13 @@ export const updateClassMaster = async (req: Request, res: Response) => {
         ErrorMessage: "This Class Name is Already Existing !!",
       });
     }
-    await classRepository.update({ Class_Id: payload.Class_Id }, payload);
+
+    const { loginUserName, ...data } = payload;
+await classRepository.update({ Class_Id: payload.Class_Id }, data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 200,
       Message: `Updated ClassMaster - Class_Id: ${existingClass.Class_Id}, Old className: ${existingClass.className} to  New className: ${payload.className} -`,
     };
@@ -189,8 +195,8 @@ export const updateClassMaster = async (req: Request, res: Response) => {
 };
 
 export const deleteClass = async (req: Request, res: Response) => {
-    const Class_Id = Number(req.params.Class_Id);
-    const { loginUserId, loginUserName } = req.body;
+  const Class_Id = Number(req.params.Class_Id);
+  const { loginUserId, loginUserName } = req.body;
   try {
     if (isNaN(Class_Id)) {
       const logsPayload: logsDto = {
@@ -251,16 +257,15 @@ export const deleteClass = async (req: Request, res: Response) => {
   }
 };
 export const updateStatusClass = async (req: Request, res: Response) => {
-    const payload: classStatus = req.body;
+  const payload: classStatus = req.body;
   try {
-
     const classRepository = appSource.getRepository(classMaster);
     //  check whether exist code
     const existingClass = await classRepository.findOneBy({
       Class_Id: payload.Class_Id,
     });
     if (!existingClass) {
-     const logsPayload: logsDto = {
+      const logsPayload: logsDto = {
         UserId: payload.loginUserId,
         UserName: payload.loginUserName,
         statusCode: 500,

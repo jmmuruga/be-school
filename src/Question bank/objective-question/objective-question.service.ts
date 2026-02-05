@@ -20,7 +20,7 @@ export const addObjectiveques = async (req: Request, res: Response) => {
         UserId: Number(payload.created_UserId),
         UserName: null,
         statusCode: 400,
-        Message: `Validation error: ${validation.error.details[0].message}`,
+        Message: `Validation error: ${validation.error.details[0].message} - `,
       };
       await InsertLog(logsPayload);
 
@@ -45,7 +45,7 @@ export const addObjectiveques = async (req: Request, res: Response) => {
         UserId: Number(payload.created_UserId),
         UserName: null,
         statusCode: 409,
-        Message: `Question already exists - ${payload.question}`,
+        Message: `Question already exists - ${payload.question} - `,
       };
       await InsertLog(logsPayload);
 
@@ -77,7 +77,7 @@ export const addObjectiveques = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Question added successfully`,
+      Message: `Question added successfully - `,
     };
     await InsertLog(logsPayload);
 
@@ -91,13 +91,12 @@ export const addObjectiveques = async (req: Request, res: Response) => {
       UserId: Number(payload?.created_UserId || 0),
       UserName: null,
       statusCode: 500,
-      Message: `Error while adding question - ${error.message}`,
+      Message: `Error while adding question - ${error.message} - `,
     };
     await InsertLog(logsPayload);
-
-    return res.status(500).json({
+     return res.status(500).json({
       message: "Internal server error",
-      error: error.message,
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
