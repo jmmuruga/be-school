@@ -1,30 +1,32 @@
 import "dotenv/config";
 import "reflect-metadata";
-import { DataSource } from "typeorm"; // Ensure this line exists
+import { DataSource } from "typeorm";
+
+// 1. Double check these import names match the 'export class X' in each file
 import { GroupMaster } from "../../Master/group_master/group.model";
 import { classMaster } from "../../Master/class_master/class.model";
-// ... (all your other model imports)
+import { SchoolMaster } from "../../Master/school_master/school.model";
+import { MarkMaster } from "../../Master/mark_master/mark.model";
+import { StreamMaster } from "../../Master/medium_master/medium.model";
+import { SubjectMaster } from "../../Master/subject_master/subject.model";
+import { Signup } from "../../Signup/signup.model";
+import { User } from "../../User-Profile/user.model";
+import { Quesgenerate } from "../../Question bank/question-paper-generate/ques-paper-generate.model";
+import { Staff } from "../../Staff-Profile/staff-Profile.model";
+import { objectiveques } from "../../Question bank/objective-question/objective-question.model";
+import { SignIn } from "../../sign-in/sign-in.model";
+import { Question } from "../../Question bank/question-prepare/questionpre.model";
+import { onlinetest } from "../../Test Board/onlinetest.model";
+import { UserRight } from "../../User-Rights/user-rights.model";
+import { studentScoreResult } from "../../Student-Result/student-result.model";
+import { logs } from "../../logs/logs.model";
+import { Generate_Otp } from "../../Generate_Otp/generate_otp.model";
 
-// Explicitly define the Entities array with a type
+// 2. Explicitly type the array as any[] to satisfy the compiler
 const Entities: any[] = [
-  classMaster, 
-  GroupMaster,
-  SchoolMaster,
-  MarkMaster,
-  StreamMaster,
-  SubjectMaster,
-  User,
-  Staff,
-  Signup,
-  objectiveques,
-  Quesgenerate,
-  SignIn,
-  Question,
-  onlinetest,
-  UserRight,
-  studentScoreResult,
-  logs,
-  Generate_Otp
+    classMaster, GroupMaster, SchoolMaster, MarkMaster, StreamMaster, 
+    SubjectMaster, User, Staff, Signup, objectiveques, Quesgenerate, 
+    SignIn, Question, onlinetest, UserRight, studentScoreResult, logs, Generate_Otp
 ];
 
 export const appSource = new DataSource({
@@ -38,7 +40,7 @@ export const appSource = new DataSource({
   synchronize: true, 
   logging: false,
   options: {
-    encrypt: false, // Set to true if your SQL server uses SSL
+    encrypt: false, 
     trustServerCertificate: true,
   },
   extra: {
