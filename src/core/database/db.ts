@@ -1,23 +1,44 @@
+import "dotenv/config";
+import "reflect-metadata";
+import { DataSource } from "typeorm"; // Ensure this line exists
+import { GroupMaster } from "../../Master/group_master/group.model";
+import { classMaster } from "../../Master/class_master/class.model";
+// ... (all your other model imports)
+
+// Explicitly define the Entities array with a type
+const Entities: any[] = [
+  classMaster, 
+  GroupMaster,
+  SchoolMaster,
+  MarkMaster,
+  StreamMaster,
+  SubjectMaster,
+  User,
+  Staff,
+  Signup,
+  objectiveques,
+  Quesgenerate,
+  SignIn,
+  Question,
+  onlinetest,
+  UserRight,
+  studentScoreResult,
+  logs,
+  Generate_Otp
+];
+
 export const appSource = new DataSource({
   type: "mssql",
-  // Changed from DB_SERVER_HOST to DB_SERVER to match your .env
   host: process.env.DB_SERVER, 
-  // Changed from DB_PORT to ensure it uses 1436 as seen in your logs
   port: parseInt(process.env.DB_PORT || "1436"), 
-  // Changed from DB_USERNAME to DB_USER to match your .env
   username: process.env.DB_USER, 
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   entities: Entities,
-  synchronize: true, // Be careful with this in production!
+  synchronize: true, 
   logging: false,
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000
-  },
   options: {
-    encrypt: false,
+    encrypt: false, // Set to true if your SQL server uses SSL
     trustServerCertificate: true,
   },
   extra: {
@@ -25,3 +46,8 @@ export const appSource = new DataSource({
     requestTimeout: 60000
   },
 });
+
+appSource
+  .initialize()
+  .then(() => console.log("SQL Server Connected"))
+  .catch((error) => console.log(error, "Error while connecting to DB"));
