@@ -37,7 +37,7 @@ export const appSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   entities: Entities,
-  synchronize: true, 
+  synchronize: false, 
   logging: false,
   options: {
     encrypt: false, 
