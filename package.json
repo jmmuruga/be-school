@@ -20,7 +20,9 @@
     "mssql": "^11.0.1",
     "nodemailer": "^7.0.6",
     "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.27"
+    "typeorm": "^0.3.27",
+    "typescript": "^5.0.0",
+    "rimraf": "^5.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
@@ -28,8 +30,6 @@
     "@types/node": "^20.0.0",
     "@types/nodemailer": "^7.0.1",
     "nodemon": "^3.1.10",
-    "rimraf": "^5.0.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.0.0"
+    "ts-node": "^10.9.2"
   }
 }
