@@ -1,17 +1,13 @@
 {
   "name": "be-school",
   "version": "1.0.0",
-  "main": "build/main.js",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "node build/main.js",
+    "start": "node dist/main.js",
     "dev": "nodemon src/main.ts",
-    "build": "rimraf ./build && tsc",
+    "build": "rimraf ./dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
