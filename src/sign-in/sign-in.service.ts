@@ -297,12 +297,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "savedatain@gmail.com",
-        pass: "unpk bcsy ibhp wzrm",
+        user: "scoreplus.2026@gmail.com",
+        pass: "tcwy inih kqoa ynsg",
       },
     });
     const response = await transporter.sendMail({
-      from: "savedatain@gmail.com",
+      from: "scoreplus.2026@gmail.com",
       to: studentmail,
       subject: `OTP to Reset Password`,
       text: `
@@ -491,13 +491,13 @@ export const userForgotPassword = async (req: Request, res: Response) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "savedatain@gmail.com",
-        pass: "unpk bcsy ibhp wzrm",
+        user: "scoreplus.2026@gmail.com",
+        pass: "tcwy inih kqoa ynsg",
       },
     });
 
     await transporter.sendMail({
-      from: "savedatain@gmail.com",
+      from: "scoreplus.2026@gmail.com",
       to: user.email,
       subject: "OTP to Reset Password",
       text: `

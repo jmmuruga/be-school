@@ -8,7 +8,7 @@ export class objectiveques {
   @PrimaryGeneratedColumn()
   id: number;
  @Column()
-Question_Id: string;
+ Question_Id: string;
   @Column()
   ClassName_Id: string;
   @Column()
