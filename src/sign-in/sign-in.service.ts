@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { SignIn } from "./sign-in.model";
 import { User } from "../User-Profile/user.model";
 import nodemailer from "nodemailer";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import { Signup } from "../Signup/signup.model";
 import { logsDto } from "../logs/logs.dto";
 import { InsertLog } from "../logs/logs.service";
@@ -55,10 +55,10 @@ export const signIn = async (req: Request, res: Response) => {
       second: "2-digit",
       hour12: true,
     });
-    const token = jwt.sign(
-      { id: user.UserID, email: user.email, phonenumber: user.phone },
-      process.env.JWT_SECRET_KEY as string,
-    );
+    // const token = jwt.sign(
+    //   { id: user.UserID, email: user.email, phonenumber: user.phone },
+    //   process.env.JWT_SECRET_KEY as string,
+    // );
     const logsPayload: logsDto = {
       UserId: user.UserID,
       UserName: null,
@@ -73,7 +73,7 @@ export const signIn = async (req: Request, res: Response) => {
         id: user.UserID,
         name: user.userName,
         email: user.email,
-        token,
+        // token,
         roleType: user.roleType,
         phone: user.phone,
         staffNo: user.staffNo,
