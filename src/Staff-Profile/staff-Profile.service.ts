@@ -14,7 +14,7 @@ export const addStaff = async (req: Request, res: Response) => {
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
       };
@@ -33,7 +33,7 @@ export const addStaff = async (req: Request, res: Response) => {
     if (existingName) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Error while saving staff detail - ${payload.staffName} (staff Name already exists) -`,
       };
@@ -50,7 +50,7 @@ export const addStaff = async (req: Request, res: Response) => {
     if (emailExisting.length > 0) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Error while saving email - ${payload.email} (email already exists) -`,
       };
@@ -66,7 +66,7 @@ export const addStaff = async (req: Request, res: Response) => {
     if (phoneExisting.length > 0) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Error while saving contactno - ${payload.contactNo} (Contactno is  already exists) -`,
       };
@@ -75,11 +75,11 @@ export const addStaff = async (req: Request, res: Response) => {
         ErrorMessage: "Contact no Already Exists",
       });
     }
-
-    await staffRepository.save(payload);
+   const {loginUserName,...data} = payload;
+    await staffRepository.save(data);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Added Staff Details - staffname (${payload.staffName})  Successfully By - `,
     };
@@ -90,7 +90,7 @@ export const addStaff = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Error while adding staff Details - ${error.message}`,
     };
@@ -149,7 +149,7 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
       };
@@ -168,7 +168,7 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
     if (nameExist.length > 0) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Error while Updating staffname - ${payload.staffName} (staff Name already exists) -`,
       };
@@ -184,7 +184,7 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
     if (emailExisting.length > 0) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: ` Error while Updating Email - ${payload.email} (email already exists),staffno: ${payload.staffNo} by -`,
       };
@@ -200,7 +200,7 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
     if (contactExisting.length > 0) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: ` Error while Updating contactno - ${payload.contactNo} (contactno already exists),staffno: ${payload.staffNo} by -`,
       };
@@ -209,11 +209,12 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
         ErrorMessage: "This Contact no is Already Existing !!",
       });
     }
-    await staffRepository.update({ staffNo: payload.staffNo }, payload);
+    const {loginUserName,...data} = payload;
+    await staffRepository.update({ staffNo: payload.staffNo }, data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Staff Details  Updated  staffname : ${payload.staffName}  Successfully By - `,
     };
@@ -223,7 +224,7 @@ export const updateStaffDetls = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Error while update staff details -${error.message}`,
     };

@@ -76,23 +76,47 @@ export const getStudentId = async (req: Request, res: Response) => {
 };
 export const getObjectiveQuestions = async (req: Request, res: Response) => {
   try {
-    const { subjectName_Id, ClassName_Id, type, question, Stream_Id } =
-      req.params;
-    const objectiveRepo = appSource.getRepository(objectiveques);
+    const {
+      subjectName_Id,
+      ClassName_Id,
+      type,
+      question,
+      Stream_Id,
+      studentId,
+    } = req.params;
 
-    const questions = await objectiveRepo.query(
-      `SELECT TOP ${question} *
-        FROM [${process.env.DB_NAME}].[dbo].[objectiveques] 
-          WHERE subjectName_Id = '${subjectName_Id}'
-          AND ClassName_Id = '${ClassName_Id}'
-  AND type = '${type}'
-  AND Stream_Id = '${Stream_Id}'
-  ;`,
-    );
+    // Fetch questions excluding ones the student has already attempted
+    const questions = await appSource.query(`
+      SELECT TOP (${question}) q.*
+      FROM [${process.env.DB_NAME}].[dbo].[objectiveques] q
+      WHERE q.subjectName_Id = '${subjectName_Id}'
+        AND q.ClassName_Id = '${ClassName_Id}'
+        AND q.type = '${type}'
+        AND q.Stream_Id = '${Stream_Id}'
+        AND NOT EXISTS (
+          SELECT 1
+          FROM [${process.env.DB_NAME}].[dbo].[studentexam_report] r
+          WHERE r.Question_Id = q.Question_Id
+            AND r.StudentId = '${studentId}'      
+            AND r.subjectName_Id = '${subjectName_Id}'
+            AND r.ClassName_Id = '${ClassName_Id}'
+            AND r.TestType = '${type}'
+        )
+      ORDER BY CAST(q.Question_Id AS INT) ASC
+    `);
+
+    if (!questions || questions.length === 0) {
+      return res.status(404).json({
+        IsSuccess: false,
+        ErrorMessage: "No more questions available for this student",
+      });
+    }
+
     return res.status(200).json({
-      IsSuccess: "successfully",
+      IsSuccess: "Start the Exam !! All the Best ",
       Result: questions,
     });
+
   } catch (error) {
     return res.status(500).json({
       IsSuccess: false,
@@ -101,3 +125,65 @@ export const getObjectiveQuestions = async (req: Request, res: Response) => {
     });
   }
 };
+//         FROM [${process.env.DB_NAME}].[dbo].[objectiveques]
+//           WHERE subjectName_Id = '${subjectName_Id}'
+//           AND ClassName_Id = '${ClassName_Id}'
+//   AND type = '${type}'
+//   AND Stream_Id = '${Stream_Id}'
+//   ;`,
+//     );
+//     return res.status(200).json({
+//       IsSuccess: "successfully",
+//       Result: questions,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       IsSuccess: false,
+//       ErrorMessage: "Internal server error",
+//       error: error instanceof Error ? error.message : error,
+//     });
+//   }
+// };
+// export const getObjectiveQuestions = async (req: Request, res: Response) => {
+//   try {
+//     const { subjectName_Id, ClassName_Id, type, question, Stream_Id, studentId } =
+//       req.params;
+
+//     // 1️⃣ Find how many tests student already attended
+//     const testResult = await appSource.query(
+//       `SELECT ISNULL(MAX(Test_No),0) AS TestNo
+//        FROM [${process.env.DB_NAME}].[dbo].[studentexam_report]
+//        WHERE StudentId='${studentId}'
+//          AND subjectName_Id='${subjectName_Id}'
+//          AND TestType='${type}'`
+//     );
+
+//     const testNo = Number(testResult[0].TestNo);
+//     const offset = testNo * Number(question);
+
+//     // 2️⃣ Fetch next set of questions
+//     const questions = await appSource.query(
+//       `SELECT *
+//        FROM [${process.env.DB_NAME}].[dbo].[objectiveques]
+//        WHERE subjectName_Id='${subjectName_Id}'
+//          AND ClassName_Id='${ClassName_Id}'
+//          AND type='${type}'
+//          AND Stream_Id='${Stream_Id}'
+//        ORDER BY Question_Id
+//        OFFSET ${offset} ROWS
+//        FETCH NEXT ${question} ROWS ONLY`
+//     );
+
+//     return res.status(200).json({
+//       IsSuccess: true,
+//       Result: questions,
+//     });
+
+//   } catch (error) {
+//     return res.status(500).json({
+//       IsSuccess: false,
+//       ErrorMessage: "Internal server error",
+//       error: error instanceof Error ? error.message : error,
+//     });
+//   }
+// }

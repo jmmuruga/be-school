@@ -20,7 +20,7 @@ export const addObjectiveques = async (req: Request, res: Response) => {
         UserId: Number(payload.created_UserId),
         UserName: null,
         statusCode: 400,
-        Message: `Validation error: ${validation.error.details[0].message}`,
+        Message: `Validation error: ${validation.error.details[0].message} - `,
       };
       await InsertLog(logsPayload);
 
@@ -45,7 +45,7 @@ export const addObjectiveques = async (req: Request, res: Response) => {
         UserId: Number(payload.created_UserId),
         UserName: null,
         statusCode: 409,
-        Message: `Question already exists - ${payload.question}`,
+        Message: `Question already exists - ${payload.question} - `,
       };
       await InsertLog(logsPayload);
 
@@ -53,31 +53,35 @@ export const addObjectiveques = async (req: Request, res: Response) => {
         ErrorMessage: "This question already exists!",
       });
     }
-    const result = await questionRepo
-      .createQueryBuilder("q")
-      .select("MAX(CAST(q.Question_Id AS INT))", "maxId")
-      .where("q.ClassName_Id = :classId", {
-        classId: payload.ClassName_Id,
-      })
-      .andWhere("q.subjectName_Id = :subjectId", {
-        subjectId: payload.subjectName_Id,
-      })
-      .andWhere("q.Stream_Id = :streamId", {
-        streamId: payload.Stream_Id,
-      })
-      .getRawOne();
+    // Get last inserted question for same Class + Subject + Stream
+    const lastQuestion = await questionRepo.findOne({
+      where: {
+        ClassName_Id: payload.ClassName_Id,
+        subjectName_Id: payload.subjectName_Id,
+        Stream_Id: payload.Stream_Id,
+      },
+      order: {
+        id: "DESC",
+      },
+    });
 
-    const nextQuestionId = (result?.maxId || 0) + 1;
-    payload.Question_Id = nextQuestionId.toString();
+    // Default first question
+    let nextNo = 1;
 
-  
+    // If previous question exists → increment
+    if (lastQuestion?.Question_Id) {
+      const lastNo = Number(lastQuestion.Question_Id) || 0;
+      nextNo = lastNo + 1;
+    }
+    // Store only running number
+    payload.Question_Id = nextNo.toString();
     await questionRepo.save(payload);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
       UserName: null,
       statusCode: 200,
-      Message: `Question added successfully`,
+      Message: `Question added successfully - `,
     };
     await InsertLog(logsPayload);
 
@@ -91,13 +95,12 @@ export const addObjectiveques = async (req: Request, res: Response) => {
       UserId: Number(payload?.created_UserId || 0),
       UserName: null,
       statusCode: 500,
-      Message: `Error while adding question - ${error.message}`,
+      Message: `Error while adding question - ${error.message} - `,
     };
     await InsertLog(logsPayload);
-
     return res.status(500).json({
       message: "Internal server error",
-      error: error.message,
+      error: error instanceof Error ? error.message : error,
     });
   }
 };

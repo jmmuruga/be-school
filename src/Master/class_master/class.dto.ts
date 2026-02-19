@@ -7,11 +7,14 @@ export const ClassValidation = Joi.object({
   updateStatus: Joi.boolean().optional(),
   created_UserId: Joi.string().required(),
   updated_UserId: Joi.string().optional().allow(null, ""),
+  loginUserName: Joi.string().optional().allow(null, ''),
+
 });
 
 export interface ClassDto {
   Class_Id: number;
   className: string;
+  loginUserName?:string
   isActive: boolean;
   updateStatus: boolean;
   created_UserId: string;

@@ -23,6 +23,7 @@ import userRightRouter from "./User-Rights/user-rights.controller";
 import studentscoreRouter from "./Student-Result/student-result.controller";
 import logsRouter from "./logs/logs.controller";
 import otpRouter from "./Generate_Otp/generate_otp.controller";
+import studentexamreportRouter from "./student-exam-report/student-exam-report.controller";
 const app = express();
 
 dotenv.config();
@@ -56,6 +57,7 @@ app.use("/userRightRouter", cors(corsOptions), userRightRouter);
 app.use("/studentscoreRouter", cors(corsOptions), studentscoreRouter);
 app.use("/logsRouter", cors(corsOptions), logsRouter);
 app.use("/otpRouter", cors(corsOptions), otpRouter);
+app.use("/studentexamreportRouter",cors(corsOptions),studentexamreportRouter);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 // app.use('/QuesGenerateRouter',cors(corsOptions),QuesGenerateRouter)

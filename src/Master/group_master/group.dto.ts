@@ -9,6 +9,8 @@ export const GroupValidation = Joi.object({
   updateStatus: Joi.boolean().optional(),
   created_UserId: Joi.string().required(),
   updated_UserId: Joi.string().optional().allow(null, ""),
+  loginUserName: Joi.string().optional().allow(null, ""),
+
 });
 
 export interface GroupDto {
@@ -20,6 +22,7 @@ export interface GroupDto {
   updateStatus: boolean;
   created_UserId: string;
   updated_UserId: string;
+  loginUserName?:string;
 }
 
 export interface groupStatus {

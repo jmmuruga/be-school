@@ -44,11 +44,12 @@ export const addSchool = async (req: Request, res: Response) => {
         ErrorMessage: "This School is already Existing !!",
       });
     }
-    await schoolRepoistry.save(payload);
+    const { loginUserName, ...data } = payload;
+    await schoolRepoistry.save(data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Added SchoolMaster - schoolname (${payload.school})Successfully By - `,
     };
@@ -57,7 +58,7 @@ export const addSchool = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Internal server error while adding School: ${error.message}`,
     };
@@ -115,7 +116,7 @@ export const updateSchool = async (req: Request, res: Response) => {
     if (validation.error) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Validation error: ${validation.error.details[0].message}`,
       };
@@ -132,7 +133,7 @@ export const updateSchool = async (req: Request, res: Response) => {
     if (!existingSchool) {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
-        UserName: null,
+        UserName: payload.loginUserName,
         statusCode: 500,
         Message: `Error: School not found for Id ${payload.school_Id}`,
       };
@@ -158,12 +159,12 @@ export const updateSchool = async (req: Request, res: Response) => {
         ErrorMessage: "This School Name Already Existing !!",
       });
     }
-
-    await schoolRepoistry.update({ school_Id: payload.school_Id }, payload);
+    const { loginUserName, ...data } = payload;
+    await schoolRepoistry.update({ school_Id: payload.school_Id }, data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Updated schoolMaster - school Id: ${existingSchool.school_Id}, Old schoolName: ${existingSchool.school} to  New schoolName: ${payload.school} successfully by-`,
     };
@@ -175,7 +176,7 @@ export const updateSchool = async (req: Request, res: Response) => {
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName: null,
+      UserName: payload.loginUserName,
       statusCode: 500,
       Message: `Internal server error while updating School: ${error.message}`,
     };

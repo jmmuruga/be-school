@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { SignIn } from "./sign-in.model";
 import { User } from "../User-Profile/user.model";
 import nodemailer from "nodemailer";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import { Signup } from "../Signup/signup.model";
 import { logsDto } from "../logs/logs.dto";
 import { InsertLog } from "../logs/logs.service";
@@ -55,10 +55,10 @@ export const signIn = async (req: Request, res: Response) => {
       second: "2-digit",
       hour12: true,
     });
-    const token = jwt.sign(
-      { id: user.UserID, email: user.email, phonenumber: user.phone },
-      process.env.JWT_SECRET_KEY as string,
-    );
+    // const token = jwt.sign(
+    //   { id: user.UserID, email: user.email, phonenumber: user.phone },
+    //   process.env.JWT_SECRET_KEY as string,
+    // );
     const logsPayload: logsDto = {
       UserId: user.UserID,
       UserName: null,
@@ -73,7 +73,7 @@ export const signIn = async (req: Request, res: Response) => {
         id: user.UserID,
         name: user.userName,
         email: user.email,
-        token,
+        // token,
         roleType: user.roleType,
         phone: user.phone,
         staffNo: user.staffNo,
@@ -297,12 +297,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "savedatain@gmail.com",
-        pass: "unpk bcsy ibhp wzrm",
+        user: "scoreplus.2026@gmail.com",
+        pass: "tcwy inih kqoa ynsg",
       },
     });
     const response = await transporter.sendMail({
-      from: "savedatain@gmail.com",
+      from: "scoreplus.2026@gmail.com",
       to: studentmail,
       subject: `OTP to Reset Password`,
       text: `
@@ -439,9 +439,9 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
 
     return res.status(200).send({
       IsSuccess: true,
-      Message: "Password reset successfully",
+      message: "Password reset successfully",
     });
-  } catch (error: any) {
+  } catch (error) {
     const logsPayload: logsDto = {
       UserId: studentId,
       UserName: null,
@@ -456,3 +456,184 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
   }
 };
 
+export const userForgotPassword = async (req: Request, res: Response) => {
+  const payload = req.body;
+
+  try {
+    const userRepository = appSource.getRepository(User);
+
+    const user =
+      (await userRepository.findOneBy({ email:payload.emailOrPhone })) ||
+      (await userRepository.findOneBy({ phone:payload.emailOrPhone }));
+
+      const email =user.email;
+      const phone = user.phone;
+
+   if (!email) {
+      return res.status(401).send({
+        ErrorMessage: "user mail doesnt exist.",
+      });
+    }
+    if (!phone) {
+      return res.status(401).send({
+        ErrorMessage: "user Phone doesnt exist.",
+      });
+    }
+
+    const GeneratedOtp = generateOpt();
+
+    await appSource.query(`
+      INSERT INTO [${process.env.DB_NAME}].[dbo].[generate_otp]
+      (studentId, Generate_Otp)
+      VALUES (${user.UserID}, ${GeneratedOtp})
+    `);
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "scoreplus.2026@gmail.com",
+        pass: "tcwy inih kqoa ynsg",
+      },
+    });
+
+    await transporter.sendMail({
+      from: "scoreplus.2026@gmail.com",
+      to: user.email,
+      subject: "OTP to Reset Password",
+      text: `
+Hello ${user.userName},
+
+Your OTP for password reset is: ${GeneratedOtp}
+
+Please use this OTP to reset your password.
+      `,
+    });
+
+     const logsPayload: logsDto = {
+      UserId: user.UserID,
+      UserName: user.userName,
+      statusCode: 200,
+      Message: `user OTP sent successfully -`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(200).send({
+      IsSuccess: true,
+      message: "OTP sent to registered email -",
+      userId: user.UserID,
+    });
+  } catch (error) {
+     return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+function generateOpt(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+export const verifyUserOtp = async (req: Request, res: Response) => {
+  const { userId, otp } = req.body;
+
+  try {
+     if (!userId || !otp) {
+      return res.status(400).send({
+        IsSuccess: false,
+        ErrorMessage: "userId and OTP are required",
+      });
+    }
+    const result = await appSource.query(`
+      SELECT TOP 1 Generate_Otp
+      FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
+      WHERE studentId = ${userId}
+      ORDER BY id DESC
+    `);
+
+  if (result.length === 0) {
+      await InsertLog({
+        UserId: userId,
+        UserName: null,
+        statusCode: 404,
+        Message: "OTP not found for user",
+      });
+
+      return res.status(404).send({
+        IsSuccess: false,
+        ErrorMessage: "OTP not found. Please request again.",
+      });
+    }
+
+    const savedOtp = String(result[0].Generate_Otp);
+    if (savedOtp !== String(otp)) {
+      const logsPayload: logsDto = {
+        UserId: userId,
+        UserName: null,
+        statusCode: 401,
+        Message: `Invalid OTP attempt for user - user
+        ID : ${userId} -`,
+      };
+      await InsertLog(logsPayload);
+      return res.status(401).send({
+        IsSuccess: false,
+        ErrorMessage: "Invalid OTP. Please try again",
+      });
+    }
+     const logsPayload: logsDto = {
+      UserId: userId,
+      UserName: null,
+      statusCode: 200,
+      Message: `OTP verified successfully for user - userId :${userId} -`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(200).send({
+      IsSuccess: true,
+      message: "OTP verified successfully -",
+    });
+  } catch (error: any) {
+    return res.status(500).send({
+      ErrorMessage: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+export const resetUserPassword = async (req: Request, res: Response) => {
+  const { userId, newPassword, confirmNewPassword } = req.body;
+
+  try {
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).send({
+        ErrorMessage: "Passwords do not match",
+      });
+    }
+
+    await appSource.query(`
+      UPDATE [${process.env.DB_NAME}].[dbo].[user]
+      SET password = '${newPassword}',confirmPassword ='${confirmNewPassword}'
+      WHERE UserID = ${userId}
+    `);
+ const logsPayload: logsDto = {
+      UserId: userId,
+      UserName: null,
+      statusCode: 200,
+      Message: `Password reset successfully for Student - userId: ${userId} -`,
+    };
+    await InsertLog(logsPayload);
+
+    return res.status(200).send({
+      IsSuccess: true,
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    const logsPayload: logsDto = {
+      UserId: userId,
+      UserName: null,
+      statusCode: 500,
+      Message: `Error while student set a new password - ${error.message}`,
+    };
+    await InsertLog(logsPayload);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
