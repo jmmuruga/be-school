@@ -89,12 +89,12 @@ export const signIn = async (req: Request, res: Response) => {
     };
     await InsertLog(logsPayload);
     return res.status(500).json({
-      message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
+       message: "Internal server error",
+       error: error instanceof Error ? error.message : error,
+       
     });
   }
 };
-
 export const StudentSignIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const studentRespository = appSource.getRepository(Signup);
@@ -106,7 +106,6 @@ export const StudentSignIn = async (req: Request, res: Response) => {
   //     password: payload.usernameOrAdmission,
   //   });
   // }
-
   let student =
     (await studentRespository.findOneBy({
       UserName: payload.usernameOrAdmission,
@@ -184,7 +183,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
+       error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -213,9 +212,8 @@ export const getStudentId = async (req: Request, res: Response) => {
     });
   } catch (error) {
     return res.status(500).json({
-      IsSuccess: false,
-      ErrorMessage: "Internal server error",
-      error: error instanceof Error ? error.message : error,
+      message: "Internal server error",
+       error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -261,11 +259,9 @@ export const logout = async (req: Request, res: Response) => {
     };
 
     await InsertLog(logsPayload);
-
     return res.status(500).json({
-      IsSuccess: false,
-      ErrorMessage: "Internal server error",
-      error: error instanceof Error ? error.message : error,
+      message: "Internal server error",
+       error: error instanceof Error ? error.message : error
     });
   }
 };
@@ -338,9 +334,9 @@ Thank you.
       },
     });
   } catch (error: any) {
-    return res.status(500).json({
-      ErrorMessage: "Internal server error",
-      error: error.message,
+        return res.status(500).json({
+      message: "Internal server error",
+       error: error instanceof Error ? error.message : error,
     });
   }
   function generateOpt(): string {
@@ -407,10 +403,9 @@ export const verifyStudentOtp = async (req: Request, res: Response) => {
       Message: "OTP verified successfully",
     });
   } catch (error: any) {
-    return res.status(500).send({
-      IsSuccess: false,
-      ErrorMessage: "Internal server error",
-      error: error.message,
+      return res.status(500).json({
+      message: "Internal server error",
+       error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -451,7 +446,7 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
+       error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -524,7 +519,7 @@ Please use this OTP to reset your password.
   } catch (error) {
      return res.status(500).json({
       message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
+       error: error instanceof Error ? error.message : error
     });
   }
 };
@@ -590,9 +585,9 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
       message: "OTP verified successfully -",
     });
   } catch (error: any) {
-    return res.status(500).send({
-      ErrorMessage: "Internal server error",
-      error: error.message,
+    return res.status(500).json({
+        message: "Internal server error",
+       error: error instanceof Error ? error.message :  "Internal server error"
     });
   }
 };
@@ -631,9 +626,9 @@ export const resetUserPassword = async (req: Request, res: Response) => {
       Message: `Error while student set a new password - ${error.message}`,
     };
     await InsertLog(logsPayload);
-    return res.status(500).json({
+      return res.status(500).json({
       message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
+       error: error instanceof Error ? error.message : String(error)
     });
   }
 };
