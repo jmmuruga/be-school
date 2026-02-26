@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { SignIn } from "./sign-in.model";
 import { User } from "../User-Profile/user.model";
 import nodemailer from "nodemailer";
-// import jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { Signup } from "../Signup/signup.model";
 import { logsDto } from "../logs/logs.dto";
 import { InsertLog } from "../logs/logs.service";
@@ -55,10 +55,15 @@ export const signIn = async (req: Request, res: Response) => {
       second: "2-digit",
       hour12: true,
     });
-    // const token = jwt.sign(
-    //   { id: user.UserID, email: user.email, phonenumber: user.phone },
-    //   process.env.JWT_SECRET_KEY as string,
-    // );
+    const token = jwt.sign(
+      {
+        id: user.UserID,
+        email: user.email,
+        phonenumber: user.phone,
+        roleType: user.roleType,
+      },
+      process.env.JWT_SECRET_KEY as string,
+    );
     const logsPayload: logsDto = {
       UserId: user.UserID,
       UserName: null,
@@ -73,11 +78,11 @@ export const signIn = async (req: Request, res: Response) => {
         id: user.UserID,
         name: user.userName,
         email: user.email,
-        // token,
         roleType: user.roleType,
         phone: user.phone,
         staffNo: user.staffNo,
         password: user.password,
+        token,
       },
     });
   } catch (error: any) {
@@ -89,9 +94,8 @@ export const signIn = async (req: Request, res: Response) => {
     };
     await InsertLog(logsPayload);
     return res.status(500).json({
-       message: "Internal server error",
-       error: error instanceof Error ? error.message : error,
-       
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -153,6 +157,15 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       second: "2-digit",
       hour12: true,
     });
+    const token = jwt.sign(
+      {
+        id: student.id,
+        username: student.UserName,
+        email: student.email,
+        standard: student.Class_Id,
+      },
+      process.env.JWT_SECRET_KEY as string,
+    );
     const logsPayload: logsDto = {
       UserId: student.id,
       UserName: student.UserName,
@@ -169,8 +182,8 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         studentid: student.id,
         studentschool: student.school,
         standard: student.Class_Id,
-        
         studentStream_Id: student.Stream_Id,
+        token,
       },
     });
   } catch (error: any) {
@@ -183,7 +196,7 @@ export const StudentSignIn = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
-       error: error instanceof Error ? error.message : error,
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -213,7 +226,7 @@ export const getStudentId = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",
-       error: error instanceof Error ? error.message : error,
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -261,7 +274,7 @@ export const logout = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
-       error: error instanceof Error ? error.message : error
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -334,9 +347,9 @@ Thank you.
       },
     });
   } catch (error: any) {
-        return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
-       error: error instanceof Error ? error.message : error,
+      error: error instanceof Error ? error.message : error,
     });
   }
   function generateOpt(): string {
@@ -403,9 +416,9 @@ export const verifyStudentOtp = async (req: Request, res: Response) => {
       Message: "OTP verified successfully",
     });
   } catch (error: any) {
-      return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
-       error: error instanceof Error ? error.message : error,
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -446,7 +459,7 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
-       error: error instanceof Error ? error.message : error,
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -458,13 +471,13 @@ export const userForgotPassword = async (req: Request, res: Response) => {
     const userRepository = appSource.getRepository(User);
 
     const user =
-      (await userRepository.findOneBy({ email:payload.emailOrPhone })) ||
-      (await userRepository.findOneBy({ phone:payload.emailOrPhone }));
+      (await userRepository.findOneBy({ email: payload.emailOrPhone })) ||
+      (await userRepository.findOneBy({ phone: payload.emailOrPhone }));
 
-      const email =user.email;
-      const phone = user.phone;
+    const email = user.email;
+    const phone = user.phone;
 
-   if (!email) {
+    if (!email) {
       return res.status(401).send({
         ErrorMessage: "user mail doesnt exist.",
       });
@@ -504,7 +517,7 @@ Please use this OTP to reset your password.
       `,
     });
 
-     const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: user.UserID,
       UserName: user.userName,
       statusCode: 200,
@@ -517,9 +530,9 @@ Please use this OTP to reset your password.
       userId: user.UserID,
     });
   } catch (error) {
-     return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
-       error: error instanceof Error ? error.message : error
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -531,7 +544,7 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
   const { userId, otp } = req.body;
 
   try {
-     if (!userId || !otp) {
+    if (!userId || !otp) {
       return res.status(400).send({
         IsSuccess: false,
         ErrorMessage: "userId and OTP are required",
@@ -544,7 +557,7 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
       ORDER BY id DESC
     `);
 
-  if (result.length === 0) {
+    if (result.length === 0) {
       await InsertLog({
         UserId: userId,
         UserName: null,
@@ -573,7 +586,7 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
         ErrorMessage: "Invalid OTP. Please try again",
       });
     }
-     const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: userId,
       UserName: null,
       statusCode: 200,
@@ -586,8 +599,8 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     return res.status(500).json({
-        message: "Internal server error",
-       error: error instanceof Error ? error.message :  "Internal server error"
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : "Internal server error",
     });
   }
 };
@@ -606,7 +619,7 @@ export const resetUserPassword = async (req: Request, res: Response) => {
       SET password = '${newPassword}',confirmPassword ='${confirmNewPassword}'
       WHERE UserID = ${userId}
     `);
- const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: userId,
       UserName: null,
       statusCode: 200,
@@ -626,9 +639,9 @@ export const resetUserPassword = async (req: Request, res: Response) => {
       Message: `Error while student set a new password - ${error.message}`,
     };
     await InsertLog(logsPayload);
-      return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
-       error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 };
