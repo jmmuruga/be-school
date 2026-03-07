@@ -55,9 +55,10 @@ export const signIn = async (req: Request, res: Response) => {
       second: "2-digit",
       hour12: true,
     });
+    
     const token = jwt.sign(
       {
-        id: user.UserID,
+        UserID: user.UserID,
         email: user.email,
         phonenumber: user.phone,
         roleType: user.roleType,

@@ -8,14 +8,16 @@ import {
   updateMarkStatus,
 } from "./mark.service";
 import { deleteClass } from "../class_master/class.service";
+import { auth } from "../../shared/helper";
 
 const markRouter = Router();
 markRouter.post("/addMark", (req, res) => addMark(req, res));
-markRouter.get("/getMarkId", (req, res) => getMarkId(req, res));
-markRouter.get("/getMarkMasterDetails", (req, res) =>
+markRouter.get("/getMarkId",auth, (req, res) => getMarkId(req, res));
+markRouter.get("/getMarkMasterDetails",auth, (req, res) =>
   getMarkMasterDetails(req, res)
 );
-markRouter.post("/updateMark", (req, res) => updateMark(req, res));
+markRouter.post("/updateMark", auth,(req, res) => updateMark(req, res));
+markRouter.post("/updateMarkStatus",auth,(req,res) => updateMarkStatus(req,res));
+markRouter.delete("/deleteMarks/:mark_Id",auth, (req, res) => deleteMarks(req, res));
+
 export default markRouter;
-markRouter.delete("/deleteMarks/:mark_Id", (req, res) => deleteMarks(req, res));
-markRouter.post("/updateMarkStatus",(req,res) => updateMarkStatus(req,res));

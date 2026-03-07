@@ -7,16 +7,18 @@ import {
   updateSchool,
   updateSchoolStatus,
 } from "./school.service";
+import { auth } from "../../shared/helper";
 
 const schoolRouter = Router();
-schoolRouter.post("/addSchool", (req, res) => addSchool(req, res));
-schoolRouter.get("/getSchoolId", (req, res) => getSchoolId(req, res));
-schoolRouter.get("/getSchoolDetails", (req, res) => getSchoolDetails(req, res));
-schoolRouter.post("/updateSchool", (req, res) => updateSchool(req, res));
-schoolRouter.delete("/deleteSchool/:school_Id", (req, res) =>
+schoolRouter.post("/addSchool", auth,(req, res) => addSchool(req, res));
+schoolRouter.get("/getSchoolId",auth, (req, res) => getSchoolId(req, res));
+schoolRouter.get("/getSchoolDetails",auth, (req, res) => getSchoolDetails(req, res));
+schoolRouter.post("/updateSchool", auth,(req, res) => updateSchool(req, res));
+schoolRouter.delete("/deleteSchool/:school_Id",auth, (req, res) =>
   deleteSchool(req, res)
 );
-export default schoolRouter;
-schoolRouter.post("/updateSchoolStatus", (req, res) =>
+schoolRouter.post("/updateSchoolStatus",auth, (req, res) =>
   updateSchoolStatus(req, res)
 );
+export default schoolRouter;
+
