@@ -167,7 +167,7 @@ export const updateSubject = async (req: Request, res: Response) => {
       UserId: Number(payload.created_UserId),
       UserName: loginUserName,
       statusCode: 200,
-      Message: `Updated subject Master - Subject Id : ${existingSubject.subject_Id}, old subjectName :${existingSubject.subject_Id} to new subject Name :${payload.subjectName} Successfully By - `,
+      Message: `Updated subject Master - Subject Id : ${existingSubject.subject_Id}, old subjectName :${existingSubject.subjectName} to new subject Name :${payload.subjectName} Successfully By - `,
     };
     await InsertLog(logsPayload);
 

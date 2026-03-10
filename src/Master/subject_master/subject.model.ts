@@ -12,8 +12,8 @@ export class SubjectMaster {
     subject_Id: number
     @Column()
     subjectName: string
-    @Column()
-    subjectType: string
+    @Column({default:true})
+    subjectType: boolean
     @Column()
     selectedClasses: string
     @Column({default:true})

@@ -4,19 +4,18 @@ import * as Joi from "joi";
 export const Subjectvalidation = Joi.object({
   subject_Id: Joi.number().required(),
   subjectName: Joi.string().required(),
-  subjectType: Joi.string().required(),
+  subjectType: Joi.boolean().required(),
   selectedClasses: Joi.string().required(),
   isActive: Joi.boolean().optional(),
   updateStatus: Joi.boolean().optional(),
   created_UserId: Joi.string().required(),
   updated_UserId: Joi.string().optional().allow(null, ""),
   loginUserName: Joi.string().optional().allow(null, ""),
-
 });
 export interface SubjectDto {
   subject_Id: number;
   subjectName: string;
-  subjectType: string;
+  subjectType: boolean;
   selectedClasses: string;
   isActive: boolean;
   updateStatus: boolean;

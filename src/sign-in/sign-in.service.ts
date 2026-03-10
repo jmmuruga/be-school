@@ -15,23 +15,43 @@ export const signIn = async (req: Request, res: Response) => {
   let user =
     (await userRepository.findOneBy({ email: payload.emailOrPhone })) ||
     (await userRepository.findOneBy({ phone: payload.emailOrPhone }));
-  if (!user) {
+    if (!user) {
     return res.status(401).send({
-      ErrorMessage: "User does not exist. Please check your username.",
+      ErrorMessage: "User does not exist.Please check your username.",
     });
   }
-  if (!user) {
+  if (!user.isActive || !user.status) {
     const logsPayload: logsDto = {
       UserId: user.UserID,
-      UserName: null,
-      statusCode: 500,
-      Message: `Login failed: User does not exist - ${payload.emailOrPhone} by-`,
+      UserName: user.userName,
+      statusCode: 401,
+      Message: `Login blocked: inactive user - ${user.email}`,
     };
+
     await InsertLog(logsPayload);
+
     return res.status(401).send({
-      ErrorMessage: "user Does Not Exist",
+      ErrorMessage: "User is inactive",
     });
   }
+//   if (!user) {
+//     return res.status(401).send({
+//       ErrorMessage: "User does not exist. Please check your username.",
+//     });
+//   }
+  // if (!user) {
+  //   const logsPayload: logsDto = {
+  //     UserId: user.UserID,
+  //     UserName: null,
+  //     statusCode: 500,
+  //     Message: `Login failed: User does not exist - ${payload.emailOrPhone} by-`,
+  //   };
+  //   await InsertLog(logsPayload);
+  //   return res.status(401).send({
+  //     ErrorMessage: "user Does Not Exist",
+  //   });
+  // }
+  
   try {
     if (user.password !== payload.password) {
       const logsPayload: logsDto = {

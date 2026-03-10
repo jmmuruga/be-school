@@ -5,6 +5,7 @@ import { classMaster } from "./class.model";
 import { DataSource, Not } from "typeorm";
 import { logsDto } from "../../logs/logs.dto";
 import { InsertLog } from "../../logs/logs.service";
+import { Signup } from "../../Signup/signup.model";
 
 export const addClass = async (req: Request, res: Response) => {
   const payload: ClassDto = req.body;
@@ -25,8 +26,11 @@ export const addClass = async (req: Request, res: Response) => {
     }
     // check data whether existing
     const classRepository = appSource.getRepository(classMaster);
-    const existingClass = await classRepository.findOneBy({
-      className: payload.className,
+    const existingClass = await classRepository.findOne({
+      where: {
+        className: payload.className,
+        isActive: true,
+      },
     });
 
     if (existingClass) {
@@ -42,8 +46,8 @@ export const addClass = async (req: Request, res: Response) => {
       });
     }
 
-const { loginUserName, ...data } = payload;
-await classRepository.save(data);
+    const { loginUserName, ...data } = payload;
+    await classRepository.save(data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -53,7 +57,6 @@ await classRepository.save(data);
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Class Added Successfully !!" });
-
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -93,7 +96,6 @@ export const getClassId = async (req: Request, res: Response) => {
     });
   }
 };
-
 export const getClasMasterDetails = async (req: Request, res: Response) => {
   try {
     const classRepositry = appSource.getRepository(classMaster);
@@ -167,7 +169,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     }
 
     const { loginUserName, ...data } = payload;
-await classRepository.update({ Class_Id: payload.Class_Id }, data);
+    await classRepository.update({ Class_Id: payload.Class_Id }, data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -193,9 +195,9 @@ await classRepository.update({ Class_Id: payload.Class_Id }, data);
     });
   }
 };
-
 export const deleteClass = async (req: Request, res: Response) => {
   const Class_Id = Number(req.params.Class_Id);
+
   const { loginUserId, loginUserName } = req.body;
   try {
     if (isNaN(Class_Id)) {
@@ -209,35 +211,52 @@ export const deleteClass = async (req: Request, res: Response) => {
       return res.status(400).json({ ErrorMessage: "Invalid class code" });
     }
 
-    const classRepository = appSource.getRepository(classMaster);
+    // const classRepository = appSource.getRepository(classMaster);
+    const signupRepository = appSource.getRepository(Signup);
     //  check whether exist code
-    const existingClass = await classRepository.findOneBy({
-      Class_Id: Class_Id,
+    // const existingClass = await classRepository.findOneBy({
+    //   Class_Id: Class_Id,
+    // });
+    const classUsed = await signupRepository.findOne({
+      where: { Class_Id: Class_Id.toString() },
     });
 
-    if (!existingClass) {
+    if (classUsed) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 500,
-        Message: `ClassMaster - Class_Id: ${existingClass.Class_Id}, className: ${existingClass.className} not found by - `,
+        Message: `ClassMaster - Class_Id: ${classUsed.Class_Id} unable to delete by - `,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({ ErrorMessage: "Class not found" });
+      return res.status(400).json({
+        ErrorMessage: "Unable to delete. Class is already assigned to users",
+      });
     }
+    //  if(existingClass.length>0){
+    // if (!existingClass) {
+    //   const logsPayload: logsDto = {
+    //     UserId: loginUserId,
+    //     UserName: loginUserName,
+    //     statusCode: 500,
+    //     Message: `ClassMaster - Class_Id: ${existingClass.Class_Id}, className: ${existingClass.className} not found by - `,
+    //   };
+    //   await InsertLog(logsPayload);
+    //   return res.status(404).json({ ErrorMessage: "Class not found" });
+    // }
     // delete and active
-    await classRepository
+    await signupRepository
       .createQueryBuilder()
       .update(classMaster)
       .set({ isActive: false })
-      .where({ Class_Id: Class_Id })
+      .where("Class_Id = :Class_Id", { Class_Id: Class_Id })
       .execute();
 
     const logsPayload: logsDto = {
       UserId: loginUserId,
       UserName: loginUserName,
       statusCode: 200,
-      Message: `Deleted ClassMaster Class_Id:${Class_Id} classname:  ${existingClass.className} By - `,
+      Message: `Deleted ClassMaster Class_Id:${Class_Id} By - `,
     };
     await InsertLog(logsPayload);
 
