@@ -5,6 +5,9 @@ import { MarkMaster } from "./mark.model";
 import { Not } from "typeorm";
 import { InsertLog } from "../../logs/logs.service";
 import { logsDto } from "../../logs/logs.dto";
+import { objectiveques } from "../../Question bank/objective-question/objective-question.model";
+import { Quesgenerate } from "../../Question bank/question-paper-generate/ques-paper-generate.model";
+import { Question } from "../../Question bank/question-prepare/questionpre.model";
 
 export const getMarkMasterDetails = async (req: Request, res: Response) => {
   try {
@@ -90,7 +93,7 @@ export const getMarkId = async (req: Request, res: Response) => {
       `SELECT mark_Id
             FROM [${process.env.DB_NAME}].[dbo].[mark_master] 
             Group by mark_Id
-            ORDER BY CAST(mark_Id AS INT) DESC;`
+            ORDER BY CAST(mark_Id AS INT) DESC;`,
     );
     let id = "0";
     if (mark_Id?.length > 0) {
@@ -157,7 +160,7 @@ export const updateMark = async (req: Request, res: Response) => {
         ErrorMessage: "This Mark is Already Existing !!",
       });
     }
-    const {loginUserName, ...data} = payload
+    const { loginUserName, ...data } = payload;
     await markRepository.update({ mark_Id: payload.mark_Id }, data);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -199,8 +202,25 @@ export const deleteMarks = async (req: Request, res: Response) => {
         message: "Invalid Mark Code",
       });
     }
+    // const objectQuesRepository = appSource.getRepository(objectiveques);
+    const QuestionRepository = appSource.getRepository(Question);
     const markRepository = appSource.getRepository(MarkMaster);
     // check whether markid exists
+    const questionUsed = await QuestionRepository.findOneBy({
+      mark: mark_Id,
+    });
+    if (questionUsed) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 404,
+        Message: `Delete failed. Subject Id ${mark_Id} is used in other tables -`,
+      };
+      await InsertLog(logsPayload);
+      return res.status(404).json({
+        ErrorMessage: "Unable to delete mark  ",
+      });
+    }
     const existingMark = await markRepository.findOneBy({ mark_Id: mark_Id });
 
     if (!existingMark) {
@@ -217,7 +237,6 @@ export const deleteMarks = async (req: Request, res: Response) => {
     }
     await markRepository
       .createQueryBuilder()
-      .delete()
       .update(MarkMaster)
       .set({ isActive: false })
       .where({ mark_Id: mark_Id })

@@ -25,7 +25,7 @@ export const signIn = async (req: Request, res: Response) => {
       UserId: user.UserID,
       UserName: user.userName,
       statusCode: 401,
-      Message: `Login blocked: inactive user - ${user.email}`,
+      Message: `Login blocked: inactive user - ${user.email} - `,
     };
 
     await InsertLog(logsPayload);

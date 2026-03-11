@@ -6,6 +6,10 @@ import { DataSource, Not } from "typeorm";
 import { logsDto } from "../../logs/logs.dto";
 import { InsertLog } from "../../logs/logs.service";
 import { Signup } from "../../Signup/signup.model";
+import { objectiveques } from "../../Question bank/objective-question/objective-question.model";
+import { Question } from "../../Question bank/question-prepare/questionpre.model";
+import { SubjectMaster } from "../subject_master/subject.model";
+import { GroupMaster } from "../group_master/group.model";
 
 export const addClass = async (req: Request, res: Response) => {
   const payload: ClassDto = req.body;
@@ -213,27 +217,79 @@ export const deleteClass = async (req: Request, res: Response) => {
 
     // const classRepository = appSource.getRepository(classMaster);
     const signupRepository = appSource.getRepository(Signup);
+    const subjectRepository = appSource.getRepository(SubjectMaster);
+    const objectivequestionRepository = appSource.getRepository(objectiveques);
+    const questionRepository = appSource.getRepository(Question);
+    const groupRepository = appSource.getRepository(GroupMaster);
+    const classRepository = appSource.getRepository(classMaster);
     //  check whether exist code
+
     // const existingClass = await classRepository.findOneBy({
     //   Class_Id: Class_Id,
     // });
-    const classUsed = await signupRepository.findOne({
-      where: { Class_Id: Class_Id.toString() },
+    const signupUsed = await signupRepository.findOneBy({
+      Class_Id: Class_Id.toString(),
+    });
+    const groupUsed = await groupRepository.findOneBy({
+      className_Id: Class_Id.toString(),
+    });
+    const subjectUsed = await subjectRepository
+      .createQueryBuilder("subject")
+      .where("subject.selectedClasses LIKE :clsId1", {
+        clsId1: `${Class_Id},%`,
+      })
+      .orWhere("subject.selectedClasses LIKE :clsId2", {
+        clsId2: `%,${Class_Id},%`,
+      })
+      .orWhere("subject.selectedClasses LIKE :clsId3", {
+        clsId3: `%,${Class_Id}`,
+      })
+      .orWhere("subject.selectedClasses = :clsId4", { clsId4: `${Class_Id}` })
+      .getOne();
+
+    const objectiveUsed = await objectivequestionRepository.findOneBy({
+      ClassName_Id: Class_Id.toString(),
     });
 
-    if (classUsed) {
+    const questionUsed = await questionRepository.findOneBy({
+      ClassName_Id: Class_Id.toString(),
+    });
+
+    if (
+      signupUsed ||
+      subjectUsed ||
+      objectiveUsed ||
+      questionUsed ||
+      groupUsed
+    ) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 500,
-        Message: `ClassMaster - Class_Id: ${classUsed.Class_Id} unable to delete by - `,
+        statusCode: 400,
+        Message: `ClassMaster - Class_Id: ${Class_Id} unable to delete (Already used) by - `,
       };
+
       await InsertLog(logsPayload);
       return res.status(400).json({
-        ErrorMessage: "Unable to delete. Class is already assigned to users",
+        ErrorMessage: "Unable to delete Class.",
       });
     }
-    //  if(existingClass.length>0){
+    // const classUsed = await signupRepository.findOne({
+    //   where: { Class_Id: Class_Id.toString() },
+    // });
+
+    // if (classUsed?.length>0) {
+    //   const logsPayload: logsDto = {
+    //     UserId: loginUserId,
+    //     UserName: loginUserName,
+    //     statusCode: 500,
+    //     Message: `ClassMaster - Class_Id: ${classUsed.Class_Id} unable to delete by - `,
+    //   };
+    //   await InsertLog(logsPayload);
+    //   return res.status(400).json({
+    //     ErrorMessage: "Unable to delete. Class is already assigned to users",
+    //   });
+    // }
     // if (!existingClass) {
     //   const logsPayload: logsDto = {
     //     UserId: loginUserId,
@@ -245,7 +301,7 @@ export const deleteClass = async (req: Request, res: Response) => {
     //   return res.status(404).json({ ErrorMessage: "Class not found" });
     // }
     // delete and active
-    await signupRepository
+    await classRepository
       .createQueryBuilder()
       .update(classMaster)
       .set({ isActive: false })

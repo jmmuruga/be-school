@@ -7,6 +7,8 @@ import { Not } from "typeorm";
 import { InsertLog } from "../../logs/logs.service";
 import { logsDto } from "../../logs/logs.dto";
 import { number } from "joi";
+import { objectiveques } from "../../Question bank/objective-question/objective-question.model";
+import { Question } from "../../Question bank/question-prepare/questionpre.model";
 export const addSubject = async (req: Request, res: Response) => {
   const payload: SubjectDto = req.body;
   try {
@@ -47,7 +49,7 @@ export const addSubject = async (req: Request, res: Response) => {
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
-      UserName:loginUserName ,
+      UserName: loginUserName,
       statusCode: 200,
       Message: `Added subjectMaster -Subject(${payload.subjectName}) Successfully By - `,
     };
@@ -75,7 +77,7 @@ export const getsubjectId = async (req: Request, res: Response) => {
       `SELECT subject_Id
             FROM [${process.env.DB_NAME}].[dbo].[subject_master] 
             Group by subject_Id
-            ORDER BY CAST(subject_Id AS INT) DESC;`
+            ORDER BY CAST(subject_Id AS INT) DESC;`,
     );
     let id = "0";
     if (subject_Id?.length > 0) {
@@ -117,7 +119,7 @@ export const updateSubject = async (req: Request, res: Response) => {
         UserId: Number(payload.created_UserId),
         UserName: null,
         statusCode: 500,
-        Message: `Validation error: ${validation.error.details[0].message } -`,
+        Message: `Validation error: ${validation.error.details[0].message} -`,
       };
       await InsertLog(logsPayload);
       return res.status(400).json({
@@ -159,10 +161,7 @@ export const updateSubject = async (req: Request, res: Response) => {
       });
     }
     const { loginUserName, ...data } = payload;
-    await subjectRepoistry.update(
-      { subject_Id: payload.subject_Id },
-      data
-    );
+    await subjectRepoistry.update({ subject_Id: payload.subject_Id }, data);
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
       UserName: loginUserName,
@@ -204,30 +203,50 @@ export const deleteSubject = async (req: Request, res: Response) => {
         ErrorMessage: "Invalid subject Id",
       });
     }
+
+    const objectQuesRepository = appSource.getRepository(objectiveques);
+    const questionRepository = appSource.getRepository(Question);
     const subjectRepoistry = appSource.getRepository(SubjectMaster);
+
     // Check whether subjectid exists
+    const objectivesubjectUsed = await objectQuesRepository.findOneBy({
+      subjectName_Id: subject_Id.toString(),
+    });
+    const questionsubjectUsed = await questionRepository.findOneBy({
+      subjectName_Id: subject_Id.toString(),
+    });
     const existingSubject = await subjectRepoistry.findOneBy({
       subject_Id: subject_Id,
     });
+    if (objectivesubjectUsed || questionsubjectUsed) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 404,
+        Message: `Delete failed. Subject Id ${subject_Id} is used in other tables -`,
+      };
+      await InsertLog(logsPayload);
+      return res.status(404).json({
+        ErrorMessage: "Unable to delete Subject ",
+      });
+    }
     if (!existingSubject) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 500,
-        Message: `Deleted failed  SubjectMaster -subject Id: ${existingSubject.subject_Id}, subjectName: ${existingSubject.subjectName} not found by - `,
+        statusCode: 404,
+        Message: `Deleted failed  SubjectMaster -subject Id: ${existingSubject.subject_Id} not found by - `,
       };
       await InsertLog(logsPayload);
       return res.status(404).json({
         ErrorMessage: "subject_Id  not found",
       });
     }
-    // set active status
     await subjectRepoistry
       .createQueryBuilder()
-      .delete()
       .update(SubjectMaster)
       .set({ isActive: false })
-      .where({ subject_Id: subject_Id })
+      .where("subject_Id = :subject_Id", { subject_Id })
       .execute();
 
     const logsPayload: logsDto = {
