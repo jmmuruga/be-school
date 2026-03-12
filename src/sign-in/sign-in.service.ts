@@ -15,7 +15,7 @@ export const signIn = async (req: Request, res: Response) => {
   let user =
     (await userRepository.findOneBy({ email: payload.emailOrPhone })) ||
     (await userRepository.findOneBy({ phone: payload.emailOrPhone }));
-    if (!user) {
+  if (!user) {
     return res.status(401).send({
       ErrorMessage: "User does not exist.Please check your username.",
     });
@@ -34,11 +34,11 @@ export const signIn = async (req: Request, res: Response) => {
       ErrorMessage: "User is inactive",
     });
   }
-//   if (!user) {
-//     return res.status(401).send({
-//       ErrorMessage: "User does not exist. Please check your username.",
-//     });
-//   }
+  //   if (!user) {
+  //     return res.status(401).send({
+  //       ErrorMessage: "User does not exist. Please check your username.",
+  //     });
+  //   }
   // if (!user) {
   //   const logsPayload: logsDto = {
   //     UserId: user.UserID,
@@ -51,7 +51,7 @@ export const signIn = async (req: Request, res: Response) => {
   //     ErrorMessage: "user Does Not Exist",
   //   });
   // }
-  
+
   try {
     if (user.password !== payload.password) {
       const logsPayload: logsDto = {
@@ -75,7 +75,7 @@ export const signIn = async (req: Request, res: Response) => {
       second: "2-digit",
       hour12: true,
     });
-    
+
     const token = jwt.sign(
       {
         UserID: user.UserID,
@@ -356,8 +356,7 @@ Thank you.
     await InsertLog(logsPayload);
 
     return res.status(200).send({
-      IsSuccess: true,
-      Message: "OTP sent successfully to your email",
+      IsSuccess: "OTP sent successfully to your email",
       user: {
         id: student.id,
         name: student.name,
@@ -392,7 +391,7 @@ export const verifyStudentOtp = async (req: Request, res: Response) => {
     const result = await appSource.query(`
       SELECT TOP 1 Generate_Otp
       FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
-      WHERE studentId = ${studentId}
+      WHERE userId = ${studentId}
       ORDER BY id DESC
     `);
 
@@ -421,7 +420,6 @@ export const verifyStudentOtp = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(401).send({
-        IsSuccess: false,
         ErrorMessage: "Invalid OTP. Please try again",
       });
     }
@@ -432,10 +430,14 @@ export const verifyStudentOtp = async (req: Request, res: Response) => {
       Message: `OTP verified successfully for Student - studentID :${studentId} -`,
     };
     await InsertLog(logsPayload);
-    return res.status(200).send({
-      IsSuccess: true,
-      Message: "OTP verified successfully",
+     res.status(200).send({
+      IsSuccess: "OTP verified successfully",
     });
+       // Then delete the OTP from DB
+    await appSource.query(`
+      DELETE FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
+      WHERE userId = ${studentId} AND Generate_Otp = '${savedOtp}'
+    `);
   } catch (error: any) {
     return res.status(500).json({
       message: "Internal server error",
@@ -467,9 +469,9 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
 
     return res.status(200).send({
-      IsSuccess: true,
-      message: "Password reset successfully",
+      IsSuccess: "Password reset successfully",
     });
+
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: studentId,
@@ -513,7 +515,7 @@ export const userForgotPassword = async (req: Request, res: Response) => {
 
     await appSource.query(`
       INSERT INTO [${process.env.DB_NAME}].[dbo].[generate_otp]
-      (studentId, Generate_Otp)
+      (userId, Generate_Otp)
       VALUES (${user.UserID}, ${GeneratedOtp})
     `);
 
@@ -546,8 +548,7 @@ Please use this OTP to reset your password.
     };
     await InsertLog(logsPayload);
     return res.status(200).send({
-      IsSuccess: true,
-      message: "OTP sent to registered email -",
+      IsSuccess: "OTP sent to registered email",
       userId: user.UserID,
     });
   } catch (error) {
@@ -574,7 +575,7 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
     const result = await appSource.query(`
       SELECT TOP 1 Generate_Otp
       FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
-      WHERE studentId = ${userId}
+      WHERE userId = ${userId}
       ORDER BY id DESC
     `);
 
@@ -614,10 +615,15 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
       Message: `OTP verified successfully for user - userId :${userId} -`,
     };
     await InsertLog(logsPayload);
-    return res.status(200).send({
-      IsSuccess: true,
-      message: "OTP verified successfully -",
+    res.status(200).send({
+      IsSuccess: "OTP verified successfully.",
     });
+
+    // Then delete the OTP from DB
+    await appSource.query(`
+      DELETE FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
+      WHERE userId = ${userId} AND Generate_Otp = '${savedOtp}'
+    `);
   } catch (error: any) {
     return res.status(500).json({
       message: "Internal server error",
@@ -649,8 +655,7 @@ export const resetUserPassword = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
 
     return res.status(200).send({
-      IsSuccess: true,
-      message: "Password reset successfully",
+      IsSuccess: "Password reset Successfully",
     });
   } catch (error) {
     const logsPayload: logsDto = {
