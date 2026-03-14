@@ -138,11 +138,11 @@ export const updateStream = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
         UserName: null,
-        statusCode: 404,
+        statusCode: 500,
         Message: `Update Stream Failed - Stream_Id ${payload.Stream_Id} not found`,
       };
       await InsertLog(logsPayload);
-      return res.status(400).json({
+      return res.status(500).json({
         ErrorMessage: "Stream Doesn't exist",
       });
     }
@@ -203,7 +203,7 @@ export const deleteStream = async (req: Request, res: Response) => {
         Message: `Validation error: Invalid Stream Code (${req.params.Stream_Id})-`,
       };
       await InsertLog(logsPayload);
-      return res.status(400).json({
+      return res.status(500).json({
         ErrorMessage: "Invalid class code",
       });
     }
@@ -221,11 +221,11 @@ export const deleteStream = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 404,
+        statusCode: 500,
         Message: `Delete failed. Subject Id ${Stream_Id} is used in other tables -`,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({
+      return res.status(500).json({
         ErrorMessage: "Unable to delete Stream  ",
       });
     }
@@ -236,7 +236,7 @@ export const deleteStream = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 404,
+        statusCode: 500,
         Message: ` Stream Failed - Stream Id ${Stream_Id} not found`,
       };
       await InsertLog(logsPayload);
@@ -290,7 +290,7 @@ export const updateStreamStatus = async (req: Request, res: Response) => {
         Message: `Validation Error: Invalid Stream Code (${payload.Stream_Id})`,
       };
       await InsertLog(logsPayload);
-      return res.status(400).json({
+      return res.status(500).json({
         ErrorMessage: "Stream not found",
       });
     }

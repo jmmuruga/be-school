@@ -5,6 +5,7 @@ import { appSource } from "../core/database/db";
 import { In, Not } from "typeorm";
 import { logsDto } from "../logs/logs.dto";
 import { InsertLog } from "../logs/logs.service";
+import { decrypter, encryptString } from "../shared/helper";
 // import { ValidationException } from "../exceptions/ValidationException";
 
 export const addUser = async (req: Request, res: Response) => {
@@ -67,6 +68,11 @@ export const addUser = async (req: Request, res: Response) => {
         ErrorMessage: "Phone Number Already Exists ",
       });
     }
+    payload.password = await encryptString(payload.password, "ABCXY123");
+    payload.confirmPassword = await encryptString(
+      payload.confirmPassword,
+      "ABCXY123",
+    );
     const { loginUserName, ...data } = payload;
     await userRepoistry.save(data);
     const logsPayload: logsDto = {
@@ -96,9 +102,17 @@ export const getUserDetails = async (req: Request, res: Response) => {
     const userRepoistry = appSource.getRepository(User);
     // get the details
     const userM = await userRepoistry.find({ where: { isActive: true } });
+    // decrypt passwords before sending
+    const usersWithDecryptedPasswords = userM.map((user) => ({
+      ...user,
+      password: user.password ? decrypter(user.password) : "",
+      confirmPassword: user.confirmPassword
+        ? decrypter(user.confirmPassword)
+        : "",
+    }));
 
     res.status(200).send({
-      Result: userM,
+      Result: usersWithDecryptedPasswords,
     });
   } catch (error) {
     return res.status(500).json({
@@ -205,6 +219,13 @@ export const updateUserLogin = async (req: Request, res: Response) => {
         ErrorMessage: "Email Id Already Exist",
       });
     }
+    if (payload.password && payload.confirmPassword) {
+      payload.password = await encryptString(payload.password, "ABCXY123");
+      payload.confirmPassword = await encryptString(
+        payload.confirmPassword,
+        "ABCXY123",
+      );
+    }
     const { loginUserName, ...data } = payload;
     await userRepository.update({ UserID: payload.UserID }, data);
     const logsPayload: logsDto = {
@@ -245,7 +266,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     });
 
     if (!existingUser) {
-      return res.status(404).json({ ErrorMessage: "User not found" });
+      return res.status(500).json({ ErrorMessage: "User not found" });
     }
     // delete and active
     await userRepository

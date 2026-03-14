@@ -9,7 +9,6 @@ export const QuestionValidation = Joi.object({
   Imagequestion: Joi.string().optional().allow(null, ""),
   isActive: Joi.boolean().optional(),
   created_UserId: Joi.string().required(),
-  updated_UserId:Joi.string().optional().allow(null, ""),
 });
 export interface QuestionDto {
   ClassName_Id: string;
@@ -21,5 +20,4 @@ export interface QuestionDto {
   FilePath?: string;
   isActive: Boolean;
   created_UserId: string;
-  updated_UserId: string;
 }

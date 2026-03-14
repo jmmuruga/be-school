@@ -25,7 +25,9 @@ export const addQuesgene = async (req: Request, res: Response) => {
       });
     }
     const QuesgenerateRepository = appSource.getRepository(Quesgenerate);
+    
     await QuesgenerateRepository.save(payload);
+    
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
       UserName: null,
@@ -79,6 +81,7 @@ WHERE subjectName_Id = '${subjectName_Id}'
 };
 export const getQuestionAns = async (req: Request, res: Response) => {
   try {
+    // console.log('gettiong ',req.params);
     const {
       subjectName_Id,
       ClassName_Id,
@@ -115,36 +118,47 @@ export const getQuestionAns = async (req: Request, res: Response) => {
     const finalThreeMax = Math.min(threeDb, threeUserMax);
     const finalFiveMax = Math.min(fiveDb, fiveUserMax);
 
-    const query = `
-      SELECT TOP ${finalTwoMax} * FROM
-       FROM [${process.env.DB_NAME}].[dbo].[question]
-      WHERE subjectName_Id = '${subjectName_Id}'
-        AND ClassName_Id = '${ClassName_Id}'
-        AND type = '${type}'
-        AND mark = 2   
-      UNION ALL
-
-      SELECT TOP ${finalThreeMax} * FROM 
-             FROM [${process.env.DB_NAME}].[dbo].[question]
-      WHERE subjectName_Id = '${subjectName_Id}'
-        AND ClassName_Id = '${ClassName_Id}'
-        AND type = '${type}'
-        AND mark = 3
-      UNION ALL
-
-      SELECT TOP ${finalFiveMax} * FROM 
-           FROM [${process.env.DB_NAME}].[dbo].[question]
-      WHERE subjectName_Id = '${subjectName_Id}'
-        AND ClassName_Id = '${ClassName_Id}'
-        AND type = '${type}'
-        AND mark = 5 
-    `;
-
+ const query = `
+  SELECT TOP ${finalTwoMax} * 
+  FROM [${process.env.DB_NAME}].[dbo].[question]
+  WHERE subjectName_Id = '${subjectName_Id}'
+    AND ClassName_Id = '${ClassName_Id}'
+    AND type = '${type}'
+    AND mark = 2   
+  UNION ALL
+  SELECT TOP ${finalThreeMax} *
+  FROM [${process.env.DB_NAME}].[dbo].[question]
+  WHERE subjectName_Id = '${subjectName_Id}'
+    AND ClassName_Id = '${ClassName_Id}'
+    AND type = '${type}'
+    AND mark = 3
+  UNION ALL
+  SELECT TOP ${finalFiveMax} *
+  FROM [${process.env.DB_NAME}].[dbo].[question]
+  WHERE subjectName_Id = '${subjectName_Id}'
+    AND ClassName_Id = '${ClassName_Id}'
+    AND type = '${type}'
+    AND mark = 5
+`;
     const questions = await quesAnsRepo.query(query);
-
+// Map questions properly without overwriting mark
+const mappedQuestions = questions.map((q: any) => ({
+  id: q.id,
+  ClassName_Id: q.ClassName_Id,
+  subjectName_Id: q.subjectName_Id,
+  type: q.type,
+  mark: q.mark,          
+  question: q.question,
+  Imagequestion: q.Imagequestion,
+  isActive: q.isActive,
+  created_UserId: q.created_UserId,
+  updated_UserId: q.updated_UserId,
+  created_at: q.created_at,
+  updated_at: q.updated_at,
+}));
     return res.status(200).json({
       IsSuccess: " Genarated  Question Paper Successfully ",
-      Result: questions,
+      Result: mappedQuestions,
     });
   } catch (error) {
     return res.status(500).json({

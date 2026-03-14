@@ -222,11 +222,11 @@ export const deleteSubject = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 404,
+        statusCode: 500,
         Message: `Delete failed. Subject Id ${subject_Id} is used in other tables -`,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({
+      return res.status(500).json({
         ErrorMessage: "Unable to delete Subject ",
       });
     }
@@ -234,11 +234,11 @@ export const deleteSubject = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 404,
+        statusCode: 500,
         Message: `Deleted failed  SubjectMaster -subject Id: ${existingSubject.subject_Id} not found by - `,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({
+      return res.status(500).json({
         ErrorMessage: "subject_Id  not found",
       });
     }

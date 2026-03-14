@@ -2,7 +2,7 @@ import { Router } from "express";
 import { addSignup, getDetails, getStreamCount, getStudentCount, getXandXIIClassCount, } from "./signup.service";
 import { auth } from "../shared/helper";
 const signupRouter = Router();
-signupRouter.post('/addSignup' , (req,res) => addSignup(req,res));
+signupRouter.post('/addSignup', (req,res) => addSignup(req,res));
 signupRouter.get("/getDetails",auth,(req,res) => getDetails(req,res));
 signupRouter.get("/getStudentCount",auth,(req,res) => getStudentCount(req,res));
 // signupRouter.get("/getTenthCount",(req,res) => getTenthCount(req,res));

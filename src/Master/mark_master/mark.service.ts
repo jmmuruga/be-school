@@ -135,7 +135,7 @@ export const updateMark = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
         UserName: payload.loginUserName,
-        statusCode: 404,
+        statusCode: 500,
         Message: `Update Mark Failed - mark_Id ${payload.mark_Id} not found`,
       };
       await InsertLog(logsPayload);
@@ -194,7 +194,7 @@ export const deleteMarks = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 400,
+        statusCode: 500,
         Message: `Invalid Mark Id received for Delete: ${req.params.mark_Id}`,
       };
       await InsertLog(logsPayload);
@@ -213,11 +213,11 @@ export const deleteMarks = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 404,
+        statusCode: 500,
         Message: `Delete failed. Subject Id ${mark_Id} is used in other tables -`,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({
+      return res.status(500).json({
         ErrorMessage: "Unable to delete mark  ",
       });
     }
@@ -227,11 +227,11 @@ export const deleteMarks = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 404,
+        statusCode:500,
         Message: `Delete Failed - MarkId ${mark_Id} not found`,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({
+      return res.status(500).json({
         ErrorMessage: "Mark Id not found",
       });
     }
@@ -279,7 +279,7 @@ export const updateMarkStatus = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: payload.loginUserId,
         UserName: payload.loginUserName,
-        statusCode: 404,
+        statusCode: 500,
         Message: `Update Mark Status Failed - Mark Id ${payload.mark_Id} not found`,
       };
       await InsertLog(logsPayload);

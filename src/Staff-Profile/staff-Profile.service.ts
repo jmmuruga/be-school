@@ -264,7 +264,7 @@ export const deleteStaff = async (req: Request, res: Response) => {
         Message: ` Delete failed. staff No ${staffNo} is used in other tables - `,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({ ErrorMessage: "Unable to delete " });
+      return res.status(500).json({ ErrorMessage: "Unable to delete " });
    }
     const existingStaff = await staffRepository.findOneBy({
       staffNo: staffNo,
@@ -277,7 +277,7 @@ export const deleteStaff = async (req: Request, res: Response) => {
         Message: `Staff Details - staffNo: ${existingStaff.staffNo}, staffName: ${existingStaff.staffName} not found by - `,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({ ErrorMessage: "Staff not found" });
+      return res.status(500).json({ ErrorMessage: "Staff not found" });
     }
 
     // delete and active

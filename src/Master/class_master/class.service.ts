@@ -265,7 +265,7 @@ export const deleteClass = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 400,
+        statusCode: 500,
         Message: `ClassMaster - Class_Id: ${Class_Id} unable to delete (Already used) by - `,
       };
 
@@ -274,32 +274,6 @@ export const deleteClass = async (req: Request, res: Response) => {
         ErrorMessage: "Unable to delete Class.",
       });
     }
-    // const classUsed = await signupRepository.findOne({
-    //   where: { Class_Id: Class_Id.toString() },
-    // });
-
-    // if (classUsed?.length>0) {
-    //   const logsPayload: logsDto = {
-    //     UserId: loginUserId,
-    //     UserName: loginUserName,
-    //     statusCode: 500,
-    //     Message: `ClassMaster - Class_Id: ${classUsed.Class_Id} unable to delete by - `,
-    //   };
-    //   await InsertLog(logsPayload);
-    //   return res.status(400).json({
-    //     ErrorMessage: "Unable to delete. Class is already assigned to users",
-    //   });
-    // }
-    // if (!existingClass) {
-    //   const logsPayload: logsDto = {
-    //     UserId: loginUserId,
-    //     UserName: loginUserName,
-    //     statusCode: 500,
-    //     Message: `ClassMaster - Class_Id: ${existingClass.Class_Id}, className: ${existingClass.className} not found by - `,
-    //   };
-    //   await InsertLog(logsPayload);
-    //   return res.status(404).json({ ErrorMessage: "Class not found" });
-    // }
     // delete and active
     await classRepository
       .createQueryBuilder()
@@ -348,6 +322,22 @@ export const updateStatusClass = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(404).json({ ErrorMessage: "Class not found" });
+    }
+    const subjectRepository = appSource.getRepository(SubjectMaster);
+    const existsubjectUsed = await subjectRepository.findOneBy({
+      selectedClasses: payload.Class_Id.toString(),
+    });
+    if (!existsubjectUsed) {
+      const logsPayload: logsDto = {
+        UserId: payload.loginUserId,
+        UserName: payload.loginUserName,
+        statusCode: 500,
+        Message: `Unable to inactive Status  Class_Id ${payload.Class_Id} by - `,
+      };
+      await InsertLog(logsPayload);
+      return res
+        .status(404)
+        .json({ ErrorMessage: "Class to Inactive tha status " });
     }
     await classRepository
       .createQueryBuilder()

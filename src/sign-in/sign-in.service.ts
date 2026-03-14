@@ -9,6 +9,7 @@ import { Signup } from "../Signup/signup.model";
 import { logsDto } from "../logs/logs.dto";
 import { InsertLog } from "../logs/logs.service";
 import { saveOtpForStudent } from "../Generate_Otp/generate_otp.service";
+import { decrypter, encryptString } from "../shared/helper";
 export const signIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const userRepository = appSource.getRepository(User);
@@ -24,7 +25,7 @@ export const signIn = async (req: Request, res: Response) => {
     const logsPayload: logsDto = {
       UserId: user.UserID,
       UserName: user.userName,
-      statusCode: 401,
+      statusCode: 500,
       Message: `Login blocked: inactive user - ${user.email} - `,
     };
 
@@ -34,33 +35,19 @@ export const signIn = async (req: Request, res: Response) => {
       ErrorMessage: "User is inactive",
     });
   }
-  //   if (!user) {
-  //     return res.status(401).send({
-  //       ErrorMessage: "User does not exist. Please check your username.",
-  //     });
-  //   }
-  // if (!user) {
-  //   const logsPayload: logsDto = {
-  //     UserId: user.UserID,
-  //     UserName: null,
-  //     statusCode: 500,
-  //     Message: `Login failed: User does not exist - ${payload.emailOrPhone} by-`,
-  //   };
-  //   await InsertLog(logsPayload);
-  //   return res.status(401).send({
-  //     ErrorMessage: "user Does Not Exist",
-  //   });
-  // }
-
+ 
   try {
-    if (user.password !== payload.password) {
+    const decryptedPassword = decrypter(user.password);
+    if (decryptedPassword !== payload.password) {
       const logsPayload: logsDto = {
         UserId: user.UserID,
         UserName: null,
         statusCode: 500,
         Message: `Login failed: Wrong password for user ${user.email} by -`,
       };
+
       await InsertLog(logsPayload);
+
       return res.status(401).send({
         ErrorMessage: "Invalid password. Please try again.",
       });
@@ -102,7 +89,6 @@ export const signIn = async (req: Request, res: Response) => {
         roleType: user.roleType,
         phone: user.phone,
         staffNo: user.staffNo,
-        password: user.password,
         token,
       },
     });
@@ -122,6 +108,7 @@ export const signIn = async (req: Request, res: Response) => {
 };
 export const StudentSignIn = async (req: Request, res: Response) => {
   const payload = req.body;
+  const password = payload.password || payload.Password;
   const studentRespository = appSource.getRepository(Signup);
   // let student = await studentRespository.findOneBy({
   //   UserName: payload.usernameOrAdmission,
@@ -155,8 +142,10 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       ErrorMessage: "Student Does Not Exist ..Please Check your name ",
     });
   }
+
   try {
-    if (student.password !== payload.Password) {
+    const decryptedPassword = decrypter(student.password);
+    if (decryptedPassword !== payload.Password) {
       const logsPayload: logsDto = {
         UserId: student.id,
         UserName: student.UserName,
@@ -430,10 +419,10 @@ export const verifyStudentOtp = async (req: Request, res: Response) => {
       Message: `OTP verified successfully for Student - studentID :${studentId} -`,
     };
     await InsertLog(logsPayload);
-     res.status(200).send({
+    res.status(200).send({
       IsSuccess: "OTP verified successfully",
     });
-       // Then delete the OTP from DB
+    // Then delete the OTP from DB
     await appSource.query(`
       DELETE FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
       WHERE userId = ${studentId} AND Generate_Otp = '${savedOtp}'
@@ -455,11 +444,18 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
         ErrorMessage: "StudentId and New Password required",
       });
     }
+    const encryptedPassword = encryptString(newPassword, "ABCXY123");
+    const encryptedConfirmPassword = encryptString(
+      confirmNewPassword,
+      "ABCXY123",
+    );
+
     await appSource.query(`
        UPDATE [${process.env.DB_NAME}].[dbo].[signup]
-  SET password = '${newPassword}', confirmPassword = '${confirmNewPassword}'
-  WHERE id = ${studentId}
+       SET password = '${encryptedPassword}', confirmPassword = '${encryptedConfirmPassword}'
+       WHERE id = ${studentId}
     `);
+
     const logsPayload: logsDto = {
       UserId: studentId,
       UserName: null,
@@ -471,7 +467,6 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
     return res.status(200).send({
       IsSuccess: "Password reset successfully",
     });
-
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: studentId,
@@ -640,10 +635,16 @@ export const resetUserPassword = async (req: Request, res: Response) => {
         ErrorMessage: "Passwords do not match",
       });
     }
+    const encryptedPassword = encryptString(newPassword, "ABCXY123");
+    const encryptedConfirmPassword = encryptString(
+      confirmNewPassword,
+      "ABCXY123",
+    );
 
+    // Update both password and confirmPassword
     await appSource.query(`
       UPDATE [${process.env.DB_NAME}].[dbo].[user]
-      SET password = '${newPassword}',confirmPassword ='${confirmNewPassword}'
+      SET password = '${encryptedPassword}', confirmPassword = '${encryptedConfirmPassword}'
       WHERE UserID = ${userId}
     `);
     const logsPayload: logsDto = {

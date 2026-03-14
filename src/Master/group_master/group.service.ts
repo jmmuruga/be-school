@@ -212,7 +212,7 @@ export const deleteGroup = async (req: Request, res: Response) => {
         Message: `GroupMaster - Group_Id: ${existingGroup.Group_Id}, GroupName: ${existingGroup.groupName} not found by - `,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({
+      return res.status(500).json({
         ErrorMessage: "Group_Id  not found",
       });
     }
@@ -266,7 +266,7 @@ export const updateGroupStatus = async (req: Request, res: Response) => {
         Message: `Group not found for Group_Id ${payload.Group_Id} by - `,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({ ErrorMessage: "Group Not Found" });
+      return res.status(500).json({ ErrorMessage: "Group Not Found" });
     }
     await classRepository
       .createQueryBuilder()
