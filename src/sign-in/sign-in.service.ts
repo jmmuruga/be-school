@@ -270,8 +270,7 @@ export const logout = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
 
     return res.status(200).json({
-      IsSuccess: true,
-      Message: "Sign out successfully",
+      IsSuccess: "Sign out Successfully",
     });
   } catch (error: any) {
     const logsPayload: logsDto = {
