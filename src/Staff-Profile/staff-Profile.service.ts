@@ -7,6 +7,7 @@ import { Not } from "typeorm";
 import { invalid } from "joi";
 import { logsDto } from "../logs/logs.dto";
 import { InsertLog } from "../logs/logs.service";
+import { User } from "../User-Profile/user.model";
 export const addStaff = async (req: Request, res: Response) => {
   const payload: StaffDto = req.body;
   try {
@@ -249,8 +250,22 @@ export const deleteStaff = async (req: Request, res: Response) => {
       await InsertLog(logsPayload);
       return res.status(400).json({ ErrorMessage: "Invalid Staff No" });
     }
+    const userRepository = appSource.getRepository(User);
     const staffRepository = appSource.getRepository(Staff);
     // check whether exist no
+    const userUsed = await userRepository.findOneBy({
+      staffNo:staffNo.toString(),
+    });
+   if(userUsed){
+    const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 500,
+        Message: ` Delete failed. staff No ${staffNo} is used in other tables - `,
+      };
+      await InsertLog(logsPayload);
+      return res.status(500).json({ ErrorMessage: "Unable to delete " });
+   }
     const existingStaff = await staffRepository.findOneBy({
       staffNo: staffNo,
     });
@@ -262,7 +277,7 @@ export const deleteStaff = async (req: Request, res: Response) => {
         Message: `Staff Details - staffNo: ${existingStaff.staffNo}, staffName: ${existingStaff.staffName} not found by - `,
       };
       await InsertLog(logsPayload);
-      return res.status(404).json({ ErrorMessage: "Staff not found" });
+      return res.status(500).json({ ErrorMessage: "Staff not found" });
     }
 
     // delete and active

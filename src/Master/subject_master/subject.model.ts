@@ -12,15 +12,15 @@ export class SubjectMaster {
     subject_Id: number
     @Column()
     subjectName: string
-    @Column()
-    subjectType: string
+    @Column({default:true})
+    subjectType: boolean
     @Column()
     selectedClasses: string
     @Column({default:true})
     isActive: boolean
-   @Column({default:true})
-   status:boolean
-   @Column({nullable:true})
+    @Column({default:true})
+    status:boolean
+    @Column({nullable:true})
     created_UserId: string
     @Column({nullable:true})
     updated_UserId: string

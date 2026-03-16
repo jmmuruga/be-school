@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   addClass,
   deleteClass,
@@ -7,17 +8,25 @@ import {
   updateClassMaster,
   updateStatusClass,
 } from "./class.service";
+import { auth } from "../../shared/helper";
 
 const classRouter = Router();
 
-classRouter.post("/addClass", (req, res) => addClass(req, res));
-classRouter.get("/getClassId", (req, res) => getClassId(req, res));
-classRouter.post("/updateClassMaster", (req, res) =>
-  updateClassMaster(req, res)
+classRouter.post("/addClass", auth, (req, res) => addClass(req, res));
+classRouter.get("/getClassId", auth, (req, res) => getClassId(req, res));
+classRouter.post("/updateClassMaster", auth, (req, res) =>
+  updateClassMaster(req, res),
 );
-classRouter.get("/getClasMasterDetails", (req, res) =>
-  getClasMasterDetails(req, res)
+classRouter.get("/getClasMasterDetails", auth, (req, res) =>
+  getClasMasterDetails(req, res),
 );
-classRouter.delete("/deleteClass/:Class_Id",(req,res) => deleteClass(req,res));
+classRouter.get("/getClassMasterDetail", (req, res) =>
+  getClasMasterDetails(req, res),
+);
+classRouter.delete("/deleteClass/:Class_Id", auth, (req, res) =>
+  deleteClass(req, res),
+);
+classRouter.post("/updateStatusClass", auth, (req, res) =>
+  updateStatusClass(req, res),
+);
 export default classRouter;
-classRouter.post("/updateStatusClass",(req,res) => updateStatusClass(req,res));

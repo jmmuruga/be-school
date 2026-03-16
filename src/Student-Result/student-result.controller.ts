@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { AddStudentScoreResult, AddTryAgainLog, getstudentResultCount, getSubjectNameCount } from "./student-result.service";
 import { getStudentScoreResult } from "./student-result.service";
+import { auth } from "../shared/helper";
 const studentscoreRouter =Router();
-studentscoreRouter.post('/AddstudentScoreResult',(req,res) =>AddStudentScoreResult(req,res));
-studentscoreRouter.post('/AddTryAgainLog',(req,res) =>AddTryAgainLog(req,res));
-studentscoreRouter.get('/getStudentScoreResult',(req,res) =>getStudentScoreResult(req,res));
-studentscoreRouter.get('/getstudentResultCount',(req,res) =>getstudentResultCount(req,res));
-studentscoreRouter.get('/getSubjectNameCount',(req,res)=>getSubjectNameCount(req,res));
+studentscoreRouter.post('/AddstudentScoreResult',auth,(req,res) =>AddStudentScoreResult(req,res));
+studentscoreRouter.post('/AddTryAgainLog',auth,(req,res) =>AddTryAgainLog(req,res));
+studentscoreRouter.get('/getStudentScoreResult',auth,(req,res) =>getStudentScoreResult(req,res));
+studentscoreRouter.get('/getstudentResultCount',auth,(req,res) =>getstudentResultCount(req,res));
+studentscoreRouter.get('/getSubjectNameCount',auth,(req,res)=>getSubjectNameCount(req,res));
 export default studentscoreRouter;

@@ -6,6 +6,9 @@ import StreamRouter from "./medium.controller";
 import { Not } from "typeorm";
 import { InsertLog } from "../../logs/logs.service";
 import { logsDto } from "../../logs/logs.dto";
+import { Signup } from "../../Signup/signup.model";
+import { objectiveques } from "../../Question bank/objective-question/objective-question.model";
+import { Question } from "../../Question bank/question-prepare/questionpre.model";
 
 export const addStream = async (req: Request, res: Response) => {
   const payload: StreamDto = req.body;
@@ -135,11 +138,11 @@ export const updateStream = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: Number(payload.created_UserId),
         UserName: null,
-        statusCode: 404,
+        statusCode: 500,
         Message: `Update Stream Failed - Stream_Id ${payload.Stream_Id} not found`,
       };
       await InsertLog(logsPayload);
-      return res.status(400).json({
+      return res.status(500).json({
         ErrorMessage: "Stream Doesn't exist",
       });
     }
@@ -197,15 +200,35 @@ export const deleteStream = async (req: Request, res: Response) => {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 500,
-        Message: `Validation error: Invalid Stream Code (${req.params.Stream_Id})`,
+        Message: `Validation error: Invalid Stream Code (${req.params.Stream_Id})-`,
       };
       await InsertLog(logsPayload);
-      return res.status(400).json({
+      return res.status(500).json({
         ErrorMessage: "Invalid class code",
       });
     }
+    const signupRepository = appSource.getRepository(Signup);
+    const objectiveRepository = appSource.getRepository(objectiveques);
     const StreamRepoistry = appSource.getRepository(StreamMaster);
     // Check whether StreamId exists
+    const signupExistingUsed = await signupRepository.findOneBy({
+      Stream_Id: Stream_Id.toString(),
+    });
+    const objectiveQuesUsed = await objectiveRepository.findOneBy({
+      Stream_Id: Stream_Id.toString(),
+    });
+    if (signupExistingUsed || objectiveQuesUsed) {
+      const logsPayload: logsDto = {
+        UserId: loginUserId,
+        UserName: loginUserName,
+        statusCode: 500,
+        Message: `Delete failed. Subject Id ${Stream_Id} is used in other tables -`,
+      };
+      await InsertLog(logsPayload);
+      return res.status(500).json({
+        ErrorMessage: "Unable to delete Stream  ",
+      });
+    }
     const existingStream = await StreamRepoistry.findOneBy({
       Stream_Id: Stream_Id,
     });
@@ -213,11 +236,10 @@ export const deleteStream = async (req: Request, res: Response) => {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
-        statusCode: 404,
+        statusCode: 500,
         Message: ` Stream Failed - Stream Id ${Stream_Id} not found`,
       };
       await InsertLog(logsPayload);
-
       return res.status(400).json({
         ErrorMessage: "Stream Id  not found",
       });
@@ -268,7 +290,7 @@ export const updateStreamStatus = async (req: Request, res: Response) => {
         Message: `Validation Error: Invalid Stream Code (${payload.Stream_Id})`,
       };
       await InsertLog(logsPayload);
-      return res.status(400).json({
+      return res.status(500).json({
         ErrorMessage: "Stream not found",
       });
     }

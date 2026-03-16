@@ -4,11 +4,12 @@ import { Request, Response } from "express";
 import { SignIn } from "./sign-in.model";
 import { User } from "../User-Profile/user.model";
 import nodemailer from "nodemailer";
-// import jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { Signup } from "../Signup/signup.model";
 import { logsDto } from "../logs/logs.dto";
 import { InsertLog } from "../logs/logs.service";
 import { saveOtpForStudent } from "../Generate_Otp/generate_otp.service";
+import { decrypter, encryptString } from "../shared/helper";
 export const signIn = async (req: Request, res: Response) => {
   const payload = req.body;
   const userRepository = appSource.getRepository(User);
@@ -17,30 +18,36 @@ export const signIn = async (req: Request, res: Response) => {
     (await userRepository.findOneBy({ phone: payload.emailOrPhone }));
   if (!user) {
     return res.status(401).send({
-      ErrorMessage: "User does not exist. Please check your username.",
+      ErrorMessage: "User does not exist.Please check your username.",
     });
   }
-  if (!user) {
+  if (!user.isActive || !user.status) {
     const logsPayload: logsDto = {
       UserId: user.UserID,
-      UserName: null,
+      UserName: user.userName,
       statusCode: 500,
-      Message: `Login failed: User does not exist - ${payload.emailOrPhone} by-`,
+      Message: `Login blocked: inactive user - ${user.email} - `,
     };
+
     await InsertLog(logsPayload);
+
     return res.status(401).send({
-      ErrorMessage: "user Does Not Exist",
+      ErrorMessage: "User is inactive",
     });
   }
+ 
   try {
-    if (user.password !== payload.password) {
+    const decryptedPassword = decrypter(user.password);
+    if (decryptedPassword !== payload.password) {
       const logsPayload: logsDto = {
         UserId: user.UserID,
         UserName: null,
         statusCode: 500,
         Message: `Login failed: Wrong password for user ${user.email} by -`,
       };
+
       await InsertLog(logsPayload);
+
       return res.status(401).send({
         ErrorMessage: "Invalid password. Please try again.",
       });
@@ -55,10 +62,16 @@ export const signIn = async (req: Request, res: Response) => {
       second: "2-digit",
       hour12: true,
     });
-    // const token = jwt.sign(
-    //   { id: user.UserID, email: user.email, phonenumber: user.phone },
-    //   process.env.JWT_SECRET_KEY as string,
-    // );
+
+    const token = jwt.sign(
+      {
+        UserID: user.UserID,
+        email: user.email,
+        phonenumber: user.phone,
+        roleType: user.roleType,
+      },
+      process.env.JWT_SECRET_KEY as string,
+    );
     const logsPayload: logsDto = {
       UserId: user.UserID,
       UserName: null,
@@ -73,11 +86,10 @@ export const signIn = async (req: Request, res: Response) => {
         id: user.UserID,
         name: user.userName,
         email: user.email,
-        // token,
         roleType: user.roleType,
         phone: user.phone,
         staffNo: user.staffNo,
-        password: user.password,
+        token,
       },
     });
   } catch (error: any) {
@@ -94,9 +106,9 @@ export const signIn = async (req: Request, res: Response) => {
     });
   }
 };
-
 export const StudentSignIn = async (req: Request, res: Response) => {
   const payload = req.body;
+  const password = payload.password || payload.Password;
   const studentRespository = appSource.getRepository(Signup);
   // let student = await studentRespository.findOneBy({
   //   UserName: payload.usernameOrAdmission,
@@ -106,7 +118,6 @@ export const StudentSignIn = async (req: Request, res: Response) => {
   //     password: payload.usernameOrAdmission,
   //   });
   // }
-
   let student =
     (await studentRespository.findOneBy({
       UserName: payload.usernameOrAdmission,
@@ -131,8 +142,10 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       ErrorMessage: "Student Does Not Exist ..Please Check your name ",
     });
   }
+
   try {
-    if (student.password !== payload.Password) {
+    const decryptedPassword = decrypter(student.password);
+    if (decryptedPassword !== payload.Password) {
       const logsPayload: logsDto = {
         UserId: student.id,
         UserName: student.UserName,
@@ -154,6 +167,15 @@ export const StudentSignIn = async (req: Request, res: Response) => {
       second: "2-digit",
       hour12: true,
     });
+    const token = jwt.sign(
+      {
+        id: student.id,
+        username: student.UserName,
+        email: student.email,
+        standard: student.Class_Id,
+      },
+      process.env.JWT_SECRET_KEY as string,
+    );
     const logsPayload: logsDto = {
       UserId: student.id,
       UserName: student.UserName,
@@ -170,8 +192,8 @@ export const StudentSignIn = async (req: Request, res: Response) => {
         studentid: student.id,
         studentschool: student.school,
         standard: student.Class_Id,
-        
         studentStream_Id: student.Stream_Id,
+        token,
       },
     });
   } catch (error: any) {
@@ -213,8 +235,7 @@ export const getStudentId = async (req: Request, res: Response) => {
     });
   } catch (error) {
     return res.status(500).json({
-      IsSuccess: false,
-      ErrorMessage: "Internal server error",
+      message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
   }
@@ -249,8 +270,7 @@ export const logout = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
 
     return res.status(200).json({
-      IsSuccess: true,
-      Message: "Sign out successfully",
+      IsSuccess: "Sign out Successfully",
     });
   } catch (error: any) {
     const logsPayload: logsDto = {
@@ -261,10 +281,8 @@ export const logout = async (req: Request, res: Response) => {
     };
 
     await InsertLog(logsPayload);
-
     return res.status(500).json({
-      IsSuccess: false,
-      ErrorMessage: "Internal server error",
+      message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
   }
@@ -326,8 +344,7 @@ Thank you.
     await InsertLog(logsPayload);
 
     return res.status(200).send({
-      IsSuccess: true,
-      Message: "OTP sent successfully to your email",
+      IsSuccess: "OTP sent successfully to your email",
       user: {
         id: student.id,
         name: student.name,
@@ -339,8 +356,8 @@ Thank you.
     });
   } catch (error: any) {
     return res.status(500).json({
-      ErrorMessage: "Internal server error",
-      error: error.message,
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
   function generateOpt(): string {
@@ -362,7 +379,7 @@ export const verifyStudentOtp = async (req: Request, res: Response) => {
     const result = await appSource.query(`
       SELECT TOP 1 Generate_Otp
       FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
-      WHERE studentId = ${studentId}
+      WHERE userId = ${studentId}
       ORDER BY id DESC
     `);
 
@@ -391,7 +408,6 @@ export const verifyStudentOtp = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(401).send({
-        IsSuccess: false,
         ErrorMessage: "Invalid OTP. Please try again",
       });
     }
@@ -402,15 +418,18 @@ export const verifyStudentOtp = async (req: Request, res: Response) => {
       Message: `OTP verified successfully for Student - studentID :${studentId} -`,
     };
     await InsertLog(logsPayload);
-    return res.status(200).send({
-      IsSuccess: true,
-      Message: "OTP verified successfully",
+    res.status(200).send({
+      IsSuccess: "OTP verified successfully",
     });
+    // Then delete the OTP from DB
+    await appSource.query(`
+      DELETE FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
+      WHERE userId = ${studentId} AND Generate_Otp = '${savedOtp}'
+    `);
   } catch (error: any) {
-    return res.status(500).send({
-      IsSuccess: false,
-      ErrorMessage: "Internal server error",
-      error: error.message,
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };
@@ -424,11 +443,18 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
         ErrorMessage: "StudentId and New Password required",
       });
     }
+    const encryptedPassword = encryptString(newPassword, "ABCXY123");
+    const encryptedConfirmPassword = encryptString(
+      confirmNewPassword,
+      "ABCXY123",
+    );
+
     await appSource.query(`
        UPDATE [${process.env.DB_NAME}].[dbo].[signup]
-  SET password = '${newPassword}', confirmPassword = '${confirmNewPassword}'
-  WHERE id = ${studentId}
+       SET password = '${encryptedPassword}', confirmPassword = '${encryptedConfirmPassword}'
+       WHERE id = ${studentId}
     `);
+
     const logsPayload: logsDto = {
       UserId: studentId,
       UserName: null,
@@ -438,8 +464,7 @@ export const resetStudentPassword = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
 
     return res.status(200).send({
-      IsSuccess: true,
-      message: "Password reset successfully",
+      IsSuccess: "Password reset successfully",
     });
   } catch (error) {
     const logsPayload: logsDto = {
@@ -463,13 +488,13 @@ export const userForgotPassword = async (req: Request, res: Response) => {
     const userRepository = appSource.getRepository(User);
 
     const user =
-      (await userRepository.findOneBy({ email:payload.emailOrPhone })) ||
-      (await userRepository.findOneBy({ phone:payload.emailOrPhone }));
+      (await userRepository.findOneBy({ email: payload.emailOrPhone })) ||
+      (await userRepository.findOneBy({ phone: payload.emailOrPhone }));
 
-      const email =user.email;
-      const phone = user.phone;
+    const email = user.email;
+    const phone = user.phone;
 
-   if (!email) {
+    if (!email) {
       return res.status(401).send({
         ErrorMessage: "user mail doesnt exist.",
       });
@@ -484,7 +509,7 @@ export const userForgotPassword = async (req: Request, res: Response) => {
 
     await appSource.query(`
       INSERT INTO [${process.env.DB_NAME}].[dbo].[generate_otp]
-      (studentId, Generate_Otp)
+      (userId, Generate_Otp)
       VALUES (${user.UserID}, ${GeneratedOtp})
     `);
 
@@ -509,7 +534,7 @@ Please use this OTP to reset your password.
       `,
     });
 
-     const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: user.UserID,
       UserName: user.userName,
       statusCode: 200,
@@ -517,12 +542,11 @@ Please use this OTP to reset your password.
     };
     await InsertLog(logsPayload);
     return res.status(200).send({
-      IsSuccess: true,
-      message: "OTP sent to registered email -",
+      IsSuccess: "OTP sent to registered email",
       userId: user.UserID,
     });
   } catch (error) {
-     return res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
       error: error instanceof Error ? error.message : error,
     });
@@ -536,7 +560,7 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
   const { userId, otp } = req.body;
 
   try {
-     if (!userId || !otp) {
+    if (!userId || !otp) {
       return res.status(400).send({
         IsSuccess: false,
         ErrorMessage: "userId and OTP are required",
@@ -545,11 +569,11 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
     const result = await appSource.query(`
       SELECT TOP 1 Generate_Otp
       FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
-      WHERE studentId = ${userId}
+      WHERE userId = ${userId}
       ORDER BY id DESC
     `);
 
-  if (result.length === 0) {
+    if (result.length === 0) {
       await InsertLog({
         UserId: userId,
         UserName: null,
@@ -578,21 +602,26 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
         ErrorMessage: "Invalid OTP. Please try again",
       });
     }
-     const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: userId,
       UserName: null,
       statusCode: 200,
       Message: `OTP verified successfully for user - userId :${userId} -`,
     };
     await InsertLog(logsPayload);
-    return res.status(200).send({
-      IsSuccess: true,
-      message: "OTP verified successfully -",
+    res.status(200).send({
+      IsSuccess: "OTP verified successfully.",
     });
+
+    // Then delete the OTP from DB
+    await appSource.query(`
+      DELETE FROM [${process.env.DB_NAME}].[dbo].[generate_otp]
+      WHERE userId = ${userId} AND Generate_Otp = '${savedOtp}'
+    `);
   } catch (error: any) {
-    return res.status(500).send({
-      ErrorMessage: "Internal server error",
-      error: error.message,
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : "Internal server error",
     });
   }
 };
@@ -605,13 +634,19 @@ export const resetUserPassword = async (req: Request, res: Response) => {
         ErrorMessage: "Passwords do not match",
       });
     }
+    const encryptedPassword = encryptString(newPassword, "ABCXY123");
+    const encryptedConfirmPassword = encryptString(
+      confirmNewPassword,
+      "ABCXY123",
+    );
 
+    // Update both password and confirmPassword
     await appSource.query(`
       UPDATE [${process.env.DB_NAME}].[dbo].[user]
-      SET password = '${newPassword}',confirmPassword ='${confirmNewPassword}'
+      SET password = '${encryptedPassword}', confirmPassword = '${encryptedConfirmPassword}'
       WHERE UserID = ${userId}
     `);
- const logsPayload: logsDto = {
+    const logsPayload: logsDto = {
       UserId: userId,
       UserName: null,
       statusCode: 200,
@@ -620,8 +655,7 @@ export const resetUserPassword = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
 
     return res.status(200).send({
-      IsSuccess: true,
-      message: "Password reset successfully",
+      IsSuccess: "Password reset Successfully",
     });
   } catch (error) {
     const logsPayload: logsDto = {
@@ -633,7 +667,7 @@ export const resetUserPassword = async (req: Request, res: Response) => {
     await InsertLog(logsPayload);
     return res.status(500).json({
       message: "Internal server error",
-      error: error instanceof Error ? error.message : error,
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 };

@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { Signup } from "./signup.model";
 import { InsertLog } from "../logs/logs.service";
 import { logsDto } from "../logs/logs.dto";
+import { encryptString } from "../shared/helper";
 export const addSignup = async (req: Request, res: Response) => {
   try {
     const payload: SignupDto = req.body;
@@ -55,6 +56,11 @@ export const addSignup = async (req: Request, res: Response) => {
         ErrorMessage: "Contact No Already Exist !! Please Another No",
       });
     }
+    payload.password = await encryptString(payload.password, "ABCXY123");
+    payload.confirmPassword = await encryptString(
+      payload.confirmPassword,
+      "ABCXY123",
+    );
     await signupRepository.save(payload);
     const logsPayload: logsDto = {
       UserId: 1,
@@ -101,7 +107,8 @@ export const getStudentCount = async (req: Request, res: Response) => {
     });
   } catch (error) {
     return res.status(500).json({
-      ErrorMessage: "Internal server error",
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };

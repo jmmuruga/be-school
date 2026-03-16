@@ -7,17 +7,19 @@ import {
   updateGroupMaster,
   updateGroupStatus,
 } from "./group.service";
+import { auth } from "../../shared/helper";
 
 const groupRouter = Router();
-groupRouter.post("/addGroup", (req, res) => addGroup(req, res));
-groupRouter.get("/getGroupId", (req, res) => getGroupId(req, res));
-groupRouter.get("/getGroupMasterDetails", (req, res) =>
+groupRouter.post("/addGroup", auth,(req, res) => addGroup(req, res));
+groupRouter.get("/getGroupId", auth,(req, res) => getGroupId(req, res));
+groupRouter.get("/getGroupMasterDetails",auth, (req, res) =>
   getGroupMasterDetails(req, res)
 );
-groupRouter.post("/updateGroupMaster", (req, res) =>
+groupRouter.post("/updateGroupMaster",auth, (req, res) =>
   updateGroupMaster(req, res)
 );
-groupRouter.delete("/deleteGroup/:Group_Id",(req,res) => deleteGroup(req,res));
+groupRouter.delete("/deleteGroup/:Group_Id",auth,(req,res) => deleteGroup(req,res));
+groupRouter.post("/updateGroupStatus",auth,(req,res) => updateGroupStatus(req,res));
+
 export default groupRouter;
-groupRouter.post("/updateGroupStatus",(req,res) => updateGroupStatus(req,res));
 

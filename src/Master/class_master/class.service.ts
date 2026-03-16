@@ -5,6 +5,11 @@ import { classMaster } from "./class.model";
 import { DataSource, Not } from "typeorm";
 import { logsDto } from "../../logs/logs.dto";
 import { InsertLog } from "../../logs/logs.service";
+import { Signup } from "../../Signup/signup.model";
+import { objectiveques } from "../../Question bank/objective-question/objective-question.model";
+import { Question } from "../../Question bank/question-prepare/questionpre.model";
+import { SubjectMaster } from "../subject_master/subject.model";
+import { GroupMaster } from "../group_master/group.model";
 
 export const addClass = async (req: Request, res: Response) => {
   const payload: ClassDto = req.body;
@@ -25,8 +30,11 @@ export const addClass = async (req: Request, res: Response) => {
     }
     // check data whether existing
     const classRepository = appSource.getRepository(classMaster);
-    const existingClass = await classRepository.findOneBy({
-      className: payload.className,
+    const existingClass = await classRepository.findOne({
+      where: {
+        className: payload.className,
+        isActive: true,
+      },
     });
 
     if (existingClass) {
@@ -42,8 +50,8 @@ export const addClass = async (req: Request, res: Response) => {
       });
     }
 
-const { loginUserName, ...data } = payload;
-await classRepository.save(data);
+    const { loginUserName, ...data } = payload;
+    await classRepository.save(data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -53,7 +61,6 @@ await classRepository.save(data);
     };
     await InsertLog(logsPayload);
     return res.status(200).json({ IsSuccess: "Class Added Successfully !!" });
-
   } catch (error) {
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -93,7 +100,6 @@ export const getClassId = async (req: Request, res: Response) => {
     });
   }
 };
-
 export const getClasMasterDetails = async (req: Request, res: Response) => {
   try {
     const classRepositry = appSource.getRepository(classMaster);
@@ -167,7 +173,7 @@ export const updateClassMaster = async (req: Request, res: Response) => {
     }
 
     const { loginUserName, ...data } = payload;
-await classRepository.update({ Class_Id: payload.Class_Id }, data);
+    await classRepository.update({ Class_Id: payload.Class_Id }, data);
 
     const logsPayload: logsDto = {
       UserId: Number(payload.created_UserId),
@@ -193,9 +199,9 @@ await classRepository.update({ Class_Id: payload.Class_Id }, data);
     });
   }
 };
-
 export const deleteClass = async (req: Request, res: Response) => {
   const Class_Id = Number(req.params.Class_Id);
+
   const { loginUserId, loginUserName } = req.body;
   try {
     if (isNaN(Class_Id)) {
@@ -209,35 +215,78 @@ export const deleteClass = async (req: Request, res: Response) => {
       return res.status(400).json({ ErrorMessage: "Invalid class code" });
     }
 
+    // const classRepository = appSource.getRepository(classMaster);
+    const signupRepository = appSource.getRepository(Signup);
+    const subjectRepository = appSource.getRepository(SubjectMaster);
+    const objectivequestionRepository = appSource.getRepository(objectiveques);
+    const questionRepository = appSource.getRepository(Question);
+    const groupRepository = appSource.getRepository(GroupMaster);
     const classRepository = appSource.getRepository(classMaster);
     //  check whether exist code
-    const existingClass = await classRepository.findOneBy({
-      Class_Id: Class_Id,
+
+    // const existingClass = await classRepository.findOneBy({
+    //   Class_Id: Class_Id,
+    // });
+    const signupUsed = await signupRepository.findOneBy({
+      Class_Id: Class_Id.toString(),
+    });
+    const groupUsed = await groupRepository.findOneBy({
+      className_Id: Class_Id.toString(),
+    });
+    const subjectUsed = await subjectRepository
+      .createQueryBuilder("subject")
+      .where("subject.selectedClasses LIKE :clsId1", {
+        clsId1: `${Class_Id},%`,
+      })
+      .orWhere("subject.selectedClasses LIKE :clsId2", {
+        clsId2: `%,${Class_Id},%`,
+      })
+      .orWhere("subject.selectedClasses LIKE :clsId3", {
+        clsId3: `%,${Class_Id}`,
+      })
+      .orWhere("subject.selectedClasses = :clsId4", { clsId4: `${Class_Id}` })
+      .getOne();
+
+    const objectiveUsed = await objectivequestionRepository.findOneBy({
+      ClassName_Id: Class_Id.toString(),
     });
 
-    if (!existingClass) {
+    const questionUsed = await questionRepository.findOneBy({
+      ClassName_Id: Class_Id.toString(),
+    });
+
+    if (
+      signupUsed ||
+      subjectUsed ||
+      objectiveUsed ||
+      questionUsed ||
+      groupUsed
+    ) {
       const logsPayload: logsDto = {
         UserId: loginUserId,
         UserName: loginUserName,
         statusCode: 500,
-        Message: `ClassMaster - Class_Id: ${existingClass.Class_Id}, className: ${existingClass.className} not found by - `,
+        Message: `ClassMaster - Class_Id: ${Class_Id} unable to delete (Already used) by - `,
       };
+
       await InsertLog(logsPayload);
-      return res.status(404).json({ ErrorMessage: "Class not found" });
+      return res.status(400).json({
+        ErrorMessage: "Unable to delete Class.",
+      });
     }
     // delete and active
     await classRepository
       .createQueryBuilder()
       .update(classMaster)
       .set({ isActive: false })
-      .where({ Class_Id: Class_Id })
+      .where("Class_Id = :Class_Id", { Class_Id: Class_Id })
       .execute();
 
     const logsPayload: logsDto = {
       UserId: loginUserId,
       UserName: loginUserName,
       statusCode: 200,
-      Message: `Deleted ClassMaster Class_Id:${Class_Id} classname:  ${existingClass.className} By - `,
+      Message: `Deleted ClassMaster Class_Id:${Class_Id} By - `,
     };
     await InsertLog(logsPayload);
 
@@ -273,6 +322,22 @@ export const updateStatusClass = async (req: Request, res: Response) => {
       };
       await InsertLog(logsPayload);
       return res.status(404).json({ ErrorMessage: "Class not found" });
+    }
+    const subjectRepository = appSource.getRepository(SubjectMaster);
+    const existsubjectUsed = await subjectRepository.findOneBy({
+      selectedClasses: payload.Class_Id.toString(),
+    });
+    if (!existsubjectUsed) {
+      const logsPayload: logsDto = {
+        UserId: payload.loginUserId,
+        UserName: payload.loginUserName,
+        statusCode: 500,
+        Message: `Unable to inactive Status  Class_Id ${payload.Class_Id} by - `,
+      };
+      await InsertLog(logsPayload);
+      return res
+        .status(404)
+        .json({ ErrorMessage: "Class to Inactive tha status " });
     }
     await classRepository
       .createQueryBuilder()

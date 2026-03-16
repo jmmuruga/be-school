@@ -9,7 +9,7 @@ export class Generate_Otp {
   @PrimaryGeneratedColumn()
   Id: number;
   @Column()
-  studentId: number;
+  userId: number;
   @Column()
   Generate_Otp: number;
   @CreateDateColumn({ name: "created_at" })

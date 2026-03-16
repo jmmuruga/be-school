@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { forgotPassword, getStudentId, logout, resetStudentPassword, resetUserPassword, signIn, StudentSignIn, userForgotPassword, verifyStudentOtp, verifyUserOtp } from "./sign-in.service";
+import { auth } from "../shared/helper";
 const signInRouter = Router();
 signInRouter.post('/signIn',(req,res)=>signIn(req,res));
 signInRouter.post('/StudentSignIn',(req,res)=>StudentSignIn(req,res));
-signInRouter.get('/getStudentId/:id', (req, res) => getStudentId(req, res));
+signInRouter.get('/getStudentId/:id',auth,(req, res) => getStudentId(req, res));
 signInRouter.post('/logout/', (req, res) => logout(req, res));
 signInRouter.post('/forgot-password',(req,res)=>forgotPassword(req,res));
 signInRouter.post('/verifyStudentOtp',(req,res)=>verifyStudentOtp(req,res));
