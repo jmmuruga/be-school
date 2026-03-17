@@ -1,8 +1,6 @@
 import "dotenv/config";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-
-// 1. Double check these import names match the 'export class X' in each file
 import { GroupMaster } from "../../Master/group_master/group.model";
 import { classMaster } from "../../Master/class_master/class.model";
 import { SchoolMaster } from "../../Master/school_master/school.model";
@@ -21,32 +19,51 @@ import { UserRight } from "../../User-Rights/user-rights.model";
 import { studentScoreResult } from "../../Student-Result/student-result.model";
 import { logs } from "../../logs/logs.model";
 import { Generate_Otp } from "../../Generate_Otp/generate_otp.model";
+// import { studentexamReport } from "../../student-exam-report/student-exam-report.model";
 import { studentexamReport } from "../../student-exam-report/student-exam-report.model";
-const Entities : any = [classMaster , GroupMaster,SchoolMaster,MarkMaster,StreamMaster,SubjectMaster,User,Staff,Signup,objectiveques,
-    Quesgenerate,SignIn,Question,onlinetest,UserRight,studentScoreResult,logs,Generate_Otp,studentexamReport
-]
+const Entities: any = [
+  classMaster,
+  GroupMaster,
+  SchoolMaster,
+  MarkMaster,
+  StreamMaster,
+  SubjectMaster,
+  User,
+  Staff,
+  Signup,
+  objectiveques,
+  Quesgenerate,
+  SignIn,
+  Question,
+  onlinetest,
+  UserRight,
+  studentScoreResult,
+  logs,
+  Generate_Otp,
+  studentexamReport,
+];
 
 export const appSource = new DataSource({
   type: "mssql",
-  host: process.env.DB_SERVER, 
-  port: parseInt(process.env.DB_PORT || "1436"), 
-  username: process.env.DB_USER, 
+  host: process.env.DB_SERVER_HOST,
+  port: parseInt(process.env.DB_PORT as string),
+  username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   entities: Entities,
-  synchronize: false, 
+  synchronize: true,
   logging: false,
   options: {
-    encrypt: false, 
+    encrypt: false,
     trustServerCertificate: true,
   },
   extra: {
     trustServerCertificate: true,
-    requestTimeout: 60000
+    requestTimeout: 60000,
   },
 });
 
 appSource
   .initialize()
-  .then(() => console.log("SQL Server Connected"))
+  .then((res) => console.log("SQL Server Connected"))
   .catch((error) => console.log(error, "Error while connecting to DB"));
